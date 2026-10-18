@@ -72,6 +72,7 @@ canvas{width:100%;max-width:420px;height:auto;border-radius:12px;box-shadow:0 10
   <h2>3. ఇతర నాయకుల ఫోటోలు (ఐచ్ఛికం)</h2>
   <label>పై వరుసలో (గరిష్టంగా 8)</label><input type="file" id="top" accept="image/*" multiple>
   <label>పేరు ప్లేట్ పక్కన నాయకుడి ఫోటో</label><input type="file" id="bot" accept="image/*">
+  <label>మరో ఫోటో (ఐచ్ఛికం)</label><input type="file" id="extra" accept="image/*">
 
 
   <div class="btns">
@@ -87,7 +88,7 @@ const W=840,H=1200,cv=document.getElementById('c'),x=cv.getContext('2d');
 const $=id=>document.getElementById(id);
 const FONT="'Noto Sans Telugu',sans-serif";
 const THEMES=[['#f97316','#9a3412','#7c2d12'],['#dc2626','#991b1b','#450a0a'],['#7c3aed','#5b21b6','#2e1065'],['#16a34a','#166534','#052e16'],['#2563eb','#1e40af','#172554']];
-let th=0,imgs={main:null,logo:null,top:[],bot:[]};let EXPORT=false;
+let th=0,imgs={main:null,logo:null,top:[],bot:[],extra:null};let EXPORT=false;
 var CONES=[null,null,null];['cone_alt1','cone_main','cone_alt2'].forEach(function(n,i){var im=new Image();im.onload=function(){draw()};im.src='assets/img/'+n+'.png';CONES[i]=im});
 THEMES.forEach((t,i)=>{const b=document.createElement('button');b.style.background=`linear-gradient(135deg,${t[0]},${t[2]})`;b.onclick=()=>{th=i;mark();draw()};$('themes').appendChild(b)});
 function mark(){[...$('themes').children].forEach((b,i)=>b.classList.toggle('on',i==th))}
@@ -98,6 +99,7 @@ $('logo').onchange=async e=>{imgs.logo=e.target.files[0]?await load(e.target.fil
 
 $('top').onchange=async e=>{imgs.top=(await Promise.all([...e.target.files].slice(0,8).map(load))).filter(Boolean);draw()};
 $('bot').onchange=async e=>{imgs.bot=e.target.files[0]?[await load(e.target.files[0])].filter(Boolean):[];draw()};
+$('extra').onchange=async e=>{imgs.extra=e.target.files[0]?await load(e.target.files[0]):null;draw()};
 ['tpl','t1','t2','name','role'].forEach(id=>$(id).oninput=()=>{$('cust').style.display=$('tpl').value.startsWith('custom')?'block':'none';if(id=='tpl'){const p=$('tpl').value.split('|');if(p[3]!==undefined){th=+p[3];mark()}}draw()});
 
 function cover(img,dx,dy,dw,dh){const s=Math.max(dw/img.width,dh/img.height),w=img.width*s,h=img.height*s;x.drawImage(img,dx+(dw-w)/2,dy+(dh-h)/4,w,h)}
@@ -166,6 +168,7 @@ function draw(){
         let r2=20;x.font=`600 ${r2}px ${FONT}`;while(r2>13&&(x.measureText(ra).width>TW||x.measureText(rb).width>TW)){r2--;x.font=`600 ${r2}px ${FONT}`}
         x.strokeText(ra,TCX,1078,TW);x.fillText(ra,TCX,1078,TW);x.strokeText(rb,TCX,1106,TW);x.fillText(rb,TCX,1106,TW)}}
     circ(imgs.bot[0]||null,758,1062,54)}
+  if(imgs.extra)circ(imgs.extra,210,790,85);
   // logo
   if(imgs.logo){const r=110,s=Math.min(r/imgs.logo.width,r/imgs.logo.height);x.fillStyle='#fff';x.beginPath();x.arc(90,1090,56,0,7);x.fill();x.drawImage(imgs.logo,90-imgs.logo.width*s/2,1090-imgs.logo.height*s/2,imgs.logo.width*s,imgs.logo.height*s)}
 }
