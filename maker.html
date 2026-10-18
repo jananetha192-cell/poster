@@ -71,12 +71,8 @@ canvas{width:100%;max-width:420px;height:auto;border-radius:12px;box-shadow:0 10
 
   <h2>3. ఇతర నాయకుల ఫోటోలు (ఐచ్ఛికం)</h2>
   <label>పై వరుసలో (గరిష్టంగా 8)</label><input type="file" id="top" accept="image/*" multiple>
-  <label>కింద వరుసలో (గరిష్టంగా 3)</label><input type="file" id="bot" accept="image/*" multiple>
+  <label>పేరు ప్లేట్ పక్కన నాయకుడి ఫోటో</label><input type="file" id="bot" accept="image/*">
 
-  <h2>4. నినాదం</h2>
-  <input type="text" id="slogan" value="ప్రజల కోసం • ప్రగతి కోసం">
-  <label>చివరి లైన్</label>
-  <input type="text" id="tag" value="ఒక్కటే మా ధ్యేయం - అభివృద్ధి">
 
   <div class="btns">
     <button id="dl">⬇️ డౌన్‌లోడ్</button>
@@ -101,8 +97,8 @@ $('main').onchange=async e=>{imgs.main=e.target.files[0]?await load(e.target.fil
 $('logo').onchange=async e=>{imgs.logo=e.target.files[0]?await load(e.target.files[0]):null;draw()};
 
 $('top').onchange=async e=>{imgs.top=(await Promise.all([...e.target.files].slice(0,8).map(load))).filter(Boolean);draw()};
-$('bot').onchange=async e=>{imgs.bot=(await Promise.all([...e.target.files].slice(0,3).map(load))).filter(Boolean);draw()};
-['tpl','t1','t2','name','role','slogan','tag'].forEach(id=>$(id).oninput=()=>{$('cust').style.display=$('tpl').value.startsWith('custom')?'block':'none';if(id=='tpl'){const p=$('tpl').value.split('|');if(p[3]!==undefined){th=+p[3];mark()}}draw()});
+$('bot').onchange=async e=>{imgs.bot=e.target.files[0]?[await load(e.target.files[0])].filter(Boolean):[];draw()};
+['tpl','t1','t2','name','role'].forEach(id=>$(id).oninput=()=>{$('cust').style.display=$('tpl').value.startsWith('custom')?'block':'none';if(id=='tpl'){const p=$('tpl').value.split('|');if(p[3]!==undefined){th=+p[3];mark()}}draw()});
 
 function cover(img,dx,dy,dw,dh){const s=Math.max(dw/img.width,dh/img.height),w=img.width*s,h=img.height*s;x.drawImage(img,dx+(dw-w)/2,dy+(dh-h)/4,w,h)}
 function circ(img,cx,cy,r,ring){if(!img&&EXPORT)return;x.save();x.beginPath();x.arc(cx,cy,r,0,7);x.fillStyle='rgba(255,215,90,.85)';x.fill();x.beginPath();x.arc(cx,cy,r-5,0,7);x.clip();if(img)cover(img,cx-r,cy-r,2*r,2*r);else{x.fillStyle='#fde68a';x.fillRect(cx-r,cy-r,2*r,2*r);x.fillStyle='#b45309';x.beginPath();x.arc(cx,cy-r*.2,r*.32,0,7);x.fill();x.beginPath();x.ellipse(cx,cy+r*.85,r*.65,r*.5,0,0,7);x.fill()}x.restore()}
@@ -115,7 +111,7 @@ function decor(k){
  const star=(px,py,r,c)=>{x.fillStyle=c;x.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,q=i%2?r*.45:r;x.lineTo(px+q*Math.cos(a),py+q*Math.sin(a))}x.closePath();x.fill()};
  const lotus=(px,py,s)=>{for(let i=-2;i<=2;i++){x.save();x.translate(px,py);x.rotate(i*.4);el(0,-s*.6,s*.25,s*.6,i%2?'#f9a8d4':'#ec4899');x.restore()}};
  const wheel=(px,py,r,c)=>{x.strokeStyle=c;x.lineWidth=Math.max(2,r/10);x.beginPath();x.arc(px,py,r,0,7);x.stroke();x.lineWidth=Math.max(1,r/25);for(let i=0;i<24;i++){const a=i*Math.PI/12;x.beginPath();x.moveTo(px,py);x.lineTo(px+r*Math.cos(a),py+r*Math.sin(a));x.stroke()}};
- if(k=='bathu'){[[120,170,CONES[0]],[310,230,CONES[1]],[560,170,CONES[2]]].forEach(function(sp){var cx=sp[0],h=sp[1],im=sp[2];if(im&&im.complete&&im.naturalWidth){var w=h*im.naturalWidth/im.naturalHeight;x.drawImage(im,cx-w/2,1005-h,w,h)}})}
+ if(k=='bathu'){[[120,170,CONES[0]],[310,230,CONES[1]],[560,170,CONES[2]]].forEach(function(sp){var cx=sp[0],h=sp[1],im=sp[2];if(im&&im.complete&&im.naturalWidth){var w=h*im.naturalWidth/im.naturalHeight;x.drawImage(im,cx-w/2,1080-h,w,h)}})}
  else if(k=='bonalu'){[[170,990],[430,960],[690,990]].forEach(([px,py],i)=>{const s=i==1?120:90;el(px,py,s*.8,s*.7,'#c2410c');el(px,py-s*.7,s*.45,s*.2,'#ea580c');el(px,py-s*.9,s*.55,s*.1,'#fbbf24');el(px-s*.4,py-s*.95,s*.25,s*.08,'#16a34a');el(px+s*.4,py-s*.95,s*.25,s*.08,'#16a34a');diya(px,py-s*1.0,s*.3);for(let j=0;j<5;j++)el(px-s*.5+j*s*.25,py-s*.15,6,6,'#fde047')})}
  else if(k=='ganesh'){lotus(430,1000,140);diya(200,1000,55);diya(660,1000,55);star(430,880,18,'#fde047')}
  else if(k=='diya'){[[120,1010,40],[250,990,55],[430,975,80],[610,990,55],[740,1010,40]].forEach(([px,py,s])=>diya(px,py,s));for(let i=0;i<14;i++)star(40+i*58,800+(i%3)*30,6+(i%2)*4,'rgba(253,224,71,.8)')}
@@ -160,20 +156,18 @@ function draw(){
   decor(D);
   // name
   const nm=$('name').value||'మీ పేరు',rl=$('role').value||'పదవి, ప్రాంతం';
-  if(nm||rl){x.fillStyle='rgba(0,0,0,.45)';x.fillRect(W*.5-50,716,W*.5+30,124);
-    if(nm){let ns=46;x.font=`800 ${ns}px ${FONT}`;while(ns>26&&x.measureText(nm).width>W*.5){ns-=2;x.font=`800 ${ns}px ${FONT}`}ctext(nm,W*.75-25,762,ns,'#fff',W*.5)}
+  if(nm||rl){x.fillStyle='rgba(0,0,0,.45)';x.fillRect(W*.5-50,716,W-28-(W*.5-50),124);
+    const TW=306,TCX=533;
+    if(nm){let ns=46;x.font=`800 ${ns}px ${FONT}`;while(ns>22&&x.measureText(nm).width>TW){ns-=2;x.font=`800 ${ns}px ${FONT}`}ctext(nm,TCX,762,ns,'#fff',TW)}
     if(rl){x.textAlign='center';x.lineWidth=3;x.strokeStyle='rgba(0,0,0,.5)';x.fillStyle='#fde68a';
-      let rs=24;x.font=`600 ${rs}px ${FONT}`;while(rs>18&&x.measureText(rl).width>W*.5){rs--;x.font=`600 ${rs}px ${FONT}`}
-      if(x.measureText(rl).width<=W*.5){x.strokeText(rl,W*.75-25,808,W*.5);x.fillText(rl,W*.75-25,808,W*.5)}
+      let rs=24;x.font=`600 ${rs}px ${FONT}`;while(rs>16&&x.measureText(rl).width>TW){rs--;x.font=`600 ${rs}px ${FONT}`}
+      if(x.measureText(rl).width<=TW){x.strokeText(rl,TCX,808,TW);x.fillText(rl,TCX,808,TW)}
       else{const ws=rl.split(' '),m=Math.ceil(ws.length/2),ra=ws.slice(0,m).join(' '),rb=ws.slice(m).join(' ');
-        let r2=20;x.font=`600 ${r2}px ${FONT}`;while(r2>14&&(x.measureText(ra).width>W*.5||x.measureText(rb).width>W*.5)){r2--;x.font=`600 ${r2}px ${FONT}`}
-        x.strokeText(ra,W*.75-25,794,W*.5);x.fillText(ra,W*.75-25,794,W*.5);x.strokeText(rb,W*.75-25,822,W*.5);x.fillText(rb,W*.75-25,822,W*.5)}}}
-  // bottom leaders (as the user arranged them)
-  (imgs.bot.length?imgs.bot.slice(0,3):[null,null,null]).forEach((im,i)=>circ(im,W-268+i*95,1010,44));
+        let r2=20;x.font=`600 ${r2}px ${FONT}`;while(r2>13&&(x.measureText(ra).width>TW||x.measureText(rb).width>TW)){r2--;x.font=`600 ${r2}px ${FONT}`}
+        x.strokeText(ra,TCX,794,TW);x.fillText(ra,TCX,794,TW);x.strokeText(rb,TCX,822,TW);x.fillText(rb,TCX,822,TW)}}
+    circ(imgs.bot[0]||null,758,778,54)}
   // logo
   if(imgs.logo){const r=110,s=Math.min(r/imgs.logo.width,r/imgs.logo.height);x.fillStyle='#fff';x.beginPath();x.arc(90,1090,56,0,7);x.fill();x.drawImage(imgs.logo,90-imgs.logo.width*s/2,1090-imgs.logo.height*s/2,imgs.logo.width*s,imgs.logo.height*s)}
-  x.fillStyle='rgba(0,0,0,.35)';x.fillRect(160,1090,W-180,88);ctext($('slogan').value,W/2,1128,32,'#fff');
-  ctext($('tag').value,W/2,1172,38,'#fde68a');
 }
 document.fonts.load(`800 40px 'Noto Sans Telugu'`,'అ').then(draw);draw();
 function blob(){EXPORT=true;draw();return new Promise(r=>cv.toBlob(b=>{EXPORT=false;draw();r(b)},'image/png'))}
