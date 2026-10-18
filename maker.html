@@ -160,11 +160,16 @@ function draw(){
   decor(D);
   // name
   const nm=$('name').value||'మీ పేరు',rl=$('role').value||'పదవి, ప్రాంతం';
-  if(nm||rl){x.fillStyle='rgba(0,0,0,.45)';x.fillRect(W*.5-50,716,W*.5+30,110);
-    if(nm){let ns=46;x.font=`800 ${ns}px ${FONT}`;while(ns>26&&x.measureText(nm).width>W*.5){ns-=2;x.font=`800 ${ns}px ${FONT}`}ctext(nm,W*.75-25,764,ns,'#fff',W*.5)}
-    if(rl){let rs=25;x.font=`600 ${rs}px ${FONT}`;while(rs>16&&x.measureText(rl).width>W*.5){rs--;x.font=`600 ${rs}px ${FONT}`}x.textAlign='center';x.lineWidth=3;x.strokeStyle='rgba(0,0,0,.5)';x.strokeText(rl,W*.75-25,804,W*.5);x.fillStyle='#fde68a';x.fillText(rl,W*.75-25,804,W*.5)}}
+  if(nm||rl){x.fillStyle='rgba(0,0,0,.45)';x.fillRect(W*.5-50,716,W*.5+30,124);
+    if(nm){let ns=46;x.font=`800 ${ns}px ${FONT}`;while(ns>26&&x.measureText(nm).width>W*.5){ns-=2;x.font=`800 ${ns}px ${FONT}`}ctext(nm,W*.75-25,762,ns,'#fff',W*.5)}
+    if(rl){x.textAlign='center';x.lineWidth=3;x.strokeStyle='rgba(0,0,0,.5)';x.fillStyle='#fde68a';
+      let rs=24;x.font=`600 ${rs}px ${FONT}`;while(rs>18&&x.measureText(rl).width>W*.5){rs--;x.font=`600 ${rs}px ${FONT}`}
+      if(x.measureText(rl).width<=W*.5){x.strokeText(rl,W*.75-25,808,W*.5);x.fillText(rl,W*.75-25,808,W*.5)}
+      else{const ws=rl.split(' '),m=Math.ceil(ws.length/2),ra=ws.slice(0,m).join(' '),rb=ws.slice(m).join(' ');
+        let r2=20;x.font=`600 ${r2}px ${FONT}`;while(r2>14&&(x.measureText(ra).width>W*.5||x.measureText(rb).width>W*.5)){r2--;x.font=`600 ${r2}px ${FONT}`}
+        x.strokeText(ra,W*.75-25,794,W*.5);x.fillText(ra,W*.75-25,794,W*.5);x.strokeText(rb,W*.75-25,822,W*.5);x.fillText(rb,W*.75-25,822,W*.5)}}}
   // bottom leaders (as the user arranged them)
-  (imgs.bot.length?imgs.bot.slice(0,3):[null,null,null]).forEach((im,i)=>circ(im,W-210+i*95,1010,44));
+  (imgs.bot.length?imgs.bot.slice(0,3):[null,null,null]).forEach((im,i)=>circ(im,W-268+i*95,1010,44));
   // logo
   if(imgs.logo){const r=110,s=Math.min(r/imgs.logo.width,r/imgs.logo.height);x.fillStyle='#fff';x.beginPath();x.arc(90,1090,56,0,7);x.fill();x.drawImage(imgs.logo,90-imgs.logo.width*s/2,1090-imgs.logo.height*s/2,imgs.logo.width*s,imgs.logo.height*s)}
   x.fillStyle='rgba(0,0,0,.35)';x.fillRect(160,1090,W-180,88);ctext($('slogan').value,W/2,1128,32,'#fff');
