@@ -1,0 +1,16 @@
+{
+  "name": "జననేత - పోస్టర్ మేకర్",
+  "short_name": "జననేత",
+  "description": "మీ ఫోటో + మీ పేరుతో పండుగ, జయంతి పోస్టర్లు తయారుచేసే తెలుగు యాప్",
+  "lang": "te",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff7ec",
+  "theme_color": "#f6871f",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}
+  ]
+}
