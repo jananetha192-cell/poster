@@ -250,8 +250,8 @@ function draw(){
   else if(!EXPORT){x.strokeStyle='rgba(255,255,255,.55)';x.lineWidth=S(3);x.setLineDash([S(12),S(9)]);rr(mx+X(24),my+Y(46),mw-X(48),mh-Y(54),S(22));x.stroke();x.setLineDash([]);x.fillStyle='rgba(255,255,255,.8)';x.font=`600 ${S(26)}px ${FONT}`;x.textAlign='center';x.fillText('మీ ఫోటో',mx+mw/2,my+mh/2)}
   // name + role inside the bar, centred between lotus and photo
   const nm=$('name').value,rl=$('role').value,zl=lcx+lr+S(16),zr=mx-S(14),zc=(zl+zr)/2,TW=zr-zl;
-  const N=wrapFit(nm,TW,S(50),800,2,S(20)),R=wrapFit(rl,TW,S(27),600,2,S(13));
-  const nlh=N.q*1.3,rlh=R.q*1.35,gapY=S(14);
+  const N=wrapFit(nm,TW,S(44),800,1,S(18)),R=wrapFit(rl,TW,S(24),600,2,S(13));
+  const nlh=N.q*1.32,rlh=R.q*1.35,gapY=S(12);
   const tot=N.L.length*nlh+(rl&&nm?gapY:0)+R.L.length*rlh;
   let yy=barTop+(barH-tot)/2;
   x.textAlign='center';
