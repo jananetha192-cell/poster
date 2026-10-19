@@ -97,7 +97,7 @@ details.sec[open]>summary::before{content:'▾ '}
   <details open class="sec"><summary>3. ఇతర నాయకుల ఫోటోలు (ఐచ్ఛికం)</summary><div>
   <label>పై వరుసలో (గరిష్టంగా 8) – పెట్టకపోతే మోదీ, అమిత్ షా, నడ్డా, బండి సంజయ్, కిషన్ రెడ్డి</label><input type="file" id="top" accept="image/*" multiple>
   <label>మీ ఫోటో పక్కన చిన్న ఫోటో (ఐచ్ఛికం)</label><input type="file" id="bot" accept="image/*">
-  <label>పండుగ ఫోటో (ఐచ్ఛికం – ఎడమ చట్రంలో వస్తుంది)</label><input type="file" id="extra" accept="image/*">
+  <label>పండుగ ఫోటో (ఐచ్ఛికం – మధ్య చట్రంలో వస్తుంది)</label><input type="file" id="extra" accept="image/*">
 
   <div id="padj" style="display:none">
     <h2>4. ఫోటో సర్దుబాటు (జూమ్ / జరపండి)</h2>
@@ -230,11 +230,14 @@ function draw(){
   const s1=fitOne(a,S(118)*ts,tw,800);ctext(a,W/2,Y(318),s1,tc,tw);
   const s2=fitOne(b,S(70)*ts,tw,800);ctext(b,W/2,Y(412),s2,'#fff7e0',tw);
   // framed festival photo (left)
-  const fx=X(50),fy=Y(470),fw=X(410),fh=Y(540);
+  const fw=X(620),fh=Y(560),fx=(W-fw)/2,fy=Y(445);
   const fimg=imgs.extra||(D=='durga'?DURGA:null);
-  if(fimg){x.save();rr(fx,fy,fw,fh,S(26));x.clip();cover(fimg,fx,fy,fw,fh,imgs.extra?adj.extra:null);x.restore()}
+  x.save();rr(fx,fy,fw,fh,S(26));x.clip();
+  if(fimg){x.fillStyle='#f6e7c8';x.fillRect(fx,fy,fw,fh);const ad=imgs.extra?adj.extra:{z:1,dx:0,dy:0},pd=S(24),sc=Math.min((fw-pd*2)/fimg.width,(fh-pd*2)/fimg.height)*ad.z,w2=fimg.width*sc,h2=fimg.height*sc;x.drawImage(fimg,fx+(fw-w2)/2+S(ad.dx),fy+(fh-h2)/2+S(ad.dy),w2,h2)}
   else frameDecor(D,fx,fy,fw,fh);
+  x.restore();
   x.strokeStyle=GOLD;x.lineWidth=S(5);rr(fx,fy,fw,fh,S(26));x.stroke();
+  x.strokeStyle='rgba(180,130,30,.55)';x.lineWidth=S(2);rr(fx+S(10),fy+S(10),fw-S(20),fh-S(20),S(18));x.stroke();
   // full-width navy name bar at the bottom with BJP lotus (layout from Srinivas's 2026-10-19 mock)
   const barH=Y(180),barTop=H-barH;
   x.fillStyle='#1c2060';x.fillRect(0,barTop,W,barH);
@@ -250,7 +253,7 @@ function draw(){
   else if(!EXPORT){x.strokeStyle='rgba(255,255,255,.55)';x.lineWidth=S(3);x.setLineDash([S(12),S(9)]);rr(mx+X(24),my+Y(46),mw-X(48),mh-Y(54),S(22));x.stroke();x.setLineDash([]);x.fillStyle='rgba(255,255,255,.8)';x.font=`600 ${S(26)}px ${FONT}`;x.textAlign='center';x.fillText('మీ ఫోటో',mx+mw/2,my+mh/2)}
   // name + role inside the bar, centred between lotus and photo
   const nm=$('name').value,rl=$('role').value,zl=lcx+lr+S(16),zr=mx-S(14),zc=(zl+zr)/2,TW=zr-zl;
-  const N=wrapFit(nm,TW,S(44),800,1,S(18)),R=wrapFit(rl,TW,S(24),600,2,S(13));
+  const N=wrapFit(nm,TW,S(44),800,1,S(18)),R=wrapFit(rl,TW,S(24),600,1,S(10));
   const nlh=N.q*1.32,rlh=R.q*1.35,gapY=S(12);
   const tot=N.L.length*nlh+(rl&&nm?gapY:0)+R.L.length*rlh;
   let yy=barTop+(barH-tot)/2;
