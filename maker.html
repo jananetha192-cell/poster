@@ -29,13 +29,19 @@ input[type=file]{width:100%;font-size:12px;color:var(--mu)}
 .pv{text-align:center}
 canvas{width:100%;max-width:420px;height:auto;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
 .note{font-size:12px;color:var(--mu);margin-top:8px}
+details.sec{margin:6px 0}
+details.sec>summary{font-size:15px;font-weight:700;color:var(--pr);cursor:pointer;padding:6px 2px;list-style:none}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary::before{content:'▸ ';font-size:13px}
+details.sec[open]>summary::before{content:'▾ '}
+.btns button{min-width:0;padding:12px 8px}
 </style>
 </head>
 <body>
 <header><h1>జననేత</h1><p>మీ సొంత పోస్టర్ నిమిషాల్లో తయారు చేసుకోండి</p></header>
 <main>
 <div class="card">
-  <h2>1. పోస్టర్ రకం</h2>
+  <details open class="sec"><summary>1. పోస్టర్ రకం</summary><div>
   <select id="tpl">
     <optgroup label="హిందూ పండుగలు">
       <option value="సద్దుల బతుకమ్మ|శుభాకాంక్షలు|bathu|0">సద్దుల బతుకమ్మ</option>
@@ -78,13 +84,15 @@ canvas{width:100%;max-width:420px;height:auto;border-radius:12px;box-shadow:0 10
 
   
 
-  <h2>2. మీ వివరాలు</h2>
+  </div></details>
+  <details open class="sec"><summary>2. మీ వివరాలు</summary><div>
   <label>మీ ఫోటో (ప్రధాన)</label><input type="file" id="main" accept="image/*">
   <label>మీ పేరు</label><input type="text" id="name" placeholder="ఉదా: రామారావు">
   <label>పదవి / ప్రాంతం</label><input type="text" id="role" placeholder="ఉదా: జిల్లా అధ్యక్షులు, కరీంనగర్">
   <label>పార్టీ లోగో</label><input type="file" id="logo" accept="image/*">
 
-  <h2>3. ఇతర నాయకుల ఫోటోలు (ఐచ్ఛికం)</h2>
+  </div></details>
+  <details open class="sec"><summary>3. ఇతర నాయకుల ఫోటోలు (ఐచ్ఛికం)</summary><div>
   <label>పై వరుసలో (గరిష్టంగా 8)</label><input type="file" id="top" accept="image/*" multiple>
   <label>పేరు ప్లేట్ పక్కన నాయకుడి ఫోటో</label><input type="file" id="bot" accept="image/*">
   <label>మరో ఫోటో (ఐచ్ఛికం)</label><input type="file" id="extra" accept="image/*">
@@ -99,7 +107,11 @@ canvas{width:100%;max-width:420px;height:auto;border-radius:12px;box-shadow:0 10
   </div>
 
 
+  </div></details>
   <div class="btns">
+    <button id="undo" type="button" aria-label="వెనక్కి">↩️ వెనక్కి</button>
+    <button id="redo" type="button" aria-label="ముందుకు">↪️ ముందుకు</button>
+    <button id="rst" type="button" style="background:#dc2626">🔄 రీసెట్</button>
     <button id="dl">⬇️ డౌన్‌లోడ్</button>
     <button id="sh" class="g">📤 షేర్</button>
   </div>
@@ -116,20 +128,33 @@ const FONT="'Noto Sans Telugu',sans-serif";
 const THEMES=[['#f97316','#9a3412','#7c2d12'],['#dc2626','#991b1b','#450a0a'],['#7c3aed','#5b21b6','#2e1065'],['#16a34a','#166534','#052e16'],['#2563eb','#1e40af','#172554']];
 let th=0,imgs={main:null,logo:null,top:[],bot:[],extra:null};let EXPORT=false;
 let adj={main:{z:1.05,dx:0,dy:0},top:{},bot:{z:1,dx:0,dy:0},extra:{z:1,dx:0,dy:0}};
+let HIST=[],HI=-1,SUPPRESS=false;
+function snap(){if(SUPPRESS)return;const st={tpl:$('tpl').value,t1:$('t1').value,t2:$('t2').value,tsize:$('tsize').value,tcol:$('tcol').value,tout:$('tout').checked,th,sz:$('sz').value,name:$('name').value,role:$('role').value,adj:JSON.parse(JSON.stringify(adj))};
+  const s=JSON.stringify(st);if(HIST[HI]&&JSON.stringify(HIST[HI])==s)return;
+  HIST=HIST.slice(0,HI+1);HIST.push(st);if(HIST.length>60)HIST.shift();HI=HIST.length-1;urMark()}
+function applyState(st){SUPPRESS=true;$('tpl').value=st.tpl;$('t1').value=st.t1;$('t2').value=st.t2;$('tsize').value=st.tsize;$('tcol').value=st.tcol;$('tout').checked=st.tout;th=st.th;$('sz').value=st.sz;$('name').value=st.name;$('role').value=st.role;adj=JSON.parse(JSON.stringify(st.adj));
+  const p=$('sz').value.split('x').map(Number);W=p[0];H=p[1];mark();SUPPRESS=false;draw()}
+function urMark(){$('undo').disabled=HI<=0;$('redo').disabled=HI>=HIST.length-1}
+function changed(){draw();snap()}
+$('undo').onclick=()=>{if(HI>0){HI--;applyState(HIST[HI]);urMark()}};
+$('redo').onclick=()=>{if(HI<HIST.length-1){HI++;applyState(HIST[HI]);urMark()}};
+$('rst').onclick=()=>{if(!confirm('అన్నీ రీసెట్ చేయాలా?'))return;
+  SUPPRESS=true;$('tpl').selectedIndex=0;const p=$('tpl').value.split('|');$('t1').value=p[0];$('t2').value=p[1]||'';$('tsize').value=110;$('tcol').value='#fde68a';$('tout').checked=true;th=0;$('sz').value='1080x1350';W=1080;H=1350;$('name').value='';$('role').value='';imgs={main:null,logo:null,top:[],bot:[],extra:null};adj={main:{z:1.05,dx:0,dy:0},top:{},bot:{z:1,dx:0,dy:0},extra:{z:1,dx:0,dy:0}};
+  ['main','logo','top','bot','extra'].forEach(id=>$(id).value='');rebuildPsel();mark();SUPPRESS=false;draw();snap()};
 var CONES=[null,null,null];['cone_alt1','cone_main','cone_alt2'].forEach(function(n,i){var im=new Image();im.onload=function(){draw()};im.src='assets/img/'+n+'.png';CONES[i]=im});
-THEMES.forEach((t,i)=>{const b=document.createElement('button');b.style.background=`linear-gradient(135deg,${t[0]},${t[2]})`;b.onclick=()=>{th=i;mark();draw()};$('themes').appendChild(b)});
+THEMES.forEach((t,i)=>{const b=document.createElement('button');b.style.background=`linear-gradient(135deg,${t[0]},${t[2]})`;b.onclick=()=>{th=i;mark();changed()};$('themes').appendChild(b)});
 function mark(){[...$('themes').children].forEach((b,i)=>b.classList.toggle('on',i==th))}
 mark();
 function load(f){return new Promise(r=>{const fr=new FileReader();fr.onerror=()=>r(null);fr.onload=()=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=fr.result};fr.readAsDataURL(f)})}
-$('main').onchange=async e=>{imgs.main=e.target.files[0]?await load(e.target.files[0]):null;adj.main={z:1.05,dx:0,dy:0};rebuildPsel();draw()};
+$('main').onchange=async e=>{imgs.main=e.target.files[0]?await load(e.target.files[0]):null;adj.main={z:1.05,dx:0,dy:0};rebuildPsel();changed()};
 $('logo').onchange=async e=>{imgs.logo=e.target.files[0]?await load(e.target.files[0]):null;draw()};
 
-$('top').onchange=async e=>{imgs.top=(await Promise.all([...e.target.files].slice(0,8).map(load))).filter(Boolean);adj.top={};rebuildPsel();draw()};
-$('bot').onchange=async e=>{imgs.bot=e.target.files[0]?[await load(e.target.files[0])].filter(Boolean):[];adj.bot={z:1,dx:0,dy:0};rebuildPsel();draw()};
-$('extra').onchange=async e=>{imgs.extra=e.target.files[0]?await load(e.target.files[0]):null;adj.extra={z:1,dx:0,dy:0};rebuildPsel();draw()};
-$('sz').onchange=()=>{const p=$('sz').value.split('x').map(Number);W=p[0];H=p[1];draw()};
-['tpl','t1','t2','tsize','tcol','name','role'].forEach(id=>$(id).oninput=()=>{if(id=='tpl'){const p=$('tpl').value.split('|');if(p[3]!==undefined){th=+p[3];mark()}if(!p[0].startsWith('custom')){$('t1').value=p[0];$('t2').value=p[1]||''}}draw()});
-$('tout').onchange=()=>draw();
+$('top').onchange=async e=>{imgs.top=(await Promise.all([...e.target.files].slice(0,8).map(load))).filter(Boolean);adj.top={};rebuildPsel();changed()};
+$('bot').onchange=async e=>{imgs.bot=e.target.files[0]?[await load(e.target.files[0])].filter(Boolean):[];adj.bot={z:1,dx:0,dy:0};rebuildPsel();changed()};
+$('extra').onchange=async e=>{imgs.extra=e.target.files[0]?await load(e.target.files[0]):null;adj.extra={z:1,dx:0,dy:0};rebuildPsel();changed()};
+$('sz').onchange=()=>{const p=$('sz').value.split('x').map(Number);W=p[0];H=p[1];changed()};
+['tpl','t1','t2','tsize','tcol','name','role'].forEach(id=>$(id).oninput=()=>{if(id=='tpl'){const p=$('tpl').value.split('|');if(p[3]!==undefined){th=+p[3];mark()}if(!p[0].startsWith('custom')){$('t1').value=p[0];$('t2').value=p[1]||''}}changed()});
+$('tout').onchange=()=>changed();
 
 function adjFor(k){if(k.startsWith('top')){const i=+k.slice(3);if(!adj.top[i])adj.top[i]={z:1,dx:0,dy:0};return adj.top[i]}return adj[k]}
 function rebuildPsel(){const s=$('psel'),prev=s.value;s.innerHTML='';
@@ -142,8 +167,8 @@ function rebuildPsel(){const s=$('psel'),prev=s.value;s.innerHTML='';
   $('padj').style.display=opts.length?'block':'none';loadPsel()}
 function loadPsel(){const s=$('psel');if(!s.value)return;const a=adjFor(s.value);$('pz').value=Math.round(a.z*100);$('px').value=a.dx;$('py').value=a.dy}
 $('psel').onchange=loadPsel;
-['pz','px','py'].forEach(id=>$(id).oninput=()=>{const s=$('psel');if(!s.value)return;const a=adjFor(s.value);a.z=(+$('pz').value)/100;a.dx=+$('px').value;a.dy=+$('py').value;draw()});
-$('preset').onclick=()=>{const s=$('psel');if(!s.value)return;const a=adjFor(s.value);a.z=s=='main'?1.05:1;a.dx=0;a.dy=0;loadPsel();draw()};
+['pz','px','py'].forEach(id=>$(id).oninput=()=>{const s=$('psel');if(!s.value)return;const a=adjFor(s.value);a.z=(+$('pz').value)/100;a.dx=+$('px').value;a.dy=+$('py').value;changed()});
+$('preset').onclick=()=>{const s=$('psel');if(!s.value)return;const a=adjFor(s.value);a.z=s=='main'?1.05:1;a.dx=0;a.dy=0;loadPsel();changed()};
 
 function cover(img,dx,dy,dw,dh,ad){ad=ad||{z:1,dx:0,dy:0};const s=Math.max(dw/img.width,dh/img.height)*ad.z,w=img.width*s,h=img.height*s;x.drawImage(img,dx+(dw-w)/2+S(ad.dx),dy+(dh-h)/4+S(ad.dy),w,h)}
 function circ(img,cx,cy,r,ring,ad){if(!img&&EXPORT)return;x.save();x.beginPath();x.arc(cx,cy,r,0,7);x.fillStyle='rgba(255,215,90,.85)';x.fill();x.beginPath();x.arc(cx,cy,r-5,0,7);x.clip();if(img)cover(img,cx-r,cy-r,2*r,2*r,ad);else{x.fillStyle='#fde68a';x.fillRect(cx-r,cy-r,2*r,2*r);x.fillStyle='#b45309';x.beginPath();x.arc(cx,cy-r*.2,r*.32,0,7);x.fill();x.beginPath();x.ellipse(cx,cy+r*.85,r*.65,r*.5,0,0,7);x.fill()}x.restore()}
@@ -219,7 +244,7 @@ function draw(){
   // logo
   if(imgs.logo){const r=S(110),s=Math.min(r/imgs.logo.width,r/imgs.logo.height);x.fillStyle='#fff';x.beginPath();x.arc(X(90),Y(1090),S(56),0,7);x.fill();x.drawImage(imgs.logo,X(90)-imgs.logo.width*s/2,Y(1090)-imgs.logo.height*s/2,imgs.logo.width*s,imgs.logo.height*s)}
 }
-document.fonts.load(`800 40px 'Noto Sans Telugu'`,'అ').then(draw);draw();
+document.fonts.load(`800 40px 'Noto Sans Telugu'`,'అ').then(draw);draw();snap();
 function blob(){EXPORT=true;draw();return new Promise(r=>cv.toBlob(b=>{EXPORT=false;draw();r(b)},'image/png'))}
 $('dl').onclick=async()=>{const b=await blob(),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='jananeta-poster.png';a.click()};
 $('sh').onclick=async()=>{const b=await blob(),f=new File([b],'poster.png',{type:'image/png'});
