@@ -37,22 +37,32 @@ canvas{width:100%;max-width:420px;height:auto;border-radius:12px;box-shadow:0 10
 <div class="card">
   <h2>1. పోస్టర్ రకం</h2>
   <select id="tpl">
-    <option value="సద్దుల బతుకమ్మ|శుభాకాంక్షలు|bathu|0">సద్దుల బతుకమ్మ</option>
-    <option value="బోనాల|శుభాకాంక్షలు|bonalu|1">బోనాలు</option>
-    <option value="వినాయక చవితి|శుభాకాంక్షలు|ganesh|0">వినాయక చవితి</option>
-    <option value="దసరా|శుభాకాంక్షలు|diya|1">దసరా</option>
-    <option value="దీపావళి|శుభాకాంక్షలు|diya|2">దీపావళి</option>
-    <option value="సంక్రాంతి|శుభాకాంక్షలు|kite|0">సంక్రాంతి</option>
-    <option value="ఉగాది|శుభాకాంక్షలు|mango|3">ఉగాది</option>
-    <option value="రంజాన్|శుభాకాంక్షలు|moon|3">రంజాన్</option>
-    <option value="క్రిస్మస్|శుభాకాంక్షలు|star|1">క్రిస్మస్</option>
-    <option value="నూతన సంవత్సర|శుభాకాంక్షలు|star|4">నూతన సంవత్సరం</option>
-    <option value="గణతంత్ర దినోత్సవ|శుభాకాంక్షలు|flag|3">గణతంత్ర దినోత్సవం</option>
-    <option value="స్వాతంత్ర్య దినోత్సవ|శుభాకాంక్షలు|flag|3">స్వాతంత్ర్య దినోత్సవం</option>
-    <option value="తెలంగాణ ఆవిర్భావ|దినోత్సవ శుభాకాంక్షలు|flag|4">తెలంగాణ ఆవిర్భావ దినోత్సవం</option>
-    <option value="అంబేద్కర్ జయంతి|ఘన నివాళి|chakra|4">అంబేద్కర్ జయంతి</option>
-    <option value="పుట్టినరోజు|శుభాకాంక్షలు|balloon|2">పుట్టినరోజు</option>
-    <option value="custom|">నా సొంత టెక్స్ట్</option>
+    <optgroup label="హిందూ పండుగలు">
+      <option value="సద్దుల బతుకమ్మ|శుభాకాంక్షలు|bathu|0">సద్దుల బతుకమ్మ</option>
+      <option value="బోనాల|శుభాకాంక్షలు|bonalu|1">బోనాలు</option>
+      <option value="వినాయక చవితి|శుభాకాంక్షలు|ganesh|0">వినాయక చవితి</option>
+      <option value="దసరా|శుభాకాంక్షలు|diya|1">దసరా</option>
+      <option value="దీపావళి|శుభాకాంక్షలు|diya|2">దీపావళి</option>
+      <option value="సంక్రాంతి|శుభాకాంక్షలు|kite|0">సంక్రాంతి</option>
+      <option value="ఉగాది|శుభాకాంక్షలు|mango|3">ఉగాది</option>
+    </optgroup>
+    <optgroup label="ఇతర మత పండుగలు">
+      <option value="రంజాన్|శుభాకాంక్షలు|moon|3">రంజాన్</option>
+      <option value="క్రిస్మస్|శుభాకాంక్షలు|star|1">క్రిస్మస్</option>
+    </optgroup>
+    <optgroup label="జాతీయ దినోత్సవాలు">
+      <option value="గణతంత్ర దినోత్సవ|శుభాకాంక్షలు|flag|3">గణతంత్ర దినోత్సవం</option>
+      <option value="స్వాతంత్ర్య దినోత్సవ|శుభాకాంక్షలు|flag|3">స్వాతంత్ర్య దినోత్సవం</option>
+      <option value="తెలంగాణ ఆవిర్భావ|దినోత్సవ శుభాకాంక్షలు|flag|4">తెలంగాణ ఆవిర్భావ దినోత్సవం</option>
+    </optgroup>
+    <optgroup label="ప్రత్యేక రోజులు">
+      <option value="నూతన సంవత్సర|శుభాకాంక్షలు|star|4">నూతన సంవత్సరం</option>
+      <option value="అంబేద్కర్ జయంతి|ఘన నివాళి|chakra|4">అంబేద్కర్ జయంతి</option>
+      <option value="పుట్టినరోజు|శుభాకాంక్షలు|balloon|2">పుట్టినరోజు</option>
+    </optgroup>
+    <optgroup label="నా సొంతం">
+      <option value="custom|">నా సొంత టెక్స్ట్</option>
+    </optgroup>
   </select>
   <div id="cust">
     <label>పెద్ద టైటిల్</label><input type="text" id="t1" value="సద్దుల బతుకమ్మ">
