@@ -54,9 +54,12 @@ canvas{width:100%;max-width:420px;height:auto;border-radius:12px;box-shadow:0 10
     <option value="పుట్టినరోజు|శుభాకాంక్షలు|balloon|2">పుట్టినరోజు</option>
     <option value="custom|">నా సొంత టెక్స్ట్</option>
   </select>
-  <div id="cust" style="display:none">
-    <label>పెద్ద టైటిల్</label><input type="text" id="t1" value="మీ టైటిల్">
+  <div id="cust">
+    <label>పెద్ద టైటిల్</label><input type="text" id="t1" value="సద్దుల బతుకమ్మ">
     <label>చిన్న టైటిల్</label><input type="text" id="t2" value="శుభాకాంక్షలు">
+    <label>టైటిల్ సైజు</label><input type="range" id="tsize" min="60" max="150" value="110">
+    <label>టైటిల్ రంగు</label><input type="color" id="tcol" value="#fde68a">
+    <label><input type="checkbox" id="tout" checked> అవుట్‌లైన్</label>
   </div>
   <label>రంగు థీమ్</label>
   <div class="themes" id="themes"></div>
@@ -105,11 +108,12 @@ $('top').onchange=async e=>{imgs.top=(await Promise.all([...e.target.files].slic
 $('bot').onchange=async e=>{imgs.bot=e.target.files[0]?[await load(e.target.files[0])].filter(Boolean):[];draw()};
 $('extra').onchange=async e=>{imgs.extra=e.target.files[0]?await load(e.target.files[0]):null;draw()};
 $('sz').onchange=()=>{const p=$('sz').value.split('x').map(Number);W=p[0];H=p[1];draw()};
-['tpl','t1','t2','name','role'].forEach(id=>$(id).oninput=()=>{$('cust').style.display=$('tpl').value.startsWith('custom')?'block':'none';if(id=='tpl'){const p=$('tpl').value.split('|');if(p[3]!==undefined){th=+p[3];mark()}}draw()});
+['tpl','t1','t2','tsize','tcol','name','role'].forEach(id=>$(id).oninput=()=>{if(id=='tpl'){const p=$('tpl').value.split('|');if(p[3]!==undefined){th=+p[3];mark()}if(!p[0].startsWith('custom')){$('t1').value=p[0];$('t2').value=p[1]||''}}draw()});
+$('tout').onchange=()=>draw();
 
 function cover(img,dx,dy,dw,dh){const s=Math.max(dw/img.width,dh/img.height),w=img.width*s,h=img.height*s;x.drawImage(img,dx+(dw-w)/2,dy+(dh-h)/4,w,h)}
 function circ(img,cx,cy,r,ring){if(!img&&EXPORT)return;x.save();x.beginPath();x.arc(cx,cy,r,0,7);x.fillStyle='rgba(255,215,90,.85)';x.fill();x.beginPath();x.arc(cx,cy,r-5,0,7);x.clip();if(img)cover(img,cx-r,cy-r,2*r,2*r);else{x.fillStyle='#fde68a';x.fillRect(cx-r,cy-r,2*r,2*r);x.fillStyle='#b45309';x.beginPath();x.arc(cx,cy-r*.2,r*.32,0,7);x.fill();x.beginPath();x.ellipse(cx,cy+r*.85,r*.65,r*.5,0,0,7);x.fill()}x.restore()}
-function ctext(t,cx,y,size,color,w=W-40){x.font=`800 ${size}px ${FONT}`;x.textAlign='center';x.lineWidth=Math.max(3,size/10);x.strokeStyle='rgba(0,0,0,.55)';x.strokeText(t,cx,y,w);x.fillStyle=color;x.shadowColor='rgba(0,0,0,.45)';x.shadowBlur=S(8);x.shadowOffsetY=Y(3);x.fillText(t,cx,y,w);x.shadowBlur=0;x.shadowOffsetY=0}
+function ctext(t,cx,y,size,color,w=W-40){x.font=`800 ${size}px ${FONT}`;x.textAlign='center';x.lineWidth=Math.max(3,size/10);x.strokeStyle='rgba(0,0,0,.55)';if(!$('tout')||$('tout').checked)x.strokeText(t,cx,y,w);x.fillStyle=color;x.shadowColor='rgba(0,0,0,.45)';x.shadowBlur=S(8);x.shadowOffsetY=Y(3);x.fillText(t,cx,y,w);x.shadowBlur=0;x.shadowOffsetY=0}
 
 function decor(k){
  const C=['#facc15','#ec4899','#fff','#a855f7','#fb923c'];
@@ -155,13 +159,15 @@ function draw(){
     let tg=og.createLinearGradient(0,0,0,ph);tg.addColorStop(0,'rgba(0,0,0,0)');tg.addColorStop(Y(100)/ph,'rgba(0,0,0,1)');tg.addColorStop((ph-Y(220))/ph,'rgba(0,0,0,1)');tg.addColorStop(1,'rgba(0,0,0,0)');og.fillStyle=tg;og.fillRect(0,0,pw,ph);
     x.drawImage(oc,px,py)}
   // title
-  const v=$('tpl').value;let a,b,D='lotus';
-  if(v.startsWith('custom')){a=$('t1').value;b=$('t2').value}else{[a,b,D]=v.split('|')}
+  const v=$('tpl').value;let D='lotus';
+  if(!v.startsWith('custom')){const p=v.split('|');D=p[2]||'lotus'}
+  const a=$('t1').value,b=$('t2').value;
   const words=a.split(' ');const l1=words.length>1?words.slice(0,Math.ceil(words.length/2)).join(' '):a,l2=words.length>1?words.slice(Math.ceil(words.length/2)).join(' '):'';
   const cx=W*.3;
-  ctext(l1,cx,l2?Y(420):Y(470),l2?S(110):S(120),'#fde68a');
-  if(l2)ctext(l2,cx,Y(540),S(110),'#fde68a');
-  ctext(b,cx,l2?Y(630):Y(600),S(60),'#fff7d6');
+  const ts=(+$('tsize').value||110)/110,tc=$('tcol').value||'#fde68a';
+  ctext(l1,cx,l2?Y(420):Y(470),l2?S(110)*ts:S(120)*ts,tc);
+  if(l2)ctext(l2,cx,Y(540),S(110)*ts,tc);
+  ctext(b,cx,l2?Y(630):Y(600),S(60)*ts,'#fff7d6');
   decor(D);
   // name
   const nm=$('name').value||'మీ పేరు',rl=$('role').value||'పదవి, ప్రాంతం';
