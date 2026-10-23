@@ -1196,7 +1196,7 @@ var h=location.hash.slice(1);if(h&&document.getElementById(h)&&h.indexOf('view-'
   ort.env.wasm.numThreads=1;
   if(!session)session=ort.InferenceSession.create('https://cdn.jsdelivr.net/npm/@rmbg/model-u2netp@0.0.1/u2netp.onnx',{executionProviders:['wasm']}).catch(function(e){session=null;throw e});return session;
  }
- window.jnRemoveBackground=async function(image){
+ async function processPortrait(image){
   var model=await getSession(),size=320,c=document.createElement('canvas');c.width=c.height=size;
   var g=c.getContext('2d');g.drawImage(image,0,0,size,size);
   var rgba=g.getImageData(0,0,size,size).data,max=1;
@@ -1213,7 +1213,8 @@ var h=location.hash.slice(1);if(h&&document.getElementById(h)&&h.indexOf('view-'
   var out=document.createElement('canvas'),sc=Math.min(1,1600/Math.max(image.width,image.height));out.width=Math.round(image.width*sc);out.height=Math.round(image.height*sc);
   var ctx=out.getContext('2d');ctx.drawImage(image,0,0,out.width,out.height);ctx.globalCompositeOperation='destination-in';ctx.drawImage(c,0,0,out.width,out.height);
   return out;
- };
+ }
+ window.jnRemoveBackground=function(image){return Promise.race([processPortrait(image),new Promise(function(resolve,reject){setTimeout(function(){reject(new Error('Background removal timed out'))},90000)})])};
 })();
 
 </script>
