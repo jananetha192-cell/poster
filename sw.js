@@ -1,4 +1,4 @@
-var CACHE='jananetha-v2';
+var CACHE='jananetha-v3-portrait';
 var ASSETS=[
  './','./index.html','./manifest.webmanifest',
  './icons/icon-192.png','./icons/icon-512.png',
@@ -14,10 +14,11 @@ self.addEventListener('activate',function(e){
 self.addEventListener('fetch',function(e){
  if(e.request.method!=='GET')return;
  if(e.request.url.indexOf(location.origin)!==0)return;
- var isHtml=/\.(html)$/.test(e.request.url)||e.request.url.indexOf('.')===-1;
+ var path=new URL(e.request.url).pathname;
+ var isHtml=e.request.mode==='navigate'||/\.html$/.test(path)||path.endsWith('/');
  if(isHtml){
   // network-first for pages: updates appear immediately, offline falls back to cache
-  e.respondWith(fetch(e.request).then(function(r){
+  e.respondWith(fetch(e.request,{cache:'no-store'}).then(function(r){
    if(r&&r.ok){var cp=r.clone();caches.open(CACHE).then(function(c){c.put(e.request,cp)})}
    return r;
   }).catch(function(){return caches.match(e.request,{ignoreSearch:true})}));
