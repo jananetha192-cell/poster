@@ -592,8 +592,9 @@ function drawLeaderSet(L,cfg){
   for(var j=0;j<m;j++)lcirc(P[j],sx+j*(D+16),cfg.rowY,D);return}
  lcirc(P[0],cfg.lx,cfg.ly,cfg.ld);lcirc(P[1],cfg.rx,cfg.ly,cfg.ld)}
 /* ---- diwali templates: supplied original art + band + visitor identity ---- */
+function sideTouch(c2){try{var w=c2.width,h=c2.height,d=c2.getContext('2d').getImageData(0,0,w,h).data;for(var y=0;y<h;y+=3){var i=y*w*4;if(d[i+3]>24||d[i+(w-1)*4+3]>24)return true}}catch(e){}return false}
 var DGEO={
- golddiwali1:{by:1440,bc:'#350632',nx:360,ny:1520,dy:1585,lx:150,ly:190,ld:196,rx:923,pw:334,pb:1591,extrasD:104},
+ golddiwali1:{by:1440,bc:'#350632',nx:360,ny:1520,dy:1585,lx:150,ly:190,ld:196,rx:923,pw:394,pb:1600,extrasD:104},
  golddiwali2:{by:1440,bc:'#350632',nx:360,ny:1520,dy:1585,lx:160,ly:132,ld:166,rx:915,pw:263,pb:1600,extrasD:48,extrasY:51}
 };
 function drawDiwali(c,preview,k){
@@ -614,8 +615,12 @@ function drawDiwali(c,preview,k){
  cx.textAlign='center';cx.lineJoin='round';
  var leftMode=($('ox').value/100||0)<-0.5;
  var nameX=leftMode?W-G.nx:G.nx;
+ var z0=$('zoom').value/100||1,capW=600;
+ if(photo){var dw0=G.pw*z0;
+  capW=leftMode?2*((W-G.nx)-(16+dw0)-24):2*((W-dw0)-G.nx-24);
+  if(capW<120)capW=120}
  var n=$('nm').value.trim()||(preview?'మీ పేరు':'');
- if(n){var s=56;while(tw(n,s,'800')>600&&s>26)s-=2;
+ if(n){var s=56;while(tw(n,s,'800')>capW&&s>26)s-=2;
   cx.font=fnt(s,true,'800');cx.lineWidth=7;cx.strokeStyle='rgba(0,0,0,.5)';cx.strokeText(n,nameX,G.ny);
   var ng=cx.createLinearGradient(0,G.ny-s,0,G.ny);
   ng.addColorStop(0,'#fff3b0');ng.addColorStop(.55,'#ffd83d');ng.addColorStop(1,'#e6a812');
@@ -623,13 +628,14 @@ function drawDiwali(c,preview,k){
  var parts=[$('tt').value.trim(),PROF&&PROF.ac?PROF.ac+' నియోజకవర్గం':'',PROF&&PROF.district?PROF.district+' జిల్లా':''].filter(Boolean);
  var d0=parts.join(', ');
  if(!d0&&preview)d0='మీ పదవి';
- if(d0){var s2=32;while(tw(d0,s2,'600')>600&&s2>18)s2-=2;
+ if(d0){var s2=32;while(tw(d0,s2,'600')>capW&&s2>18)s2-=2;
   cx.font=fnt(s2,true,'600');cx.fillStyle='#fff';cx.fillText(d0,nameX,G.dy)}
  if(photo){var z=$('zoom').value/100||1,oy=$('oy').value/100||0;
   var dw=G.pw*z,dh=photo.height*(G.pw/photo.width)*z;
-  var dx=leftMode?30:W-dw;
+  var dx=leftMode?16:W-dw;
   var dy=G.pb-dh+oy*40;
   if(dy<0)dy=0;
+  if(dx<0)dx=0;if(dx+dw>W)dx=W-dw;
   cx.drawImage(photo,dx,dy,dw,dh)}
  else if(preview){var ph2=(G.pw-20)*1.2;Dplaceholder(W-G.pw+10,G.pb-10-ph2,G.pw-20,ph2,1)}
  cx.restore()}
@@ -1151,7 +1157,8 @@ $('pfile').onchange=function(e){var f=e.target.files[0];if(!f)return;var u=URL.c
  im.onload=async function(){$('psave').disabled=true;$('ppick').disabled=true;var r=prep(im,1400);
  if(!r.cut){$('pcutStatus').textContent='ఫోటో బ్యాక్‌గ్రౌండ్ తీసేస్తున్నాను...';try{im=await jnRemoveBackground(im);r=prep(im,1400);$('pcutStatus').textContent='బ్యాక్‌గ్రౌండ్ తీసేశాను. ఫోటో అంచులు చూసుకోండి.'}catch(err){$('pcutStatus').textContent='బ్యాక్‌గ్రౌండ్ తీయలేకపోయాను. బటన్ తో మళ్లీ ప్రయత్నించండి.'}}
   if(r.cut){PPCUT=true;var bx=r.box,c2=document.createElement('canvas');c2.width=bx.w;c2.height=bx.h;c2.getContext('2d').drawImage(r.cc,bx.x,bx.y,bx.w,bx.h,0,0,bx.w,bx.h);
-   PPH=c2.toDataURL('image/png');$('pimg').src=PPH;$('pimg').style.display='block';$('pnone').style.display='none'}
+   PPH=c2.toDataURL('image/png');$('pimg').src=PPH;$('pimg').style.display='block';$('pnone').style.display='none';
+   if(sideTouch(c2))$('pcutStatus').textContent+=' గమనిక: ఫోటో అంచులో చేయి/భాగం కట్ అవుతోంది. వీలైతే చేతులు పూర్తిగా ఉన్న ఫోటో ఎంచుకోండి.'}
   else{var im2=new Image();im2.onload=function(){openCrop(im2)};im2.src=r.cc.toDataURL('image/jpeg',0.92)}
   $('psave').disabled=false;$('ppick').disabled=false;URL.revokeObjectURL(u)};
  im.onerror=function(){$('psave').disabled=false;$('ppick').disabled=false;toast('ఈ ఫైల్ తెరవలేకపోయాను. వేరే ఫోటో ఎంచుకోండి.')};im.src=u;e.target.value=''};
