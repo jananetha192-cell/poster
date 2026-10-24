@@ -594,7 +594,7 @@ function drawLeaderSet(L,cfg){
 /* ---- diwali templates: supplied original art + band + visitor identity ---- */
 function sideTouch(c2){try{var w=c2.width,h=c2.height,d=c2.getContext('2d').getImageData(0,0,w,h).data;for(var y=0;y<h;y+=3){var i=y*w*4;if(d[i+3]>24||d[i+(w-1)*4+3]>24)return true}}catch(e){}return false}
 var DGEO={
- golddiwali1:{by:1440,bc:'#350632',nx:360,ny:1520,dy:1585,lx:150,ly:190,ld:196,rx:923,pw:519,pb:1600,extrasD:104},
+ golddiwali1:{by:1440,bc:'#350632',nx:360,ny:1520,dy:1585,lx:150,ly:190,ld:196,rx:923,pw:394,pb:1600,extrasD:104},
  golddiwali2:{by:1440,bc:'#350632',nx:360,ny:1520,dy:1585,lx:160,ly:132,ld:166,rx:915,pw:263,pb:1600,extrasD:48,extrasY:51}
 };
 function drawDiwali(c,preview,k){
@@ -617,7 +617,7 @@ function drawDiwali(c,preview,k){
  var nameX=leftMode?W-G.nx:G.nx;
  var z0=$('zoom').value/100||1,capW=600;
  if(photo){var dw0=G.pw*z0;
-  capW=leftMode?2*((W-G.nx)-(16+dw0)-24):2*((W-dw0-16)-G.nx-24);
+  capW=leftMode?2*((W-G.nx)-(16+dw0)-24):2*((W-dw0)-G.nx-24);
   if(capW<120)capW=120}
  var n=$('nm').value.trim()||(preview?'మీ పేరు':'');
  if(n){var s=56;while(tw(n,s,'800')>capW&&s>26)s-=2;
@@ -632,7 +632,7 @@ function drawDiwali(c,preview,k){
   cx.font=fnt(s2,true,'600');cx.fillStyle='#fff';cx.fillText(d0,nameX,G.dy)}
  if(photo){var z=$('zoom').value/100||1,oy=$('oy').value/100||0;
   var dw=G.pw*z,dh=photo.height*(G.pw/photo.width)*z;
-  var dx=leftMode?16:W-dw-16;
+  var dx=leftMode?16:W-dw;
   var dy=G.pb-dh+oy*40;
   if(dy<0)dy=0;
   if(dx<0)dx=0;if(dx+dw>W)dx=W-dw;
@@ -1242,4 +1242,4 @@ async function cutPhoto(which){
 }
 $('pcut').onclick=function(){cutPhoto('profile')};$('ecut').onclick=function(){cutPhoto('editor')};
 </script></body>
- </html>
+</html>
