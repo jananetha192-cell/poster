@@ -379,11 +379,6 @@ function paintSlot(s,c){
   if(sx+side>c.width)sx=c.width-side;if(sy+side>c.height)sy=c.height-side;
  }
  var r=s.d/2,cx=s.x+r,cy=s.y+r;
- if(b){
-  /* already-cut photo: place directly, no circle, fill or border; bottom-aligned, never clipped */
-  var k=Math.min(s.d/b.w,s.d/b.h),dw=b.w*k,dh=b.h*k;
-  g.save();g.shadowColor='rgba(0,0,0,.35)';g.shadowBlur=s.grp=='big'?12:8;g.shadowOffsetY=3;
-  g.drawImage(c,b.x,b.y,b.w,b.h,s.x+(s.d-dw)/2,s.y+s.d-dh,dw,dh);g.restore();return}
  g.save();
  g.shadowColor='rgba(0,0,0,'+(s.grp=='big'?'0.55':'0.45')+')';
  g.shadowBlur=s.grp=='big'?17:11;g.shadowOffsetY=s.grp=='big'?5:3;
