@@ -730,7 +730,8 @@ function exShow(){
 })();
 ['pn','pt'].forEach(function(i){$(i).value=ST[i];$(i).addEventListener('input',function(){ST[i]=$(i).value;save();draw()})});
 
-$('dl').onclick=function(){if(!ST.l0||!ST.l4){toast('డౌన్‌లోడ్ కోసం పై రెండు పెద్ద వృత్తాల్లో మీ నాయకుల ఫోటోలు పెట్టండి');var e=$('ldRows');if(e)e.scrollIntoView({behavior:'smooth',block:'center'});return}EXP=true;draw().then(function(){cv.toBlob(function(bl){try{if(bl){var a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download='jananetha-poster-valmiki.png';a.click()}}finally{EXP=false;draw()}},'image/png')})};
+async function JNready(){var t=0;while(HYD&&t<25000){await new Promise(function(r){setTimeout(r,200)});t+=200}if(HYD){var m='ఇంకా లోడ్ అవుతోంది, కొద్దిసేపు ఆగి మళ్లీ ప్రయత్నించండి';if(window.toast)toast(m);else{var s=document.getElementById('sv');if(s)s.textContent=m}return false}return true}
+$('dl').onclick=function(){if(!ST.l0||!ST.l4){toast('డౌన్‌లోడ్ కోసం పై రెండు పెద్ద వృత్తాల్లో మీ నాయకుల ఫోటోలు పెట్టండి');var e=$('ldRows');if(e)e.scrollIntoView({behavior:'smooth',block:'center'});return}JNready().then(function(ok){if(!ok)return;EXP=true;draw().then(function(){cv.toBlob(function(bl){try{if(bl){var a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download='jananetha-poster-valmiki.png';a.click()}}finally{EXP=false;draw()}},'image/png')})};
 
 
 /* serialize draws: a slow in-flight draw must not repaint over a newer one */
