@@ -63,7 +63,7 @@ canvas{width:100%;max-width:440px;height:auto;border-radius:10px;box-shadow:0 8p
 </div>
 </div>
 <script src="studio-config.js"></script>
-<script src="studio-templates.js"></script>
+<script src="studio-templates.js"></script><script src="studio-templates-more.js"></script>
 <script>
 var ART=window.JN_TEMPLATES[0].art;
 var PB=null,NB=null,DB=null,TX={nm:[0,0,1],dg:[0,0,1]};var cv=document.getElementById('cv'),g=cv.getContext('2d'),W=1122,H=1402,EXP=false,pend=-1,ME=null,IM={};
@@ -118,12 +118,22 @@ $('ldF').onchange=async function(e){var f=e.target.files[0];e.target.value='';if
 ['nm','dg','ms','mx','my'].forEach(function(i){$(i).oninput=draw});
 var modP=null;
 function loadMod(){if(!modP)modP=import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3/dist/transformers.min.js').then(function(m){return m.pipeline('background-removal','Xenova/modnet',{dtype:'fp32',device:'wasm'})}).catch(function(e){modP=null;throw e});return modP}
+function tidy(o){var w=o.width,h=o.height,g=o.getContext('2d'),im=g.getImageData(0,0,w,h),d=im.data,n=w*h,m=new Uint8Array(n),t=new Uint8Array(n),i;
+ for(i=0;i<n;i++)m[i]=d[i*4+3]>127?1:0;
+ function pass(src,dst,r,mx,hz){var x,y,k,v,a;for(y=0;y<h;y++)for(x=0;x<w;x++){v=mx?0:1;for(k=-r;k<=r;k++){var xx=hz?x+k:x,yy=hz?y:y+k;a=(xx<0||yy<0||xx>=w||yy>=h)?(mx?0:1):src[yy*w+xx];if(mx){if(a){v=1;break}}else if(!a){v=0;break}}dst[y*w+x]=v}}
+ function morph(s,r,mx){var a=new Uint8Array(n);pass(s,a,r,mx,true);var b=new Uint8Array(n);pass(a,b,r,mx,false);return b}
+ var op=morph(morph(m,9,false),9,true),lab=new Int32Array(n),best=0,bs=0,id=0,st=[];
+ for(i=0;i<n;i++)if(op[i]&&!lab[i]){id++;var c=0;st.push(i);lab[i]=id;while(st.length){var p=st.pop();c++;var x=p%w,y=(p/w)|0;[[1,0],[-1,0],[0,1],[0,-1]].forEach(function(q){var X=x+q[0],Y=y+q[1];if(X>=0&&Y>=0&&X<w&&Y<h){var j=Y*w+X;if(op[j]&&!lab[j]){lab[j]=id;st.push(j)}}})}if(c>bs){bs=c;best=id}}
+ if(!best)return o;var main=new Uint8Array(n);for(i=0;i<n;i++)main[i]=lab[i]===best?1:0;
+ var al=morph(main,12,true);
+ for(i=0;i<n;i++){if(!al[i]){d[i*4+3]=0;d[i*4]=d[i*4+1]=d[i*4+2]=0}}
+ g.putImageData(im,0,0);return o}
 async function cut(file){
  var u=URL.createObjectURL(file),im=await new Promise(function(r,j){var i=new Image();i.onload=function(){r(i)};i.onerror=j;i.src=u});
  var s=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
  var seg=await Promise.race([loadMod(),new Promise(function(_,j){setTimeout(function(){j(new Error('timeout'))},60000)})]);
  var bu=await new Promise(function(r){c.toBlob(r,'image/png')}),url=URL.createObjectURL(bu);
- var r=await seg(url);r=Array.isArray(r)?r[0]:r;var oc=r.toCanvas(),o=document.createElement('canvas');o.width=oc.width;o.height=oc.height;o.getContext('2d').drawImage(oc,0,0);return o}
+ var r=await seg(url);r=Array.isArray(r)?r[0]:r;var oc=r.toCanvas(),o=document.createElement('canvas');o.width=oc.width;o.height=oc.height;o.getContext('2d').drawImage(oc,0,0);return tidy(o)}
 $('meF').onchange=async function(e){var f=e.target.files[0];e.target.value='';if(!f)return;$('st').className='';$('st').textContent='ఫోటో సిద్ధం చేస్తున్నాం…';
  try{ME=bbox(await cut(f));$('st').textContent='ఫోటో సిద్ధం'}catch(err){$('st').className='warn';$('st').textContent='⚠ బ్యాక్‌గ్రౌండ్ తొలగింపు రాలేదు – ఫోటో అసలు బ్యాక్‌గ్రౌండ్‌తోనే చేర్చబడింది';var u=URL.createObjectURL(f);ME=await new Promise(function(r){var i=new Image();i.onload=function(){r(i)};i.src=u})}
  draw()};
@@ -165,7 +175,7 @@ function placeHit(){placeBox(hitEl,ME?PB:null);placeBox(hitN,NB);placeBox(hitD,D
 
 var TPL=window.JN_TEMPLATES[0],STORE=null,UID=null,HYD=true,saveT=null,SAVED={me:null,cu:[]},LAST='';
 function showTpls(){var d=$('tpls');d.innerHTML='';window.JN_TEMPLATES.forEach(function(t){var e=document.createElement('div');e.className='tp'+(t.id==TPL.id?' on':'');e.innerHTML='<img src="'+t.art+'"><div>'+t.title+'</div>';e.onclick=function(){useTpl(t)};d.appendChild(e)})}
-function useTpl(t){TPL=t;ART=t.art;showTpls();draw()}
+function useTpl(t){if(t.url){location.href=t.url;return}TPL=t;ART=t.art;showTpls();draw()}
 function enc(c,mx){var s=Math.min(1,mx/Math.max(c.width,c.height)),t=document.createElement('canvas');t.width=Math.max(1,Math.round(c.width*s));t.height=Math.max(1,Math.round(c.height*s));t.getContext('2d').drawImage(c,0,0,t.width,t.height);
  var u=t.toDataURL('image/webp',.82);if(u.indexOf('image/webp')<0)u=t.toDataURL('image/png');return u}
 function encFit(c,mx){var u=enc(c,mx),k=0;while(u.length>700000&&k<4){mx=Math.round(mx*.75);u=enc(c,mx);k++}return u}
