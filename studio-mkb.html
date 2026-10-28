@@ -416,6 +416,7 @@ function paintSlot(s,c){
   if(sx<0)sx=0;if(sy<0)sy=0;
   if(sx+side>c.width)sx=c.width-side;if(sy+side>c.height)sy=c.height-side;
  }
+ if(b)sy=Math.min(sy,b.y+b.h-side);
  var r=s.d/2,cx=s.x+r,cy=s.y+r;
  g.save();
  g.shadowColor='rgba(0,0,0,'+(s.grp=='big'?'0.55':'0.45')+')';
@@ -423,6 +424,7 @@ function paintSlot(s,c){
  g.beginPath();g.arc(cx,cy,r,0,6.2832);g.closePath();
  g.fillStyle='#5e2a0c';g.fill();
  g.clip();
+ g.shadowColor='transparent';g.shadowBlur=0;g.shadowOffsetY=0;
  g.drawImage(c,sx,sy,side,side,s.x,s.y,s.d,s.d);
  g.restore();
  g.save();
@@ -762,4 +764,4 @@ setTimeout(function(){draw()},0);
 })();
 </script>
 </body>
-</html>
+  </html>
