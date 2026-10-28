@@ -137,7 +137,8 @@ async function cut(file){
 $('meF').onchange=async function(e){var f=e.target.files[0];e.target.value='';if(!f)return;$('st').className='';$('st').textContent='ఫోటో సిద్ధం చేస్తున్నాం…';
  try{ME=bbox(await cut(f));$('st').textContent='ఫోటో సిద్ధం'}catch(err){$('st').className='warn';$('st').textContent='⚠ బ్యాక్‌గ్రౌండ్ తొలగింపు రాలేదు – ఫోటో అసలు బ్యాక్‌గ్రౌండ్‌తోనే చేర్చబడింది';var u=URL.createObjectURL(f);ME=await new Promise(function(r){var i=new Image();i.onload=function(){r(i)};i.src=u})}
  draw()};
-$('dl').onclick=async function(){EXP=true;await draw();cv.toBlob(function(b){var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='jananetha-poster-'+TPL.id+'.png';a.click();EXP=false;draw()},'image/png')};
+async function JNready(){var t=0;while(HYD&&t<25000){await new Promise(function(r){setTimeout(r,200)});t+=200}if(HYD){var m='ఇంకా లోడ్ అవుతోంది, కొద్దిసేపు ఆగి మళ్లీ ప్రయత్నించండి';if(window.toast)toast(m);else{var s=document.getElementById('sv');if(s)s.textContent=m}return false}return true}
+$('dl').onclick=async function(){if(!(await JNready()))return;EXP=true;await draw();cv.toBlob(function(b){var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='jananetha-poster-'+TPL.id+'.png';a.click();EXP=false;draw()},'image/png')};
 
 // drag + pinch on the photo (pointer events on an overlay box, touch-action:none)
 var hitEl=document.getElementById('hit'),hitN=document.getElementById('hitn'),hitD=document.getElementById('hitd');
