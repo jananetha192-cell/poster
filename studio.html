@@ -50,6 +50,7 @@ canvas{width:100%;max-width:440px;height:auto;border-radius:10px;box-shadow:0 8p
  <input type="file" id="meF" accept="image/*">
  <div class="note" id="sv" style="color:#9be7a5"></div>
  <div class="note">ఫోటో బ్యాక్‌గ్రౌండ్ ఆటోమేటిక్‌గా తొలగిపోతుంది (మొదటిసారి కొంచెం సమయం పడుతుంది).</div>
+ <a href="https://www.remove.bg/upload" target="_blank" rel="noopener" id="rmbgLink" style="display:block;text-align:center;margin:8px 0;padding:11px;border-radius:8px;border:1px solid #FFE9B0;color:#FFE9B0;font-weight:700;font-size:15px;text-decoration:none;font-family:inherit">బ్యాక్‌గ్రౌండ్ తొలగించండి</a>
  <div class="note" style="color:#FFE9B0;font-weight:700">పోస్టర్ మీద ఫోటో, పేరు, పదవి బాక్స్‌లను వేలితో లాగి కదిలించండి. ఫోటోను రెండు వేళ్లతో పెద్దగా / చిన్నగా చేయవచ్చు.</div>
  <div style="display:none"><input type="range" id="ms" min="30" max="300" value="100"><input type="range" id="mx" min="-1000" max="400" value="0"><input type="range" id="my" min="-1300" max="250" value="0"></div>
  <h2 style="margin-top:16px">3. పైన నాయకుల ఫోటోలు</h2>
@@ -135,7 +136,7 @@ async function cut(file){
  var bu=await new Promise(function(r){c.toBlob(r,'image/png')}),url=URL.createObjectURL(bu);
  var r=await seg(url);r=Array.isArray(r)?r[0]:r;var oc=r.toCanvas(),o=document.createElement('canvas');o.width=oc.width;o.height=oc.height;o.getContext('2d').drawImage(oc,0,0);return tidy(o)}
 $('meF').onchange=async function(e){var f=e.target.files[0];e.target.value='';if(!f)return;$('st').className='';$('st').textContent='ఫోటో సిద్ధం చేస్తున్నాం…';
- try{ME=bbox(await cut(f));$('st').textContent='ఫోటో సిద్ధం'}catch(err){$('st').className='warn';$('st').textContent='⚠ బ్యాక్‌గ్రౌండ్ తొలగింపు రాలేదు – ఫోటో అసలు బ్యాక్‌గ్రౌండ్‌తోనే చేర్చబడింది';var u=URL.createObjectURL(f);ME=await new Promise(function(r){var i=new Image();i.onload=function(){r(i)};i.src=u})}
+ try{var im0=await loadImg(f);if(hasAlpha(im0)){var s0=Math.min(1,900/Math.max(im0.width,im0.height)),c0=document.createElement('canvas');c0.width=Math.round(im0.width*s0);c0.height=Math.round(im0.height*s0);c0.getContext('2d').drawImage(im0,0,0,c0.width,c0.height);ME=bbox(c0)}else ME=bbox(await cut(f));$('st').textContent='ఫోటో సిద్ధం'}catch(err){$('st').className='warn';$('st').textContent='⚠ బ్యాక్‌గ్రౌండ్ తొలగింపు రాలేదు – ఫోటో అసలు బ్యాక్‌గ్రౌండ్‌తోనే చేర్చబడింది';var u=URL.createObjectURL(f);ME=await new Promise(function(r){var i=new Image();i.onload=function(){r(i)};i.src=u})}
  draw()};
 async function JNready(){var t=0;while(HYD&&t<25000){await new Promise(function(r){setTimeout(r,200)});t+=200}if(HYD){var m='ఇంకా లోడ్ అవుతోంది, కొద్దిసేపు ఆగి మళ్లీ ప్రయత్నించండి';if(window.toast)toast(m);else{var s=document.getElementById('sv');if(s)s.textContent=m}return false}return true}
 $('dl').onclick=async function(){if(!(await JNready()))return;EXP=true;await draw();cv.toBlob(function(b){var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='jananetha-poster-'+TPL.id+'.png';a.click();EXP=false;draw()},'image/png')};
