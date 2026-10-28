@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>జననేత – పోస్టర్ స్టూడియో</title>
+<link href="https://fonts.googleapis.com/css2?family=Ramabhadra&family=Noto+Sans+Telugu:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans Telugu','Segoe UI',sans-serif;background:linear-gradient(135deg,#1f2d4e,#0b1224);min-height:100vh;padding:15px;color:#fff}
+h1{text-align:center;color:#FFD874;margin-bottom:16px;font-size:22px;text-shadow:1px 1px 3px #000}
+.container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:380px 1fr;gap:18px}
+@media(max-width:900px){.container{grid-template-columns:1fr}}
+.card{background:rgba(0,0,0,.4);border-radius:14px;padding:16px;border:1px solid #FFD87444}
+h2{color:#FFD874;font-size:16px;margin-bottom:10px;border-bottom:1px solid #FFD87433;padding-bottom:6px}
+label{display:block;margin:10px 0 4px;font-size:13px;color:#FFE9B0}
+input[type=text]{width:100%;padding:11px;border-radius:8px;border:none;font-size:15px;font-family:inherit}
+input[type=range]{width:100%}
+.btn{width:100%;margin-top:12px;padding:13px;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#2ecc71,#16a085);color:#fff}
+#ldrs{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+.lc{width:52px;height:52px;border-radius:50%;border:3px solid #efbf59;overflow:hidden;cursor:pointer;background:#50240f}
+.lc img{width:100%;height:100%;object-fit:cover;display:block}
+.note{font-size:12px;color:#d8deee;line-height:1.6;margin-top:6px}
+.preview-area{text-align:center}
+canvas{width:100%;max-width:440px;height:auto;border-radius:10px;box-shadow:0 8px 24px #000a}
+#wrap{position:relative;width:100%;max-width:440px;margin:0 auto;line-height:0}#wrap canvas{display:block;width:100%}#hit,#hitn,#hitd{position:absolute;display:none;touch-action:none;cursor:move;border:2px dashed rgba(255,216,116,.9);border-radius:6px;box-shadow:0 0 0 1px rgba(0,0,0,.4);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#st.warn{background:#B71C1C;color:#fff;font-size:15px;font-weight:700;padding:10px 12px;border-radius:8px}
+#st{font-size:12px;color:#FFE9B0;margin-top:8px;min-height:18px}
+
+.bar{max-width:1100px;margin:0 auto 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:#FFE9B0}
+.bar button{background:#ffffff22;color:#fff;border:1px solid #ffffff55;border-radius:8px;padding:6px 12px;font-family:inherit;cursor:pointer}
+.login{max-width:420px;margin:40px auto;text-align:center}
+.gbtn{background:#fff;color:#222;font-weight:700;border:none;border-radius:10px;padding:13px 18px;font-size:16px;font-family:inherit;cursor:pointer;width:100%;margin-top:14px}
+#tpls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;max-width:1100px;margin-left:auto;margin-right:auto}
+.tp{width:92px;cursor:pointer;text-align:center;font-size:12px;color:#FFE9B0}.tp img{width:92px;height:115px;object-fit:cover;object-position:top;border-radius:8px;border:3px solid transparent;display:block}.tp.on img{border-color:#FFD874}
+</style>
+</head>
+<body>
+<h1>జననేత పోస్టర్ స్టూడియో</h1>
+<div id="scLogin" class="card login" style="display:none"><h2>లాగిన్</h2><div class="note" id="lgMsg">మీ Google ఖాతాతో లాగిన్ అవ్వండి. మీ పేరు, పదవి, ఫోటో, నాయకుల ఫోటోలు ఒకసారి పెడితే ప్రతి పోస్టర్‌కి వాటంతట అవే వస్తాయి.</div><button class="gbtn" id="gIn">Google తో లాగిన్</button><div id="lgErr" class="note" style="color:#ffb74d"></div></div>
+<div id="scApp" style="display:none">
+<div class="bar"><span id="who"></span><button id="gOut">లాగౌట్</button></div>
+<div id="tpls"></div>
+<div class="container">
+<div class="card">
+ <h2>1. మీ వివరాలు</h2>
+ <label>మీ పేరు</label><input type="text" id="nm" placeholder="మీ పేరు">
+ <label>మీ పదవి</label><input type="text" id="dg" placeholder="మీ పదవి">
+ <h2 style="margin-top:16px">2. మీ ఫోటో</h2>
+ <input type="file" id="meF" accept="image/*">
+ <div class="note" id="sv" style="color:#9be7a5"></div>
+ <div class="note">ఫోటో బ్యాక్‌గ్రౌండ్ ఆటోమేటిక్‌గా తొలగిపోతుంది (మొదటిసారి కొంచెం సమయం పడుతుంది).</div>
+ <div class="note" style="color:#FFE9B0;font-weight:700">పోస్టర్ మీద ఫోటో, పేరు, పదవి బాక్స్‌లను వేలితో లాగి కదిలించండి. ఫోటోను రెండు వేళ్లతో పెద్దగా / చిన్నగా చేయవచ్చు.</div>
+ <div style="display:none"><input type="range" id="ms" min="30" max="300" value="100"><input type="range" id="mx" min="-1000" max="400" value="0"><input type="range" id="my" min="-1300" max="250" value="0"></div>
+ <h2 style="margin-top:16px">3. పైన నాయకుల ఫోటోలు</h2>
+ <label>మొత్తం నాయకులు</label><select id="lc" style="width:100%;padding:11px;border-radius:8px;font-size:15px;font-family:inherit"><option value="0">5 మంది</option><option value="1">6 మంది</option><option value="2">7 మంది</option><option value="3">8 మంది</option><option value="4">9 మంది</option></select>
+ <div class="note">ఒక్కో వృత్తంపై నొక్కి ఆ నాయకుడి ఫోటో పెట్టండి (మొదటి రెండు: పెద్ద వృత్తాలు).</div>
+ <div id="ldrs"></div>
+ <input type="file" id="ldF" accept="image/*" style="display:none">
+ <button class="btn" id="dl">డౌన్‌లోడ్ చేయండి (PNG)</button>
+</div>
+<div class="card preview-area"><h2>ప్రివ్యూ</h2><div id="wrap"><canvas id="cv" width="1122" height="1402"></canvas><div id="hit"></div><div id="hitn"></div><div id="hitd"></div></div><div id="st"></div></div>
+</div>
+</div>
+<script src="studio-config.js"></script>
+<script src="studio-templates.js"></script>
+<script>
+var ART=window.JN_TEMPLATES[0].art;
+var PB=null,NB=null,DB=null,TX={nm:[0,0,1],dg:[0,0,1]};var cv=document.getElementById('cv'),g=cv.getContext('2d'),W=1122,H=1402,EXP=false,pend=-1,ME=null,IM={};
+var NS=3,SL=[],SP=[];
+function mkSL(){SL=[[23,39,146],[953,39,146]];var w=NS*88+(NS-1)*20,x0=Math.round((1122-w)/2);for(var k=0;k<NS;k++)SL.push([x0+108*k,72,88]);SP=SL.map(function(){return 0})}
+var CU=[];for(var k=0;k<9;k++)CU.push(null);mkSL();   // custom leader canvases
+function $(i){return document.getElementById(i)}
+function img(src){return new Promise(function(r){if(IM[src])return r(IM[src]);var i=new Image();i.onload=function(){IM[src]=i;r(i)};i.onerror=function(){r(null)};i.src=src})}
+function fit(t,fam,wt,maxW,st,mn){var p=st;while(p>mn){g.font=wt+' '+p+'px '+fam;if(g.measureText(t).width<=maxW)break;p--}return p}
+function ring(c,cx,cy,d,hasFill){c.beginPath();c.arc(cx,cy,d/2-2,0,6.2832);c.lineWidth=4;c.strokeStyle='#efbf59';c.stroke()}
+async function draw(){await draw0();placeHit()}
+async function draw0(){
+ try{await document.fonts.load('40px Ramabhadra','తెలుగు');await document.fonts.load('700 30px "Noto Sans Telugu"','తెలుగు')}catch(e){}
+ g.clearRect(0,0,W,H);g.imageSmoothingQuality='high';
+ g.fillStyle='#0f2561';g.fillRect(0,0,W,H);g.drawImage(await img(ART),0,0,W,1226);g.fillStyle='#0f2561';g.fillRect(0,1226,W,H-1226);g.fillStyle='rgba(255,216,116,.55)';g.fillRect(0,1226,W,3);
+ for(var i=0;i<SL.length;i++){var q=SL[i],cx=q[0]+q[2]/2,cy=q[1]+q[2]/2;
+  if(!CU[i]){if(EXP){continue}g.save();g.beginPath();g.arc(cx,cy,q[2]/2-2,0,6.2832);g.fillStyle='rgba(60,10,10,.45)';g.fill();g.setLineDash([9,7]);g.lineWidth=3;g.strokeStyle='rgba(255,216,116,.9)';g.stroke();g.setLineDash([]);g.fillStyle='rgba(255,216,116,.95)';g.font='700 '+Math.round(q[2]*0.42)+'px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('+',cx,cy+2);g.restore();continue}
+  g.save();g.beginPath();g.arc(cx,cy,q[2]/2-2,0,6.2832);g.clip();
+  var gr=g.createRadialGradient(cx,cy-q[2]*0.1,2,cx,cy,q[2]/2);gr.addColorStop(0,'#6b3118');gr.addColorStop(1,'#2a0f06');g.fillStyle=gr;g.fillRect(q[0],q[1],q[2],q[2]);
+  var o=CU[i],d=q[2]-10,sc=Math.min(d/o.width,d/o.height*1.0);if(o.width*sc<d*0.6)sc=d*0.6/o.width;var w=o.width*sc,h=o.height*sc;
+  g.drawImage(o,cx-w/2,q[1]+q[2]-5-h,w,h);g.restore();ring(g,cx,cy,q[2])}
+ if(ME){var s2=(+$('ms').value)/100,bw=260,bh=330,sc3=Math.min(bw/ME.width,bh/ME.height)*s2,mw=ME.width*sc3,mh=ME.height*sc3;
+  PB=[1110-mw+(+$('mx').value),H-mh+(+$('my').value),mw,mh];g.drawImage(ME,PB[0],PB[1],mw,mh)}
+ else if(!EXP){PB=null;g.save();g.setLineDash([10,8]);g.strokeStyle='rgba(255,216,116,.7)';g.lineWidth=3;g.strokeRect(850,1072,260,330);g.fillStyle='rgba(255,216,116,.8)';g.font='700 26px "Noto Sans Telugu",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('మీ ఫోటో',980,1237);g.restore()}
+ var nm=$('nm').value||(EXP?'':'మీ పేరు'),dg=$('dg').value||(EXP?'':'మీ పదవి');
+ g.textAlign='left';g.textBaseline='top';
+ NB=null;DB=null;if(nm){var p=Math.round(fit(nm,'Ramabhadra, "Noto Sans Telugu"','400',760,56,24)*TX.nm[2]);g.font=p+'px Ramabhadra, "Noto Sans Telugu", sans-serif';g.fillStyle=$('nm').value?'#ffffff':'rgba(255,255,255,.6)';var nx=44+TX.nm[0],ny=1262+TX.nm[1];g.fillText(nm,nx,ny);var nw=g.measureText(nm).width;NB=[nx,ny,nw,p*1.35]}
+ if(dg){var q2=Math.round(fit(dg,'"Noto Sans Telugu"','700',760,30,16)*TX.dg[2]);g.font='700 '+q2+'px "Noto Sans Telugu",sans-serif';g.fillStyle=$('dg').value?'#ffd874':'rgba(255,216,116,.65)';var dx2=44+TX.dg[0],dy2=1348+TX.dg[1];g.fillText(dg,dx2,dy2);var dw=g.measureText(dg).width;DB=[dx2,dy2,dw,q2*1.5]}
+}
+function th(){var d=$('ldrs');d.innerHTML='';for(var i=0;i<NS+2;i++){(function(i){var c=document.createElement('div');c.className='lc';var t=document.createElement('canvas');t.width=t.height=52;t.style.cssText='width:100%;height:100%;border-radius:0;box-shadow:none';
+ var tc=t.getContext('2d');if(CU[i]){var o=CU[i],sc=Math.min(52/o.width,52/o.height);tc.drawImage(o,(52-o.width*sc)/2,52-o.height*sc,o.width*sc,o.height*sc)}else{tc.fillStyle='#fff3';tc.font='700 26px sans-serif';tc.textAlign='center';tc.fillText('+',26,35)}
+ c.appendChild(t);c.onclick=function(){pend=i;$('ldF').click()};d.appendChild(c)})(i)}}
+function bbox(o){var d=o.getContext('2d').getImageData(0,0,o.width,o.height).data,x0=o.width,x1=0,y0=o.height,y1=0;
+ for(var y=0;y<o.height;y++)for(var x=0;x<o.width;x++)if(d[(y*o.width+x)*4+3]>40){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+ var w=x1-x0+1,h=y1-y0+1,t=document.createElement('canvas');t.width=w;t.height=h;t.getContext('2d').drawImage(o,x0,y0,w,h,0,0,w,h);return t}
+$('lc').onchange=function(){NS=3+(+$('lc').value);mkSL();th();draw()};
+function okCut(o){var w=o.width,h=o.height,d=o.getContext('2d').getImageData(0,0,w,h).data,n=0,c=0,cn=0;
+ for(var y=0;y<h;y+=3)for(var x=0;x<w;x+=3){var a=d[(y*w+x)*4+3]>128;n++;if(a)c++;if(x>w*.3&&x<w*.7&&y>h*.1&&y<h*.5){cn++;}}
+ var cc=0;for(y=Math.floor(h*.1);y<h*.5;y+=3)for(x=Math.floor(w*.3);x<w*.7;x+=3){if(d[(y*w+x)*4+3]>128)cc++}
+ return c/n>=0.2&&cc/cn>=0.6}
+async function loadImg(f){var u=URL.createObjectURL(f);return await new Promise(function(r,j){var a=new Image();a.onload=function(){r(a)};a.onerror=j;a.src=u})}
+function hasAlpha(im){var c=document.createElement('canvas');c.width=Math.min(200,im.width);c.height=Math.min(200,im.height);var g=c.getContext('2d');g.drawImage(im,0,0,c.width,c.height);var d=g.getImageData(0,0,c.width,c.height).data,t=0;for(var i=3;i<d.length;i+=4)if(d[i]<250)t++;return t/(c.width*c.height)>0.03}
+function plain(im){var t=document.createElement('canvas'),s=Math.min(1,700/Math.max(im.width,im.height));t.width=Math.round(im.width*s);t.height=Math.round(im.height*s);t.getContext('2d').drawImage(im,0,0,t.width,t.height);return t}
+$('ldF').onchange=async function(e){var f=e.target.files[0];e.target.value='';if(!f||pend<0)return;var i=pend;$('st').className='';$('st').textContent='నాయకుడి ఫోటో సిద్ధం చేస్తున్నాం…';
+ var o=null,im0=null;try{im0=await loadImg(f)}catch(err){}
+ if(im0&&hasAlpha(im0)){CU[i]=plain(im0);$('st').textContent=''}
+ else{try{o=await cut(f)}catch(err){}
+ if(o&&!okCut(o)){o=null}
+ if(o){CU[i]=bbox(o);$('st').textContent=''}
+ else{var u=URL.createObjectURL(f),im=await new Promise(function(r){var a=new Image();a.onload=function(){r(a)};a.src=u}),t=document.createElement('canvas'),s=Math.min(1,500/Math.max(im.width,im.height));t.width=im.width*s;t.height=im.height*s;t.getContext('2d').drawImage(im,0,0,t.width,t.height);CU[i]=t;$('st').className='warn';$('st').textContent='⚠ బ్యాక్‌గ్రౌండ్ తొలగింపు విఫలమైంది - ఈ ఫోటో అసలు బ్యాక్‌గ్రౌండ్‌తోనే పెట్టబడింది'}}
+ th();draw()};
+['nm','dg','ms','mx','my'].forEach(function(i){$(i).oninput=draw});
+var modP=null;
+function loadMod(){if(!modP)modP=import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3/dist/transformers.min.js').then(function(m){return m.pipeline('background-removal','Xenova/modnet',{dtype:'fp32',device:'wasm'})}).catch(function(e){modP=null;throw e});return modP}
+async function cut(file){
+ var u=URL.createObjectURL(file),im=await new Promise(function(r,j){var i=new Image();i.onload=function(){r(i)};i.onerror=j;i.src=u});
+ var s=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+ var seg=await Promise.race([loadMod(),new Promise(function(_,j){setTimeout(function(){j(new Error('timeout'))},60000)})]);
+ var bu=await new Promise(function(r){c.toBlob(r,'image/png')}),url=URL.createObjectURL(bu);
+ var r=await seg(url);r=Array.isArray(r)?r[0]:r;var oc=r.toCanvas(),o=document.createElement('canvas');o.width=oc.width;o.height=oc.height;o.getContext('2d').drawImage(oc,0,0);return o}
+$('meF').onchange=async function(e){var f=e.target.files[0];e.target.value='';if(!f)return;$('st').className='';$('st').textContent='ఫోటో సిద్ధం చేస్తున్నాం…';
+ try{ME=bbox(await cut(f));$('st').textContent='ఫోటో సిద్ధం'}catch(err){$('st').className='warn';$('st').textContent='⚠ బ్యాక్‌గ్రౌండ్ తొలగింపు రాలేదు – ఫోటో అసలు బ్యాక్‌గ్రౌండ్‌తోనే చేర్చబడింది';var u=URL.createObjectURL(f);ME=await new Promise(function(r){var i=new Image();i.onload=function(){r(i)};i.src=u})}
+ draw()};
+$('dl').onclick=async function(){EXP=true;await draw();cv.toBlob(function(b){var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='jananetha-poster-'+TPL.id+'.png';a.click();EXP=false;draw()},'image/png')};
+
+// drag + pinch on the photo (pointer events on an overlay box, touch-action:none)
+var hitEl=document.getElementById('hit'),hitN=document.getElementById('hitn'),hitD=document.getElementById('hitd');
+function placeBox(el,B){if(!B){el.style.display='none';return}
+ var x0=Math.max(0,B[0]),y0=Math.max(0,B[1]),x1=Math.min(W,B[0]+B[2]),y1=Math.min(H,B[1]+B[3]);
+ if(x1<=x0||y1<=y0){el.style.display='none';return}
+ if(x1-x0<80){var c=(x0+x1)/2;x0=Math.max(0,c-40);x1=Math.min(W,c+40)}if(y1-y0<60){var d=(y0+y1)/2;y0=Math.max(0,d-30);y1=Math.min(H,d+30)}
+ el.style.display='block';el.style.left=(x0/W*100)+'%';el.style.top=(y0/H*100)+'%';el.style.width=((x1-x0)/W*100)+'%';el.style.height=((y1-y0)/H*100)+'%'}
+function placeHit(){placeBox(hitEl,ME?PB:null);placeBox(hitN,NB);placeBox(hitD,DB)}
+(function(){
+ function setv(id,v){var e=$(id);e.value=Math.max(+e.min,Math.min(+e.max,Math.round(v)))}
+ function cl(v,a,b){return Math.max(a,Math.min(b,v))}
+ function bind(el,onMove,getS,setS){
+  var P={},drag=null,pin=null;
+  function k(){return Object.keys(P)}
+  function sc(){return W/cv.getBoundingClientRect().width}
+  el.addEventListener('pointerdown',function(e){e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(x){}
+   P[e.pointerId]=[e.clientX,e.clientY];var ks=k();
+   if(ks.length==1){drag=[e.clientX,e.clientY];pin=null}
+   else if(ks.length>=2){drag=null;var a=P[ks[0]],b=P[ks[1]];pin={d:Math.hypot(a[0]-b[0],a[1]-b[1]),s:getS()}}});
+  el.addEventListener('pointermove',function(e){if(!(e.pointerId in P))return;e.preventDefault();P[e.pointerId]=[e.clientX,e.clientY];var ks=k();
+   if(ks.length>=2&&pin){var a=P[ks[0]],b=P[ks[1]],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pin.d>4){setS(pin.s*d/pin.d);draw()}}
+   else if(ks.length==1&&drag){var f=sc();onMove((e.clientX-drag[0])*f,(e.clientY-drag[1])*f);drag=[e.clientX,e.clientY];draw()}});
+  function up(e){delete P[e.pointerId];var ks=k();pin=null;drag=ks.length==1?P[ks[0]].slice():null}
+  el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);el.addEventListener('lostpointercapture',up);
+  el.addEventListener('contextmenu',function(e){e.preventDefault()});
+  if(el===hitEl)el.addEventListener('wheel',function(e){e.preventDefault();setS(getS()*(e.deltaY<0?1.06:0.94));draw()},{passive:false});
+ }
+ bind(hitEl,function(x,y){setv('mx',+$('mx').value+x);setv('my',+$('my').value+y)},function(){return +$('ms').value},function(v){setv('ms',v)});
+ function tb(key){return function(x,y){TX[key][0]=cl(TX[key][0]+x,-900,900);TX[key][1]=cl(TX[key][1]+y,-1300,120)}}
+ bind(hitN,tb('nm'),function(){return 1},function(){});
+ bind(hitD,tb('dg'),function(){return 1},function(){});
+})();
+(async function(){th();draw()})();
+
+var TPL=window.JN_TEMPLATES[0],STORE=null,UID=null,HYD=true,saveT=null,SAVED={me:null,cu:[]},LAST='';
+function showTpls(){var d=$('tpls');d.innerHTML='';window.JN_TEMPLATES.forEach(function(t){var e=document.createElement('div');e.className='tp'+(t.id==TPL.id?' on':'');e.innerHTML='<img src="'+t.art+'"><div>'+t.title+'</div>';e.onclick=function(){useTpl(t)};d.appendChild(e)})}
+function useTpl(t){TPL=t;ART=t.art;showTpls();draw()}
+function enc(c,mx){var s=Math.min(1,mx/Math.max(c.width,c.height)),t=document.createElement('canvas');t.width=Math.max(1,Math.round(c.width*s));t.height=Math.max(1,Math.round(c.height*s));t.getContext('2d').drawImage(c,0,0,t.width,t.height);
+ var u=t.toDataURL('image/webp',.82);if(u.indexOf('image/webp')<0)u=t.toDataURL('image/png');return u}
+function encFit(c,mx){var u=enc(c,mx),k=0;while(u.length>700000&&k<4){mx=Math.round(mx*.75);u=enc(c,mx);k++}return u}
+function fromUrl(u){return new Promise(function(r){var i=new Image();i.onload=function(){r(i)};i.onerror=function(){r(null)};i.src=u})}
+function curState(){return {name:$('nm').value,desg:$('dg').value,ns:NS,pos:{ms:+$('ms').value,mx:+$('mx').value,my:+$('my').value,tx:TX}}}
+function schedSave(){if(HYD||!STORE||!UID)return;clearTimeout(saveT);$('sv').textContent='సేవ్ చేస్తున్నాం…';saveT=setTimeout(doSave,1200)}
+async function doSave(){try{var st=curState();var prev=await STORE.getMain(UID)||{};var pos=prev.pos||{};pos[TPL.id]=st.pos;
+  var assets={};if(ME&&ME!==SAVED.me){assets.photo=encFit(ME,420)}
+  for(var i=0;i<9;i++){if(CU[i]&&CU[i]!==SAVED.cu[i])assets['l'+i]=encFit(CU[i],260)}
+  await STORE.saveMain(UID,{name:st.name,desg:st.desg,ns:st.ns,pos:pos});
+  for(var k in assets){await STORE.saveAsset(UID,k,assets[k])}
+  SAVED.me=ME;for(i=0;i<9;i++)SAVED.cu[i]=CU[i];$('sv').textContent='సేవ్ అయింది ✓'}catch(e){$('sv').className='warn';$('sv').textContent='⚠ సేవ్ కాలేదు: '+(e&&e.message||e)}}
+var _draw=draw;draw=async function(){await _draw();schedSave()};
+async function hydrate(){HYD=true;var m=await STORE.getMain(UID);
+  $('nm').value=(m&&m.name)||'';$('dg').value=(m&&m.desg)||'';
+  if(m&&m.ns){NS=m.ns;$('lc').value=String(NS-3);mkSL()}
+  var p=m&&m.pos&&m.pos[TPL.id];if(p){$('ms').value=p.ms;$('mx').value=p.mx;$('my').value=p.my;if(p.tx)TX=p.tx}
+  var ph=await STORE.getAsset(UID,'photo');ME=ph?await fromUrl(ph):null;SAVED.me=ME;
+  for(var i=0;i<9;i++){var u=await STORE.getAsset(UID,'l'+i);CU[i]=u?await fromUrl(u):null;SAVED.cu[i]=CU[i]}
+  th();HYD=false;await draw();$('sv').textContent=m?'మీ సేవ్ చేసిన వివరాలు లోడ్ అయ్యాయి':'' }
+function fbStore(cfg){var M=null,P=null;
+ async function init(){if(M)return;var b='https://www.gstatic.com/firebasejs/10.14.1/';var a=await import(b+'firebase-app.js'),au=await import(b+'firebase-auth.js'),fs=await import(b+'firebase-firestore.js');
+  var app=a.initializeApp(cfg);M={au:au,fs:fs,auth:au.getAuth(app),db:fs.getFirestore(app)}}
+ return {async onAuth(cb){await init();M.au.onAuthStateChanged(M.auth,function(u){cb(u?{uid:u.uid,name:u.displayName||u.email}:null)})},
+  async signIn(){await init();await M.au.signInWithPopup(M.auth,new M.au.GoogleAuthProvider())},
+  async signOut(){await M.au.signOut(M.auth)},
+  async getMain(uid){var s=await M.fs.getDoc(M.fs.doc(M.db,'users',uid));return s.exists()?s.data():null},
+  async saveMain(uid,d){await M.fs.setDoc(M.fs.doc(M.db,'users',uid),d)},
+  async getAsset(uid,k){var s=await M.fs.getDoc(M.fs.doc(M.db,'users',uid,'assets',k));return s.exists()?s.data().d:null},
+  async saveAsset(uid,k,d){await M.fs.setDoc(M.fs.doc(M.db,'users',uid,'assets',k),{d:d})}}}
+async function startApp(){
+ STORE=window.JN_TEST_STORE||(window.JN_FIREBASE_CONFIG?fbStore(window.JN_FIREBASE_CONFIG):null);
+ if(!STORE){$('scLogin').style.display='block';$('gIn').style.display='none';$('lgMsg').textContent='లాగిన్ ఇంకా సిద్ధం కాలేదు. త్వరలో అందుబాటులోకి వస్తుంది.';return}
+ $('gIn').onclick=async function(){$('lgErr').textContent='';try{await STORE.signIn()}catch(e){$('lgErr').textContent='లాగిన్ కాలేదు: '+(e&&e.message||e)}};
+ $('gOut').onclick=function(){STORE.signOut()};
+ await STORE.onAuth(async function(u){if(!u){UID=null;ME=null;for(var i=0;i<9;i++)CU[i]=null;$('nm').value='';$('dg').value='';$('scApp').style.display='none';$('scLogin').style.display='block';return}
+  UID=u.uid;$('who').textContent=u.name;$('scLogin').style.display='none';$('scApp').style.display='block';useTpl(TPL);await hydrate()})}
+startApp();
+</script>
+</body>
+</html>
