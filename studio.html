@@ -84,8 +84,8 @@ async function draw0(){
   if(!CU[i]){if(EXP){continue}g.save();g.beginPath();g.arc(cx,cy,q[2]/2-2,0,6.2832);g.fillStyle='rgba(60,10,10,.45)';g.fill();g.setLineDash([9,7]);g.lineWidth=3;g.strokeStyle='rgba(255,216,116,.9)';g.stroke();g.setLineDash([]);g.fillStyle='rgba(255,216,116,.95)';g.font='700 '+Math.round(q[2]*0.42)+'px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('+',cx,cy+2);g.restore();continue}
   g.save();g.beginPath();g.arc(cx,cy,q[2]/2-2,0,6.2832);g.clip();
   var gr=g.createRadialGradient(cx,cy-q[2]*0.1,2,cx,cy,q[2]/2);gr.addColorStop(0,'#6b3118');gr.addColorStop(1,'#2a0f06');g.fillStyle=gr;g.fillRect(q[0],q[1],q[2],q[2]);
-  var o=CU[i],d=q[2]-10,sc=Math.min(d/o.width,d/o.height*1.0);if(o.width*sc<d*0.6)sc=d*0.6/o.width;var w=o.width*sc,h=o.height*sc;
-  g.drawImage(o,cx-w/2,q[1]+q[2]-5-h,w,h);g.restore();ring(g,cx,cy,q[2])}
+  var o=CU[i],f=leadFit(o,q[2]),w=o.width*f.sc,h=o.height*f.sc;
+  g.drawImage(o,cx-w/2+f.dx,q[1]+q[2]-5-h,w,h);g.restore();ring(g,cx,cy,q[2])}
  if(ME){var s2=(+$('ms').value)/100,bw=260,bh=330,sc3=Math.min(bw/ME.width,bh/ME.height)*s2,mw=ME.width*sc3,mh=ME.height*sc3;
   PB=[1110-mw+(+$('mx').value),H-mh+(+$('my').value),mw,mh];g.drawImage(ME,PB[0],PB[1],mw,mh)}
  else if(!EXP){PB=null;g.save();g.setLineDash([10,8]);g.strokeStyle='rgba(255,216,116,.7)';g.lineWidth=3;g.strokeRect(850,1072,260,330);g.fillStyle='rgba(255,216,116,.8)';g.font='700 26px "Noto Sans Telugu",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('మీ ఫోటో',980,1237);g.restore()}
@@ -97,6 +97,18 @@ async function draw0(){
 function th(){var d=$('ldrs');d.innerHTML='';for(var i=0;i<NS+2;i++){(function(i){var c=document.createElement('div');c.className='lc';var t=document.createElement('canvas');t.width=t.height=52;t.style.cssText='width:100%;height:100%;border-radius:0;box-shadow:none';
  var tc=t.getContext('2d');if(CU[i]){var o=CU[i],sc=Math.min(52/o.width,52/o.height);tc.drawImage(o,(52-o.width*sc)/2,52-o.height*sc,o.width*sc,o.height*sc)}else{tc.fillStyle='#fff3';tc.font='700 26px sans-serif';tc.textAlign='center';tc.fillText('+',26,35)}
  c.appendChild(t);c.onclick=function(){pend=i;$('ldF').click()};d.appendChild(c)})(i)}}
+function leadFit(o,D){if(o._lf&&o._lf.D===D)return o._lf;var d=D-10,r=D/2-2-4,sc=Math.min(d/o.width,d/o.height);if(o.width*sc<d*0.6)sc=d*0.6/o.width;
+ var w0=o.width,h0=o.height,m=document.createElement('canvas');m.width=Math.min(120,w0);m.height=Math.round(m.width*h0/w0);var mc=m.getContext('2d');mc.drawImage(o,0,0,m.width,m.height);var A=mc.getImageData(0,0,m.width,m.height).data,P=[],x0=m.width,x1=0,ty=m.height,by=0;
+ for(var y=0;y<m.height;y++)for(var x=0;x<m.width;x++)if(A[(y*m.width+x)*4+3]>40){if(x<x0)x0=x;if(x>x1)x1=x;if(y<ty)ty=y;if(y>by)by=y;P.push([x,y])}
+ var k=w0/m.width,top=ty*k,bot=by*k,hh=bot-top,dx=0;
+ if(P.length){var ux=[1e9,-1e9];P.forEach(function(p){if(p[1]*k<top+hh*0.5){if(p[0]<ux[0])ux[0]=p[0];if(p[0]>ux[1])ux[1]=p[0]}});var dx0=((ux[0]+ux[1])/2-m.width/2)*k}else{var dx0=0}
+ var cxo=dx0;
+ // shrink until every opaque pixel in the upper 60% lies inside the circle (bottom anchored, head centred)
+ for(var it=0;it<60;it++){var ok=true,ox=-cxo*sc;for(var j=0;j<P.length;j+=1){var p=P[j],py=p[1]*k;if(py>top+hh*0.6)continue;var X=p[0]*k*sc+ox-w0*sc/2,Y=-(h0*sc)+py*sc+ (D-10)*0+(D/2-5)*1;
+   // circle centre at (0,0): image bottom at +(D/2-3)
+   var yy=py*sc-h0*sc+(D/2-3);if(X*X+yy*yy>r*r){ok=false;break}}
+  if(ok)break;sc*=0.97}
+ sc*=0.9;o._lf={D:D,sc:sc,dx:-cxo*sc};return o._lf}
 function bbox(o){var d=o.getContext('2d').getImageData(0,0,o.width,o.height).data,x0=o.width,x1=0,y0=o.height,y1=0;
  for(var y=0;y<o.height;y++)for(var x=0;x<o.width;x++)if(d[(y*o.width+x)*4+3]>40){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
  var w=x1-x0+1,h=y1-y0+1,t=document.createElement('canvas');t.width=w;t.height=h;t.getContext('2d').drawImage(o,x0,y0,w,h,0,0,w,h);return t}
