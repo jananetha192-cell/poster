@@ -115,7 +115,7 @@ $('ldF').onchange=async function(e){var f=e.target.files[0];e.target.value='';if
  if(o){CU[i]=bbox(o);$('st').textContent=''}
  else{var u=URL.createObjectURL(f),im=await new Promise(function(r){var a=new Image();a.onload=function(){r(a)};a.src=u}),t=document.createElement('canvas'),s=Math.min(1,500/Math.max(im.width,im.height));t.width=im.width*s;t.height=im.height*s;t.getContext('2d').drawImage(im,0,0,t.width,t.height);CU[i]=t;$('st').className='warn';$('st').textContent='⚠ బ్యాక్‌గ్రౌండ్ తొలగింపు విఫలమైంది - ఈ ఫోటో అసలు బ్యాక్‌గ్రౌండ్‌తోనే పెట్టబడింది'}}
  th();draw()};
-['nm','dg','ms','mx','my'].forEach(function(i){$(i).oninput=draw});
+['nm','dg','ms','mx','my'].forEach(function(i){$(i).oninput=function(){draw()}});
 var modP=null;
 function loadMod(){if(!modP)modP=import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3/dist/transformers.min.js').then(function(m){return m.pipeline('background-removal','Xenova/modnet',{dtype:'fp32',device:'wasm'})}).catch(function(e){modP=null;throw e});return modP}
 function tidy(o){var w=o.width,h=o.height,g=o.getContext('2d'),im=g.getImageData(0,0,w,h),d=im.data,n=w*h,m=new Uint8Array(n),t=new Uint8Array(n),i;
