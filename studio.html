@@ -113,10 +113,19 @@ function bbox(o){var d=o.getContext('2d').getImageData(0,0,o.width,o.height).dat
  for(var y=0;y<o.height;y++)for(var x=0;x<o.width;x++)if(d[(y*o.width+x)*4+3]>40){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
  var w=x1-x0+1,h=y1-y0+1,t=document.createElement('canvas');t.width=w;t.height=h;t.getContext('2d').drawImage(o,x0,y0,w,h,0,0,w,h);return t}
 $('lc').onchange=function(){NS=3+(+$('lc').value);mkSL();th();draw()};
-function okCut(o){var w=o.width,h=o.height,d=o.getContext('2d').getImageData(0,0,w,h).data,n=0,c=0,cn=0;
+function okCutOld(o){var w=o.width,h=o.height,d=o.getContext('2d').getImageData(0,0,w,h).data,n=0,c=0,cn=0;
  for(var y=0;y<h;y+=3)for(var x=0;x<w;x+=3){var a=d[(y*w+x)*4+3]>128;n++;if(a)c++;if(x>w*.3&&x<w*.7&&y>h*.1&&y<h*.5){cn++;}}
  var cc=0;for(y=Math.floor(h*.1);y<h*.5;y+=3)for(x=Math.floor(w*.3);x<w*.7;x+=3){if(d[(y*w+x)*4+3]>128)cc++}
  return c/n>=0.2&&cc/cn>=0.6}
+function okCut(o){return okCutOld(o)||okCutBox(o)}
+function okCutBox(o){var w=o.width,h=o.height,d=o.getContext('2d').getImageData(0,0,w,h).data,n=0,c=0,x0=w,x1=-1,y0=h,y1=-1;
+ for(var y=0;y<h;y+=3)for(var x=0;x<w;x+=3){n++;if(d[(y*w+x)*4+3]>128){c++;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}}
+ if(x1<0||c/n<0.2)return false;var bw=x1-x0,bh=y1-y0,cn=0,cc=0;
+ for(y=Math.floor(y0+bh*.1);y<y0+bh*.5;y+=3)for(x=Math.floor(x0+bw*.3);x<x0+bw*.7;x+=3){cn++;if(d[(y*w+x)*4+3]>128)cc++}
+ if(!(cn>0&&cc/cn>=0.6))return false;
+ var tl=0,tt=0,tr=0,tn=0;for(y=y0;y<y0+bh*.2;y+=3)for(x=x0;x<x0+bw*.2;x+=3){tn++;if(d[(y*w+x)*4+3]>128)tl++}
+ for(y=y0;y<y0+bh*.2;y+=3)for(x=Math.floor(x1-bw*.2);x<=x1;x+=3){tt++;if(d[(y*w+x)*4+3]>128)tr++}
+ return tn>0&&tt>0&&tl/tn<0.5&&tr/tt<0.5}
 async function loadImg(f){var u=URL.createObjectURL(f);return await new Promise(function(r,j){var a=new Image();a.onload=function(){r(a)};a.onerror=j;a.src=u})}
 function hasAlpha(im){var c=document.createElement('canvas');c.width=Math.min(200,im.width);c.height=Math.min(200,im.height);var g=c.getContext('2d');g.drawImage(im,0,0,c.width,c.height);var d=g.getImageData(0,0,c.width,c.height).data,t=0;for(var i=3;i<d.length;i+=4)if(d[i]<250)t++;return t/(c.width*c.height)>0.03}
 function plain(im){var t=document.createElement('canvas'),s=Math.min(1,700/Math.max(im.width,im.height));t.width=Math.round(im.width*s);t.height=Math.round(im.height*s);t.getContext('2d').drawImage(im,0,0,t.width,t.height);return t}
