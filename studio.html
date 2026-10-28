@@ -190,6 +190,7 @@ async function doSave(){try{var st=curState();var prev=await STORE.getMain(UID)|
   for(var k in assets){await STORE.saveAsset(UID,k,assets[k])}
   SAVED.me=ME;for(i=0;i<9;i++)SAVED.cu[i]=CU[i];$('sv').textContent='సేవ్ అయింది ✓'}catch(e){$('sv').className='warn';$('sv').textContent='⚠ సేవ్ కాలేదు: '+(e&&e.message||e)}}
 var _draw=draw;draw=async function(){await _draw();schedSave()};
+async function JNsafeHydrate(fn,ids){var els=ids.map(function(i){return document.getElementById(i)}),ph=els.map(function(e){return e&&e.placeholder}),sv=document.getElementById('sv');function lock(on){els.forEach(function(e,k){if(!e)return;e.disabled=on;e.placeholder=on?'లోడ్ అవుతోంది…':(ph[k]||'')})}lock(true);if(sv){sv.className='note';sv.textContent='మీ వివరాలు లోడ్ అవుతున్నాయి… కొద్దిసేపు ఆగండి'}for(var t=0;t<3;t++){try{await fn();lock(false);return}catch(e){HYD=true;if(sv)sv.textContent='లోడ్ కాలేదు, మళ్లీ ప్రయత్నిస్తున్నాం…';await new Promise(function(r){setTimeout(r,3000)})}}HYD=true;if(sv){sv.className='note warn';sv.innerHTML='⚠ మీ వివరాలు లోడ్ కాలేదు (ఇంటర్నెట్ సమస్య కావచ్చు). <a href="" onclick="location.reload();return false" style="color:#fff;text-decoration:underline">మళ్లీ ప్రయత్నించండి</a>. అప్పటివరకు ఇప్పటి సేవ్ చేసిన వివరాలు మారవు.'}}
 async function hydrate(){HYD=true;var m=await STORE.getMain(UID);
   $('nm').value=(m&&m.name)||'';$('dg').value=(m&&m.desg)||'';
   if(m&&m.ns){NS=m.ns;$('lc').value=String(NS-3);mkSL()}
@@ -213,7 +214,7 @@ async function startApp(){
  $('gIn').onclick=async function(){$('lgErr').textContent='';try{await STORE.signIn()}catch(e){$('lgErr').textContent='లాగిన్ కాలేదు: '+(e&&e.message||e)}};
  $('gOut').onclick=function(){STORE.signOut()};
  await STORE.onAuth(async function(u){if(!u){UID=null;ME=null;for(var i=0;i<9;i++)CU[i]=null;$('nm').value='';$('dg').value='';$('scApp').style.display='none';$('scLogin').style.display='block';return}
-  UID=u.uid;$('who').textContent=u.name;$('scLogin').style.display='none';$('scApp').style.display='block';useTpl(TPL);await hydrate()})}
+  UID=u.uid;$('who').textContent=u.name;$('scLogin').style.display='none';$('scApp').style.display='block';useTpl(TPL);await JNsafeHydrate(hydrate,['nm','dg'])})}
 startApp();
 </script>
 </body>
