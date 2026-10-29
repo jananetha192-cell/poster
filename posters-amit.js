@@ -1,1 +1,1 @@
-POSTERS.unshift({date:'2026-11-02',title:'అమిత్ షా · మహా పాదయాత్ర',sub:'మీ పేరు, మీ ఫోటోతో పోస్టర్',href:'3-studio-amit.html',img:'1-amit-highlight.png',home:true});
+POSTERS.unshift({date:'2026-11-02',title:'అమిత్ షా · మహా పాదయాత్ర',sub:'మీ పేరు, మీ ఫోటోతో పోస్టర్',href:'3-studio-amit.html?v=20261029-highlight',img:'1-amit-highlight.png',home:true});
