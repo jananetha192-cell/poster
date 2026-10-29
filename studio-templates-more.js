@@ -4,4 +4,4 @@ window.JN_TEMPLATES.push({"id": "padayatra", "title": "మహా పాదయా
 
 window.JN_TEMPLATES.push({id:"patel-unity",title:"పటేల్ జయంతి",art:"2-patel-unity-base.png",url:"3-studio-patel.html"});
 
-window.JN_TEMPLATES.push({id:"amit-padayatra",title:"అమిత్ షా · మహా పాదయాత్ర",art:"1-amit-highlight.png",url:"3-studio-amit.html"});
+window.JN_TEMPLATES.push({id:"amit-padayatra",title:"అమిత్ షా · మహా పాదయాత్ర",art:"1-amit-highlight.png",url:"3-studio-amit.html?v=20261029-highlight"});
