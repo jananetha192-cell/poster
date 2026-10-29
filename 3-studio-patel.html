@@ -222,30 +222,35 @@ async function doSave(){try{var st=curState();var prev=await STORE.getMain(UID)|
   for(var k in assets){await STORE.saveAsset(UID,k,assets[k])}
   SAVED.me=ME;for(i=0;i<9;i++)SAVED.cu[i]=CU[i];$('sv').textContent='సేవ్ అయింది ✓'}catch(e){$('sv').className='warn';$('sv').textContent='⚠ సేవ్ కాలేదు: '+(e&&e.message||e)}}
 var _draw=draw;draw=async function(){await _draw();schedSave()};
-async function JNsafeHydrate(fn,ids){var els=ids.map(function(i){return document.getElementById(i)}),ph=els.map(function(e){return e&&e.placeholder}),sv=document.getElementById('sv');function lock(on){els.forEach(function(e,k){if(!e)return;e.disabled=on;e.placeholder=on?'లోడ్ అవుతోంది…':(ph[k]||'')})}lock(true);if(sv){sv.className='note';sv.textContent='మీ వివరాలు లోడ్ అవుతున్నాయి… కొద్దిసేపు ఆగండి'}for(var t=0;t<3;t++){try{await fn();lock(false);return}catch(e){HYD=true;if(sv)sv.textContent='లోడ్ కాలేదు, మళ్లీ ప్రయత్నిస్తున్నాం…';await new Promise(function(r){setTimeout(r,3000)})}}HYD=true;if(sv){sv.className='note warn';sv.innerHTML='⚠ మీ వివరాలు లోడ్ కాలేదు (ఇంటర్నెట్ సమస్య కావచ్చు). <a href="" onclick="location.reload();return false" style="color:#fff;text-decoration:underline">మళ్లీ ప్రయత్నించండి</a>. అప్పటివరకు ఇప్పటి సేవ్ చేసిన వివరాలు మారవు.'}}
-async function hydrate(){HYD=true;var m=await STORE.getMain(UID);
-  $('nm').value=(m&&m.name)||'';$('dg').value=(m&&m.desg)||'';
-  if(m&&m.ns){NS=m.ns;$('lc').value=String(NS-3);mkSL()}
-  var p=m&&m.pos&&m.pos[TPL.id];if(p){$('ms').value=p.ms;$('mx').value=p.mx;$('my').value=p.my;if(p.tx)TX=p.tx}
-  var ph=await STORE.getAsset(UID,'photo');ME=ph?await fromUrl(ph):null;SAVED.me=ME;
-  for(var i=0;i<9;i++){var u=await STORE.getAsset(UID,'l'+i);CU[i]=u?await fromUrl(u):null;SAVED.cu[i]=CU[i]}
-  th();HYD=false;await draw();$('sv').textContent=m?'మీ సేవ్ చేసిన వివరాలు లోడ్ అయ్యాయి':'' }
+function JNlockHydration(on){['nm','dg','meF','lc','ldF','dl'].forEach(function(id){var e=$(id);if(e)e.disabled=on});$('ldrs').style.pointerEvents=on?'none':'';$('wrap').style.pointerEvents=on?'none':''}
+async function JNsafeHydrate(fn,ids){HYD=true;clearTimeout(saveT);JNlockHydration(true);$('sv').className='note';$('sv').textContent='మీ వివరాలు లోడ్ అవుతున్నాయి… కొద్దిసేపు ఆగండి';var err;
+ for(var attempt=0;attempt<3;attempt++){try{await fn();JNlockHydration(false);return}catch(e){err=e;HYD=true;if(attempt<2){$('sv').textContent='లోడ్ కాలేదు, మళ్లీ ప్రయత్నిస్తున్నాం…';await new Promise(function(r){setTimeout(r,3000)})}}}
+ $('sv').className='note warn';$('sv').textContent='మీ వివరాలు లోడ్ కాలేదు. సేవ్ చేసిన వివరాలు మార్చలేదు. '+String(err&&err.code||'network-error')+' ';
+ var retry=document.createElement('button');retry.type='button';retry.textContent='మళ్లీ ప్రయత్నించండి';retry.onclick=function(){JNsafeHydrate(hydrate,ids)};$('sv').appendChild(retry)}
+async function hydrate(){HYD=true;var owner=UID;if(!owner)throw Error('not-signed-in');
+ var m=await STORE.getMain(owner);var raw=await Promise.all(['photo','l0','l1','l2','l3','l4','l5','l6','l7','l8'].map(function(k){return STORE.getAsset(owner,k)}));
+ var images=await Promise.all(raw.map(async function(u){if(!u)return null;var im=await fromUrl(u);if(!im)throw Error('saved-image-load-failed');return im}));
+ if(UID!==owner)throw Error('member-changed');
+ $('nm').value=m&&m.name||'';$('dg').value=m&&m.desg||'';NS=m&&m.ns||3;$('lc').value=String(NS-3);mkSL();
+ var p=m&&m.pos&&m.pos[TPL.id];$('ms').value=p&&p.ms||100;$('mx').value=p&&p.mx||0;$('my').value=p&&p.my||0;TX=p&&p.tx||{nm:[0,0,1],dg:[0,0,1]};
+ ME=images[0];SAVED.me=ME;for(var i=0;i<9;i++){CU[i]=images[i+1];SAVED.cu[i]=CU[i]}th();
+ await draw();clearTimeout(saveT);HYD=false;$('sv').textContent=m?'మీ సేవ్ చేసిన వివరాలు లోడ్ అయ్యాయి':''}
 function fbStore(cfg){var M=null,P=null;
  async function init(){if(M)return;var b='https://www.gstatic.com/firebasejs/10.14.1/';var a=await import(b+'firebase-app.js'),au=await import(b+'firebase-auth.js'),fs=await import(b+'firebase-firestore.js');
   var app=a.initializeApp(cfg);M={au:au,fs:fs,auth:au.getAuth(app),db:fs.getFirestore(app)}}
  return {async onAuth(cb){await init();M.au.onAuthStateChanged(M.auth,function(u){cb(u?{uid:u.uid,name:u.displayName||u.email}:null)})},
   async signIn(){await init();await M.au.signInWithPopup(M.auth,new M.au.GoogleAuthProvider())},
   async signOut(){await M.au.signOut(M.auth)},
-  async getMain(uid){var s=await M.fs.getDoc(M.fs.doc(M.db,'users',uid));return s.exists()?s.data():null},
+  async getMain(uid){var s=await M.fs.getDocFromServer(M.fs.doc(M.db,'users',uid));return s.exists()?s.data():null},
   async saveMain(uid,d){await M.fs.setDoc(M.fs.doc(M.db,'users',uid),d)},
-  async getAsset(uid,k){var s=await M.fs.getDoc(M.fs.doc(M.db,'users',uid,'assets',k));return s.exists()?s.data().d:null},
+  async getAsset(uid,k){var s=await M.fs.getDocFromServer(M.fs.doc(M.db,'users',uid,'assets',k));return s.exists()?s.data().d:null},
   async saveAsset(uid,k,d){await M.fs.setDoc(M.fs.doc(M.db,'users',uid,'assets',k),{d:d})}}}
 async function startApp(){
  STORE=window.JN_TEST_STORE||(window.JN_FIREBASE_CONFIG?fbStore(window.JN_FIREBASE_CONFIG):null);
  if(!STORE){$('scLogin').style.display='block';$('gIn').style.display='none';$('lgMsg').textContent='లాగిన్ ఇంకా సిద్ధం కాలేదు. త్వరలో అందుబాటులోకి వస్తుంది.';return}
  $('gIn').onclick=async function(){$('lgErr').textContent='';try{await STORE.signIn()}catch(e){$('lgErr').textContent='లాగిన్ కాలేదు: '+(e&&e.message||e)}};
  $('gOut').onclick=function(){STORE.signOut()};
- await STORE.onAuth(async function(u){if(!u){UID=null;ME=null;for(var i=0;i<9;i++)CU[i]=null;$('nm').value='';$('dg').value='';$('scApp').style.display='none';$('scLogin').style.display='block';return}
+ await STORE.onAuth(async function(u){if(!u){clearTimeout(saveT);HYD=true;UID=null;ME=null;for(var i=0;i<9;i++)CU[i]=null;$('nm').value='';$('dg').value='';$('scApp').style.display='none';$('scLogin').style.display='block';return}
   UID=u.uid;$('who').textContent=u.name;$('scLogin').style.display='none';$('scApp').style.display='block';useTpl(TPL);await JNsafeHydrate(hydrate,['nm','dg'])})}
 startApp();
 </script>
