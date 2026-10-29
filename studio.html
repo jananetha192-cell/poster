@@ -64,7 +64,7 @@ canvas{width:100%;max-width:440px;height:auto;border-radius:10px;box-shadow:0 8p
 </div>
 <script src="studio-config.js"></script>
 <script src="studio-templates.js"></script><script src="studio-templates-more.js"></script><script>window.JN_TEMPLATES.unshift({"id": "bjp-victory-20261029", "title": "బీజేపీ విజయాలకు అభినందనలు", "frame": "victory", "art": "2-bjp-victory-middle-20261029.jpg"});
-</script>
+window.JN_TEMPLATES.unshift({"id": "pmkisan24-20261029", "title": "పీఎం కిసాన్ 24వ విడత", "frame": "victory", "art": "1-pmkisan24-middle.jpg"});</script>
 <script>
 var ART=window.JN_TEMPLATES[0].art;
 var PB=null,NB=null,DB=null,TX={nm:[0,0,1],dg:[0,0,1]};var cv=document.getElementById('cv'),g=cv.getContext('2d'),W=1122,H=1402,EXP=false,pend=-1,ME=null,IM={};
@@ -88,7 +88,7 @@ async function draw0(){
   var gr=g.createRadialGradient(cx,cy-q[2]*0.1,2,cx,cy,q[2]/2);gr.addColorStop(0,TPL.frame==='victory'?'#eee4cd':'#6b3118');gr.addColorStop(1,TPL.frame==='victory'?'#eee4cd':'#2a0f06');g.fillStyle=gr;g.fillRect(q[0],q[1],q[2],q[2]);
   var o=CU[i],f=leadFit(o,q[2]),w=o.width*f.sc,h=o.height*f.sc;
   g.drawImage(o,cx-w/2+f.dx,q[1]+q[2]-5-h,w,h);g.restore();ring(g,cx,cy,q[2])}
- if(ME){var s2=(+$('ms').value)/100,bw=260,bh=(TPL.frame==='victory'?260:330),sc3=Math.min(bw/ME.width,bh/ME.height)*s2,mw=ME.width*sc3,mh=ME.height*sc3;
+ if(ME){var s2=(+$('ms').value)/100,bw=(TPL.id==='pmkisan24-20261029'?190:260),bh=(TPL.id==='pmkisan24-20261029'?170:(TPL.frame==='victory'?260:330)),sc3=Math.min(bw/ME.width,bh/ME.height)*s2,mw=ME.width*sc3,mh=ME.height*sc3;
   PB=[1110-mw+(+$('mx').value),(TPL.frame==='victory'?1322:H)-mh+(+$('my').value),mw,mh];g.drawImage(ME,PB[0],PB[1],mw,mh)}
  else if(!EXP){PB=null;g.save();g.setLineDash([10,8]);g.strokeStyle='rgba(255,216,116,.7)';g.lineWidth=3;g.strokeRect(850,1072,260,330);g.fillStyle='rgba(255,216,116,.8)';g.font='700 26px "Noto Sans Telugu",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('మీ ఫోటో',980,1237);g.restore()}
  var nm=$('nm').value||(EXP?'':'మీ పేరు'),dg=$('dg').value||(EXP?'':'మీ పదవి');
