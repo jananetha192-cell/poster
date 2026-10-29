@@ -86,7 +86,7 @@ async function draw0(){
   var o=CU[i],f=leadFit(o,q[2]),w=o.width*f.sc,h=o.height*f.sc;
   g.drawImage(o,cx-w/2+f.dx,q[1]+q[2]-5-h,w,h);g.restore();ring(g,cx,cy,q[2])}
  // Bottom identity panel and existing BJP lotus. Paint before member photo/text.
- g.save();g.fillStyle='#fff3d8';g.strokeStyle='#cf8c29';g.lineWidth=3;g.beginPath();g.roundRect(20,1240,1082,152,18);g.fill();g.stroke();g.restore();
+ g.save();g.fillStyle='#ffffff';g.strokeStyle='#cf8c29';g.lineWidth=3;g.beginPath();g.roundRect(20,1240,1082,152,18);g.fill();g.stroke();g.restore();
  var lotus=await img(LOTUS);if(lotus)g.drawImage(lotus,35,1266,110,118);
  if(ME){var s2=(+$('ms').value)/100,bw=135.2,bh=171.6,sc3=Math.min(bw/ME.width,bh/ME.height)*s2,mw=ME.width*sc3,mh=ME.height*sc3;
   PB=[1110-mw+(+$('mx').value),H-mh+(+$('my').value),mw,mh];g.drawImage(ME,PB[0],PB[1],mw,mh)}
