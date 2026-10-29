@@ -45,6 +45,7 @@ dialog{margin:auto;max-width:min(440px,calc(100% - 28px));max-height:90vh;overfl
 <div id="daytabs" aria-label="పోస్టర్ రోజు"><button type="button" data-day="0">నిన్న</button><button type="button" data-day="1" class="selected" aria-pressed="true">ఈ రోజు</button><button type="button" data-day="2">రేపు</button></div><div id="track"></div>
 <div id="dots"></div>
 <div id="count"></div>
+<div id="newPosters" style="margin:16px 14px 0"></div>
 <div class="below-actions"><a href="studio.html">నా ప్రొఫైల్</a><button type="button" id="inviteOpen">మీ స్నేహితులను ఆహ్వానించండి</button></div>
 <a class="arch" href="admin.html">అన్ని పోస్టర్లు (ఆర్కైవ్) చూడండి →</a>
 
@@ -52,6 +53,7 @@ dialog{margin:auto;max-width:min(440px,calc(100% - 28px));max-height:90vh;overfl
 </main>
 <dialog id="inviteDialog" aria-labelledby="inviteTitle"><h2 id="inviteTitle">మీ స్నేహితులను ఆహ్వానించండి</h2><p>స్టూడియోలో మీ పేరు, ఫొటో పెట్టి, పబ్లిక్‌గా చూపించడానికి ఒప్పుకున్న తర్వాత మీ వ్యక్తిగత ఆహ్వాన లింక్ సృష్టించుకోండి.</p><p>మీ హోదా, లీడర్ ఫొటోలు, మిగతా ప్రొఫైల్ ప్రైవేట్‌గానే ఉంటాయి. ఆహ్వాన లింక్‌ను ఎప్పుడైనా నిలిపివేయవచ్చు.</p><p>పోస్టర్ డౌన్‌లోడ్, లింక్ కాపీ, PNG + లింక్ షేర్ బటన్లు స్టూడియోలో ఉన్నాయి. WhatsAppలో పంపేముందు ఫొటోతో పాటు లింక్ క్యాప్షన్ ఉందో చూడండి.</p><a class="go" href="studio.html">నా ఆహ్వాన లింక్ సృష్టించండి</a><form method="dialog"><button class="dialog-close">మూసివేయండి</button></form></dialog>
 <script src="posters.js?v=202610252054"></script>
+<script src="posters-amit.js?v=20261029"></script>
 <script>
 /* మూడు స్లయిడ్‌లు: నిన్న / ఈ రోజు / రేపు – తేదీ ఆధారంగా ఆర్కైవ్ (posters.js) నుండి ఆటోమేటిక్ ఎంపిక */
 function istDate(off){var d=new Date(Date.now()+off*86400000);
@@ -65,6 +67,7 @@ function pick(ds){
   if(!first)first=p;
   if(p.feature){feat=p;break}}
  return feat||first}
+POSTERS.filter(function(p){return p.home}).forEach(function(p){var d=document.createElement('div');d.className='pcard';d.innerHTML='<div class="ptitle">'+p.title+'</div><div class="psub">'+p.sub+'</div><img src="'+p.img+'" alt="'+p.title+'" loading="lazy"><a class="go" style="margin-top:12px" href="'+p.href+'">పోస్టర్ చేసుకోండి</a>';document.getElementById('newPosters').appendChild(d)});
 var DAYS=[{label:'నిన్న',off:-1},{label:'ఈ రోజు',off:0},{label:'రేపు',off:1}];
 var tr=document.getElementById('track'),dots=document.getElementById('dots'),cnt=document.getElementById('count');
 DAYS.forEach(function(day,i){
