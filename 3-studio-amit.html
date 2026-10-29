@@ -92,7 +92,7 @@ async function draw0(){
  else if(!EXP){PB=null;g.save();g.setLineDash([10,8]);g.strokeStyle='rgba(255,216,116,.7)';g.lineWidth=3;g.strokeRect(584,818,190,225);g.fillStyle='rgba(255,216,116,.8)';g.font='700 26px "Noto Sans Telugu",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('మీ ఫోటో',679,930);g.restore()}
  var nm=$('nm').value||(EXP?'':'మీ పేరు'),dg=$('dg').value||(EXP?'':'మీ పదవి');
  g.textAlign='left';g.textBaseline='top';
- NB=null;DB=null;if(nm){var p=Math.round(fit(nm,'Ramabhadra, "Noto Sans Telugu"','400',515,42,22)*TX.nm[2]);g.font=p+'px Ramabhadra, "Noto Sans Telugu", sans-serif';g.fillStyle=$('nm').value?'#ffffff':'rgba(255,255,255,.6)';var nx=30+TX.nm[0],ny=880+TX.nm[1];g.fillText(nm,nx,ny);var nw=g.measureText(nm).width;NB=[nx,ny,nw,p*1.35]}
+ NB=null;DB=null;if(nm){var p=Math.round(fit(nm,'Ramabhadra, "Noto Sans Telugu"','400',515,42,22)*TX.nm[2]);g.font=p+'px Ramabhadra, "Noto Sans Telugu", sans-serif';var nx=30+TX.nm[0],ny=880+TX.nm[1];g.fillStyle=ny>=925?'#301f0d':'#ffffff';g.fillText(nm,nx,ny);var nw=g.measureText(nm).width;NB=[nx,ny,nw,p*1.35]}
  if(dg){var q2=Math.round(fit(dg,'"Noto Sans Telugu"','700',515,26,16)*TX.dg[2]);g.font='700 '+q2+'px "Noto Sans Telugu",sans-serif';g.fillStyle=$('dg').value?'#5b3b1b':'rgba(80,60,30,.65)';var dx2=30+TX.dg[0],dy2=955+TX.dg[1];g.fillText(dg,dx2,dy2);var dw=g.measureText(dg).width;DB=[dx2,dy2,dw,q2*1.5]}
 }
 function th(){var d=$('ldrs');d.innerHTML='';for(var i=0;i<NS+2;i++){(function(i){var c=document.createElement('div');c.className='lc';var t=document.createElement('canvas');t.width=t.height=52;t.style.cssText='width:100%;height:100%;border-radius:0;box-shadow:none';
