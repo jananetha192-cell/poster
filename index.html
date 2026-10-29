@@ -44,7 +44,7 @@ dialog{margin:auto;max-width:min(440px,calc(100% - 28px));max-height:90vh;overfl
 <body>
 <header><h1>జననేత</h1><p>రోజువారీ పోస్టర్లు – మీ పేరు, మీ ఫోటోతో</p></header>
 <main>
-<div id="daytabs" aria-label="పోస్టర్ రోజు"><button type="button" data-day="0">ఇంతకు ముందువి</button><button type="button" data-day="1" class="selected" aria-pressed="true">ఈ రోజు</button><button type="button" data-day="2">రాబోయేవి</button></div><div id="track"></div>
+<div id="daytabs" aria-label="పోస్టర్ రోజు"><button type="button" data-day="0">ఇంతకు ముందువి</button><button type="button" data-day="1" class="selected" aria-pressed="true">ఈ రోజు పోస్టర్లు</button><button type="button" data-day="2">రాబోయే పోస్టర్లు</button></div><div id="track"></div>
 <div id="dots"></div>
 <div id="count"></div>
 <div id="newPosters" style="margin:16px 14px 0"></div>
@@ -57,6 +57,9 @@ dialog{margin:auto;max-width:min(440px,calc(100% - 28px));max-height:90vh;overfl
 <script src="posters.js?v=202610252054"></script>
 <script>
 /* Critical home records travel with this page to prevent mixed-version data. */
+POSTERS=POSTERS.filter(function(p){return !/studio.html\?template=/.test(p.href||'')});
+POSTERS.unshift({date:'2026-10-29',title:'బీజేపీ విజయాలకు అభినందనలు',sub:'మీ ఫోటో, పేరు, పదవితో పోస్టర్',href:'studio.html?template=bjp-victory-20261029',img:'2-bjp-victory-middle-20261029.jpg',home:true});
+POSTERS.unshift({date:'2026-10-30',title:'పీఎం కిసాన్ 24వ విడత',sub:'మీ ఫోటో, పేరు, పదవితో పోస్టర్',href:'studio.html?template=pmkisan24-20261029',img:'1-pmkisan24-middle.jpg',home:true});
 POSTERS=POSTERS.filter(function(p){return !/3-studio-(amit|patel)\.html/.test(p.href||'')});
 POSTERS.unshift({date:'2026-10-29',title:'అమిత్ షా · మహా పాదయాత్ర',sub:'మీ పేరు, మీ ఫోటోతో పోస్టర్',href:'3-studio-amit.html?v=20261029-cinematic',img:'4-amit-cinematic-clean-20261029.png',home:true,feature:true});
 
@@ -79,13 +82,12 @@ function amitActions(p){return /3-studio-amit\.html/.test(p.href||'')?'<div clas
 var AMIT_INVITE="ఈ అమిత్ షా పోస్టర్‌ను మీ ఫోటో, పేరు, పదవి పెట్టుకుని మీరే తయారు చేసుకోండి.\n\nకింది లింక్ తెరిచి ‘ఈ రోజు’లో ‘పోస్టర్ చేసుకోండి’ నొక్కండి. మీ వివరాలు పెట్టి పోస్టర్ డౌన్‌లోడ్ చేసుకోండి.\n👇👇👇\nhttps://jananetha192-cell.github.io/poster/";
 function saveAmitBlob(b){var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='jananetha-amit-poster.png';a.click();setTimeout(function(){URL.revokeObjectURL(u)},60000)}
 document.addEventListener('click',async function(e){var btn=e.target.closest('[data-amit-action]');if(!btn)return;var card=btn.closest('.pcard'),status=card.querySelector('.poster-action-status');btn.disabled=true;try{var res=await fetch(card.querySelector('img').src);if(!res.ok)throw Error('image');var b=await res.blob();if(btn.dataset.amitAction==='share'){var f=new File([b],'jananetha-amit-poster.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:AMIT_INVITE,title:'అమిత్ షా · మహా పాదయాత్ర'});status.textContent=''}else{saveAmitBlob(b);try{await navigator.clipboard.writeText(AMIT_INVITE);status.textContent='PNG డౌన్‌లోడ్ అయింది. మెసేజ్, లింక్ కాపీ అయ్యాయి.'}catch(err){status.textContent=AMIT_INVITE}}}else{saveAmitBlob(b);status.textContent='PNG సిద్ధం.'}}catch(err){if(err.name!=='AbortError')status.textContent='మళ్లీ ప్రయత్నించండి.'}finally{btn.disabled=false}});
-POSTERS.filter(function(p){return p.home}).forEach(function(p){var d=document.createElement('div');d.className='pcard';d.innerHTML='<div class="ptitle">'+p.title+'</div><div class="psub">'+p.sub+'</div><img src="'+p.img+'" alt="'+p.title+'" loading="lazy"><a class="go" style="margin-top:12px" href="'+p.href+'">పోస్టర్ చేసుకోండి</a>'+amitActions(p);document.getElementById('newPosters').appendChild(d)});
-var DAYS=[{label:'ఇంతకు ముందువి',off:-1},{label:'ఈ రోజు',off:0},{label:'రాబోయేవి',off:1}];
+var DAYS=[{label:'ఇంతకు ముందువి',off:-1},{label:'ఈ రోజు పోస్టర్లు',off:0},{label:'రాబోయే పోస్టర్లు',off:1}];
 var tr=document.getElementById('track'),dots=document.getElementById('dots'),cnt=document.getElementById('count');
 var todayKey=istDate(0);
 function posterCard(p,label){return '<div class="pcard"><div class="daybadge">'+label+'</div><img src="'+p.img+'" alt="'+p.title+'" loading="lazy"><div class="ptitle">'+p.title+'</div><div class="psub">'+p.sub+'</div><a class="go" href="'+p.href+'">పోస్టర్ చేసుకోండి</a>'+amitActions(p)+'<div class="pdate">'+teDate(p.date)+'</div></div>'}
 DAYS.forEach(function(day,i){
- var items=i===1?([pick(todayKey)].filter(Boolean)):POSTERS.filter(function(p){return /^\d{4}-\d{2}-\d{2}$/.test(p.date)&&(i===0?p.date<todayKey:p.date>todayKey)}).sort(function(a,b){return i===0?b.date.localeCompare(a.date):a.date.localeCompare(b.date)});
+ var items=i===1?POSTERS.filter(function(p){return p.date===todayKey}):POSTERS.filter(function(p){return /^\d{4}-\d{2}-\d{2}$/.test(p.date)&&(i===0?p.date<todayKey:p.date>todayKey)}).sort(function(a,b){return i===0?b.date.localeCompare(a.date):a.date.localeCompare(b.date)});
  var d=document.createElement('div');d.className='slide';d.dataset.items=items.length;
  if(items.length){d.innerHTML=items.map(function(p){return posterCard(p,day.label)}).join('')}
  else{var msg=i===0?'ఇంతకు ముందు పోస్టర్లు లేవు':(i===2?'కొత్త పోస్టర్లు త్వరలో…':'ఈ రోజు పోస్టర్ త్వరలో…');d.innerHTML='<div class="pcard"><div class="daybadge">'+day.label+'</div><div class="empty"><div class="big">🖼️</div><div class="msg">'+msg+'</div><div class="sub">'+(i===1?teDate(todayKey)+'<br>':'')+'పాత పోస్టర్ల కొరకు కింది ఆర్కైవ్ చూడండి</div></div></div>'}
