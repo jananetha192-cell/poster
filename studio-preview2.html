@@ -78,7 +78,7 @@ canvas{width:100%;max-width:440px;height:auto;border-radius:10px;box-shadow:0 8p
 </div>
 </div>
 <script src="studio-config.js"></script>
-<script src="studio-templates.js"></script><script src="studio-templates-more-preview.js"></script><script>window.JN_TEMPLATES.unshift({"id": "bjp-victory-20261029", "title": "బీజేపీ విజయాలకు అభినందనలు", "frame": "victory", "art": "2-bjp-victory-middle-20261029.jpg"});
+<script src="studio-templates.js"></script><script src="studio-templates-more.js"></script><script>window.JN_TEMPLATES.unshift({"id": "bjp-victory-20261029", "title": "బీజేపీ విజయాలకు అభినందనలు", "frame": "victory", "art": "2-bjp-victory-middle-20261029.jpg"});
 window.JN_TEMPLATES.unshift({"id": "pmkisan24-20261029", "title": "పీఎం కిసాన్ 24వ విడత", "frame": "victory", "art": "1-pmkisan24-middle.jpg"});</script>
 <script>
 /**
@@ -794,6 +794,7 @@ function bbox2(o){var d=o.getContext('2d').getImageData(0,0,o.width,o.height).da
  var w=x1-x0+1,h=y1-y0+1,t=document.createElement('canvas');t.width=w;t.height=h;t.getContext('2d').drawImage(o,x0,y0,w,h,0,0,w,h);return {c:t,x:x0,y:y0,w:w,h:h}}
 function bbox(o){return bbox2(o).c}
 $('lc').onchange=function(){NS=3+(+$('lc').value);mkSL();th();fsSync()};
+function jnWhy(e){if(!e)return '';if(e==='quality-gate')return ' (నాణ్యత తనిఖీ ఆగింది)';try{console.error('[jn-bg]',e)}catch(x){}try{window.__jnBgLastErr=String(e&&e.stack||e)}catch(x2){}var m=String(e&&e.message||e);if(m.length>80)m=m.slice(0,80)+'…';return ' (కారణం: '+m+')'}
 function okCutOld(o){var w=o.width,h=o.height,d=o.getContext('2d').getImageData(0,0,w,h).data,n=0,c=0,cn=0;
  for(var y=0;y<h;y+=3)for(var x=0;x<w;x+=3){var a=d[(y*w+x)*4+3]>128;n++;if(a)c++;if(x>w*.3&&x<w*.7&&y>h*.1&&y<h*.5){cn++;}}
  var cc=0;for(y=Math.floor(h*.1);y<h*.5;y+=3)for(x=Math.floor(w*.3);x<w*.7;x+=3){if(d[(y*w+x)*4+3]>128)cc++}
@@ -813,10 +814,10 @@ function plain(im){var t=document.createElement('canvas'),s=Math.min(1,700/Math.
 $('ldF').onchange=async function(e){var f=e.target.files[0];e.target.value='';if(!f||pend<0)return;var i=pend;$('st').className='';$('st').textContent='నాయకుడి ఫోటో సిద్ధం చేస్తున్నాం…';
  var o=null,im0=null;try{im0=await loadImg(f)}catch(err){}
  if(im0&&hasAlpha(im0)){CU[i]=plain(im0);FS_ORIG[i]=im0;$('st').textContent=''}
- else{try{o=await cut(f)}catch(err){}
- if(o&&!okCut(o.c)){o=null}
+ else{var berr=null;try{o=await cut(f)}catch(err){berr=err}
+ if(o&&!okCut(o.c)){o=null;berr='quality-gate'}
  if(o){var r=bbox2(o.c);CU[i]=r.c;var k=o.im0.width/o.c.width,rc=document.createElement('canvas');rc.width=r.w;rc.height=r.h;rc.getContext('2d').drawImage(o.im0,r.x*k,r.y*k,r.w*k,r.h*k,0,0,r.w,r.h);FS_ORIG[i]=rc;$('st').textContent=''}
- else{var u=URL.createObjectURL(f),im=await new Promise(function(r){var a=new Image();a.onload=function(){r(a)};a.src=u}),t=document.createElement('canvas'),s=Math.min(1,500/Math.max(im.width,im.height));t.width=im.width*s;t.height=im.height*s;t.getContext('2d').drawImage(im,0,0,t.width,t.height);CU[i]=t;FS_ORIG[i]=im0||im;$('st').className='warn';$('st').textContent='⚠ బ్యాక్‌గ్రౌండ్ తొలగింపు విఫలమైంది - ఈ ఫోటో అసలు బ్యాక్‌గ్రౌండ్‌తోనే పెట్టబడింది'}}
+ else{var u=URL.createObjectURL(f),im=await new Promise(function(r){var a=new Image();a.onload=function(){r(a)};a.src=u}),t=document.createElement('canvas'),s=Math.min(1,500/Math.max(im.width,im.height));t.width=im.width*s;t.height=im.height*s;t.getContext('2d').drawImage(im,0,0,t.width,t.height);CU[i]=t;FS_ORIG[i]=im0||im;$('st').className='warn';$('st').textContent='⚠ బ్యాక్‌గ్రౌండ్ తొలగింపు విఫలమైంది' + jnWhy(berr) + ' - ఈ ఫోటో అసలు బ్యాక్‌గ్రౌండ్‌తోనే పెట్టబడింది. మళ్లీ ప్రయత్నించండి'}}
  th();fsSync()};
 ['nm','dg','ms','mx','my'].forEach(function(i){$(i).oninput=function(){draw()}});
 /* Background removal engine: @imgly/background-removal@1.5.5 (GNU AGPL v3,
@@ -830,20 +831,23 @@ function jnProg(key,cur,total){var s=$('st');if(!s)return;
 var JN_BGCFG={model:'isnet_quint8',output:{format:'image/png'},progress:jnProg};
 var bgWarmP=null;
 function warmBg(){if(!bgWarmP)bgWarmP=loadImgly().then(function(m){return m.preload(JN_BGCFG)}).catch(function(){bgWarmP=null});return bgWarmP}
-async function cut(file){
+async function cut(file,retry){
  var s0=$('st');if(s0)s0.textContent='ఫోటో సిద్ధం చేస్తున్నాం… మొదటిసారి కొంచెం సమయం పడుతుంది';
- var m=await loadImgly();
+ var m;
+ try{m=await loadImgly()}catch(e0){if(!retry){imglyP=null;bgWarmP=null;return cut(file,1)}throw e0}
  var u0=URL.createObjectURL(file),im0=await new Promise(function(r,j){var i=new Image();i.onload=function(){r(i)};i.onerror=j;i.src=u0});
  var inp=file;
  if(Math.max(im0.width,im0.height)>1500){var rs=1500/Math.max(im0.width,im0.height),rc=document.createElement('canvas');rc.width=Math.round(im0.width*rs);rc.height=Math.round(im0.height*rs);rc.getContext('2d').drawImage(im0,0,0,rc.width,rc.height);inp=await new Promise(function(r){rc.toBlob(r,'image/jpeg',0.92)})}
- var blob=await Promise.race([m.removeBackground(inp,JN_BGCFG),new Promise(function(_,j){setTimeout(function(){j(new Error('timeout'))},300000)})]);
+ var blob;
+ try{blob=await Promise.race([m.removeBackground(inp,JN_BGCFG),new Promise(function(_,j){setTimeout(function(){j(new Error('timeout'))},300000)})])}
+ catch(e2){if(!retry&&String(e2&&e2.message||e2)!=='timeout'){imglyP=null;bgWarmP=null;return cut(file,1)}throw e2}
  var u=URL.createObjectURL(blob);
  var im=await new Promise(function(r,j){var i=new Image();i.onload=function(){r(i)};i.onerror=j;i.src=u});
  var s=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
  return {c:c,im0:im0}}
 $('meBox').onclick=function(){if(!HYD){warmBg();$('meF').click()}};
 $('meF').onchange=async function(e){var f=e.target.files[0];e.target.value='';if(!f)return;$('st').className='';$('st').textContent='ఫోటో సిద్ధం చేస్తున్నాం…';
- try{var im0=await loadImg(f);if(hasAlpha(im0)){var s0=Math.min(1,900/Math.max(im0.width,im0.height)),c0=document.createElement('canvas');c0.width=Math.round(im0.width*s0);c0.height=Math.round(im0.height*s0);c0.getContext('2d').drawImage(im0,0,0,c0.width,c0.height);ME=bbox(c0)}else ME=bbox((await cut(f)).c);$('st').textContent='ఫోటో సిద్ధం';refreshMeBox()}catch(err){$('st').className='warn';$('st').textContent='⚠ బ్యాక్‌గ్రౌండ్ తొలగింపు రాలేదు – ఫోటో అసలు బ్యాక్‌గ్రౌండ్‌తోనే చేర్చబడింది';var u=URL.createObjectURL(f);ME=await new Promise(function(r){var i=new Image();i.onload=function(){r(i)};i.src=u})}
+ try{var im0=await loadImg(f);if(hasAlpha(im0)){var s0=Math.min(1,900/Math.max(im0.width,im0.height)),c0=document.createElement('canvas');c0.width=Math.round(im0.width*s0);c0.height=Math.round(im0.height*s0);c0.getContext('2d').drawImage(im0,0,0,c0.width,c0.height);ME=bbox(c0)}else ME=bbox((await cut(f)).c);$('st').textContent='ఫోటో సిద్ధం';refreshMeBox()}catch(err){$('st').className='warn';$('st').textContent='⚠ బ్యాక్‌గ్రౌండ్ తొలగింపు రాలేదు' + jnWhy(err) + ' – ఫోటో అసలు బ్యాక్‌గ్రౌండ్‌తోనే చేర్చబడింది. మళ్లీ ప్రయత్నించండి';var u=URL.createObjectURL(f);ME=await new Promise(function(r){var i=new Image();i.onload=function(){r(i)};i.src=u})}
  refreshMeBox();draw()};
 async function JNready(){var t=0;while(HYD&&t<25000){await new Promise(function(r){setTimeout(r,200)});t+=200}if(HYD){var m='ఇంకా లోడ్ అవుతోంది, కొద్దిసేపు ఆగి మళ్లీ ప్రయత్నించండి';if(window.toast)toast(m);else{var s=document.getElementById('sv');if(s)s.textContent=m}return false}return true}
 $('dl').onclick=async function(){if(!(await JNready()))return;await FS_PEND;EXP=true;await draw();cv.toBlob(function(b){var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='jananetha-poster-'+TPL.id+'.png';a.click();EXP=false;draw()},'image/png')};
@@ -955,4 +959,5 @@ setTimeout(function(){draw()},0);
 </script>
 </body>
 </html>
+
 
