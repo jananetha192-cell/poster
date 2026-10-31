@@ -729,7 +729,7 @@ var NS=3,SL=[],SP=[];
 function mkSL(){if(window.TPL&&TPL.frame==='victory'){SL=[[65,45,120],[937,45,120]];var step=NS<=3?(TPL.id==='pmkisan24-20261029'?126:111):Math.min(108,680/NS),x0=(1122-(NS-1)*step)/2;for(var vi=0;vi<NS;vi++)SL.push([x0+step*vi-(NS<=3&&TPL.id==='pmkisan24-20261029'?55:39),NS<=3&&TPL.id==='pmkisan24-20261029'?50:66,NS<=3&&TPL.id==='pmkisan24-20261029'?110:78]);SP=SL.map(function(){return 0});return}SL=[[23,39,146],[953,39,146]];var w=NS*88+(NS-1)*20,x0=Math.round((1122-w)/2);for(var k=0;k<NS;k++)SL.push([x0+108*k,72,88]);SP=SL.map(function(){return 0})}
 var CU=[];for(var k=0;k<9;k++)CU.push(null);mkSL();   // custom leader canvases
 var FS_ORIG=[];for(var k2=0;k2<9;k2++)FS_ORIG.push(null);   // original-photo regions matching CU crops (for face detection)
-function FS_ON(){return !!(window.FourStyle&&TPL&&TPL.frame==='victory')}
+function FS_ON(){return !!(window.FourStyle&&TPL&&!TPL.url)}
 var FS_PEND=Promise.resolve();
 function fsSync(){var p;
  if(FS_ON()){var list=[],origs=[],ord=[0];for(var i=2;i<NS+2;i++)ord.push(i);ord.push(1);
