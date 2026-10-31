@@ -111,7 +111,7 @@ async function draw0(){
 }
 function th(){var d=$('ldrs');d.innerHTML='';for(var i=0;i<NS+2;i++){(function(i){var c=document.createElement('div');c.className='lc';var t=document.createElement('canvas');t.width=t.height=52;t.style.cssText='width:100%;height:100%;border-radius:0;box-shadow:none';
  var tc=t.getContext('2d');if(CU[i]){var o=CU[i],sc=Math.min(52/o.width,52/o.height);tc.drawImage(o,(52-o.width*sc)/2,52-o.height*sc,o.width*sc,o.height*sc)}else{tc.fillStyle='#fff3';tc.font='700 26px sans-serif';tc.textAlign='center';tc.fillText('+',26,35)}
- c.appendChild(t);c.onclick=function(){pend=i;$('ldF').click()};d.appendChild(c)})(i)}}
+ c.appendChild(t);c.onclick=function(){pend=i;warmBg();$('ldF').click()};d.appendChild(c)})(i)}}
 function refreshMeBox(){var b=$('meBox');if(!b)return;var t=$('meTh'),tx=$('meTxt'),pl=$('mePlus');if(ME){t.style.display='block';var g2=t.getContext('2d');g2.clearRect(0,0,96,96);var s=Math.min(96/ME.width,96/ME.height);g2.drawImage(ME,(96-ME.width*s)/2,(96-ME.height*s)/2,ME.width*s,ME.height*s);pl.style.display='none';tx.textContent='మీ ఫొటో ✓ మార్చడానికి నొక్కండి'}else{t.style.display='none';pl.style.display='block';tx.textContent='మీ ఫొటో జోడించండి'}}
 function leadFitExisting(o,D){if(o._lf&&o._lf.D===D)return o._lf;var d=D-10,r=D/2-2-4,sc=Math.min(d/o.width,d/o.height);if(o.width*sc<d*0.6)sc=d*0.6/o.width;
  var w0=o.width,h0=o.height,m=document.createElement('canvas');m.width=Math.min(120,w0);m.height=Math.round(m.width*h0/w0);var mc=m.getContext('2d');mc.drawImage(o,0,0,m.width,m.height);var A=mc.getImageData(0,0,m.width,m.height).data,P=[],x0=m.width,x1=0,ty=m.height,by=0;
@@ -162,25 +162,28 @@ $('ldF').onchange=async function(e){var f=e.target.files[0];e.target.value='';if
  th();draw()};
 ['nm','dg','ms','mx','my'].forEach(function(i){$(i).oninput=function(){draw()}});
 /* Background removal engine: @imgly/background-removal@1.5.5 (GNU AGPL v3,
-   https://www.gnu.org/licenses/agpl-3.0.html), loaded unmodified from jsDelivr CDN.
+   https://www.gnu.org/licenses/agpl-3.0.html), loaded unmodified from jsDelivr CDN. Model: isnet_quint8 (smaller download, faster per photo; quality verified equal in tests).
    App source is public: https://github.com/jananetha192-cell/poster */
 var imglyP=null;
 function loadImgly(){if(!imglyP)imglyP=import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm').catch(function(e){imglyP=null;throw e});return imglyP}
 function jnProg(key,cur,total){var s=$('st');if(!s)return;
  if(key&&key.indexOf('fetch')===0){if(total>0)s.textContent='మోడల్ డౌన్‌లోడ్ అవుతోంది… '+Math.round(cur/total*100)+'%';else s.textContent='మోడల్ డౌన్‌లోడ్ అవుతోంది…'}
  else s.textContent='బ్యాక్‌గ్రౌండ్ తొలగిస్తున్నాం…'}
+var JN_BGCFG={model:'isnet_quint8',output:{format:'image/png'},progress:jnProg};
+var bgWarmP=null;
+function warmBg(){if(!bgWarmP)bgWarmP=loadImgly().then(function(m){return m.preload(JN_BGCFG)}).catch(function(){bgWarmP=null});return bgWarmP}
 async function cut(file){
  var s0=$('st');if(s0)s0.textContent='ఫోటో సిద్ధం చేస్తున్నాం… మొదటిసారి కొంచెం సమయం పడుతుంది';
  var m=await loadImgly();
  var u0=URL.createObjectURL(file),im0=await new Promise(function(r,j){var i=new Image();i.onload=function(){r(i)};i.onerror=j;i.src=u0});
  var inp=file;
  if(Math.max(im0.width,im0.height)>1500){var rs=1500/Math.max(im0.width,im0.height),rc=document.createElement('canvas');rc.width=Math.round(im0.width*rs);rc.height=Math.round(im0.height*rs);rc.getContext('2d').drawImage(im0,0,0,rc.width,rc.height);inp=await new Promise(function(r){rc.toBlob(r,'image/jpeg',0.92)})}
- var blob=await Promise.race([m.removeBackground(inp,{model:'isnet_fp16',output:{format:'image/png'},progress:jnProg}),new Promise(function(_,j){setTimeout(function(){j(new Error('timeout'))},300000)})]);
+ var blob=await Promise.race([m.removeBackground(inp,JN_BGCFG),new Promise(function(_,j){setTimeout(function(){j(new Error('timeout'))},300000)})]);
  var u=URL.createObjectURL(blob);
  var im=await new Promise(function(r,j){var i=new Image();i.onload=function(){r(i)};i.onerror=j;i.src=u});
  var s=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
  return c}
-$('meBox').onclick=function(){if(!HYD)$('meF').click()};
+$('meBox').onclick=function(){if(!HYD){warmBg();$('meF').click()}};
 $('meF').onchange=async function(e){var f=e.target.files[0];e.target.value='';if(!f)return;$('st').className='';$('st').textContent='ఫోటో సిద్ధం చేస్తున్నాం…';
  try{var im0=await loadImg(f);if(hasAlpha(im0)){var s0=Math.min(1,900/Math.max(im0.width,im0.height)),c0=document.createElement('canvas');c0.width=Math.round(im0.width*s0);c0.height=Math.round(im0.height*s0);c0.getContext('2d').drawImage(im0,0,0,c0.width,c0.height);ME=bbox(c0)}else ME=bbox(await cut(f));$('st').textContent='ఫోటో సిద్ధం';refreshMeBox()}catch(err){$('st').className='warn';$('st').textContent='⚠ బ్యాక్‌గ్రౌండ్ తొలగింపు రాలేదు – ఫోటో అసలు బ్యాక్‌గ్రౌండ్‌తోనే చేర్చబడింది';var u=URL.createObjectURL(f);ME=await new Promise(function(r){var i=new Image();i.onload=function(){r(i)};i.src=u})}
  refreshMeBox();draw()};
