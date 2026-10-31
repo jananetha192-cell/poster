@@ -989,13 +989,14 @@ async function spdRun(nw){
    if(ad){try{blob=await m.removeBackground(inp,{model:'isnet_quint8',device:'gpu',output:{format:'image/png'}});used='gpu'}catch(ge){used='gpu-విఫలం→cpu';blob=null}}
    else used='cpu (gpu లేదు)';
   }
-  if(!blob)blob=await m.removeBackground(inp,JN_BGCFG);
+  if(!blob)blob=await m.removeBackground(inp,{model:'isnet_quint8',output:{format:'image/png'}});
   var imB=await spdDec(URL.createObjectURL(blob));
   var s=Math.min(1,900/Math.max(imB.width,imB.height)),cc=document.createElement('canvas');cc.width=Math.round(imB.width*s);cc.height=Math.round(imB.height*s);cc.getContext('2d').drawImage(imB,0,0,cc.width,cc.height);
   var o={c:cc,im0:im0};
   var bb=bbox2(o.c);CU[0]=bb.c;
   var k=o.im0.width/o.c.width,oc=document.createElement('canvas');oc.width=bb.w;oc.height=bb.h;oc.getContext('2d').drawImage(o.im0,bb.x*k,bb.y*k,bb.w*k,bb.h*k,0,0,bb.w,bb.h);FS_ORIG[0]=oc;
   th();fsSync();
+  var stEl=document.getElementById('st');if(stEl)stEl.textContent='';
   var tEnd=performance.now();
   var line=label+': '+((tEnd-tLoad)/1000).toFixed(1)+' సెకన్లు ('+used+')'+(tLoad-t0>500?' | మొదటి మోడల్ లోడ్: '+((tLoad-t0)/1000).toFixed(1)+'s':'');
   window.__spdLines.push(line);
