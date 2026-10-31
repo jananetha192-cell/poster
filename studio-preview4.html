@@ -75,13 +75,6 @@ canvas{width:100%;max-width:440px;height:auto;border-radius:10px;box-shadow:0 8p
  <div id="st"></div>
  <button class="btn" id="dl">డౌన్‌లోడ్ చేయండి (PNG)</button>
 </div>
-<div class="card" id="spdTest"><h2>వేగ పరీక్ష (టెస్ట్ కాపీ మాత్రమే)</h2>
-<p style="font-size:12px;color:#FFE9B0">ఒకే ఫొటోతో రెండు పద్ధతుల వేగం కొలవండి. ముందు ఫొటో ఎంచుకోండి, తరువాత రెండు బటనులు ఒక్కొక్కటి నొక్కండి.</p>
-<input type="file" id="spdF" accept="image/*" style="margin:8px 0;color:#FFE9B0">
-<button class="btn" id="spdOld">1️⃣ ప్రస్తుత పద్ధతి</button>
-<button class="btn" id="spdNew">2️⃣ కొత్త పద్ధతి (పరీక్ష)</button>
-<div id="spdR" style="font-size:14px;color:#FFE9B0;margin-top:8px;white-space:pre-line"></div>
-</div>
 <div class="card preview-area"><h2>ప్రివ్యూ</h2><div id="wrap"><canvas id="cv" width="1122" height="1402"></canvas><div id="hit"></div><div id="hitn"></div><div id="hitd"></div></div></div>
 </div>
 </div>
@@ -959,55 +952,6 @@ window.addEventListener('pointerup',up,true);window.addEventListener('pointercan
 try{cv.style.touchAction='none'}catch(e){}
 window.JNgetPos=function(){return pos};window.JNlogoReset=function(){pos=null;try{localStorage.removeItem(KEY)}catch(e){}draw()};
 setTimeout(function(){draw()},0);
-})();
-</script>
-
-<script>
-/* SPEED TEST ONLY - not in live. A/B same photo: current (1500+cpu) vs candidate (1024+gpu with sequential cpu fallback). */
-(function(){
-function spdDec(u){return new Promise(function(r,j){var i=new Image();i.onload=function(){r(i)};i.onerror=j;i.src=u})}
-window.__spdLines=[];
-async function spdRun(nw){
- var f=document.getElementById('spdF').files[0],r=document.getElementById('spdR');
- if(!f){r.textContent='ముందు ఫొటో ఎంచుకోండి';return}
- if(window.__jnBusy){r.textContent='ఫొటో సిద్ధమవుతోంది… కొద్దిసేపు ఆగండి';return}
- if(!TPL){r.textContent='ముందు పోస్టర్ ఎంచుకోండి';return}
- window.__jnBusy=true;
- var label=nw?'2️⃣ కొత్తది':'1️⃣ ప్రస్తుతం';
- try{
-  r.textContent=label+': పని జరుగుతోంది…';
-  var t0=performance.now();
-  var m=await loadImgly();
-  var tLoad=performance.now();
-  var im0=await spdDec(URL.createObjectURL(f));
-  var target=nw?1024:1500;
-  var inp=f;
-  if(Math.max(im0.width,im0.height)>target){var rs=target/Math.max(im0.width,im0.height),rc=document.createElement('canvas');rc.width=Math.round(im0.width*rs);rc.height=Math.round(im0.height*rs);rc.getContext('2d').drawImage(im0,0,0,rc.width,rc.height);inp=await new Promise(function(r2){rc.toBlob(r2,'image/jpeg',0.92)})}
-  var used='cpu',blob=null;
-  if(nw){
-   var ad=null;try{ad=navigator.gpu?await navigator.gpu.requestAdapter():null}catch(e0){}
-   if(ad){try{blob=await m.removeBackground(inp,{model:'isnet_quint8',device:'gpu',output:{format:'image/png'}});used='gpu'}catch(ge){used='gpu-విఫలం→cpu';blob=null}}
-   else used='cpu (gpu లేదు)';
-  }
-  if(!blob)blob=await m.removeBackground(inp,{model:'isnet_quint8',output:{format:'image/png'}});
-  var imB=await spdDec(URL.createObjectURL(blob));
-  var s=Math.min(1,900/Math.max(imB.width,imB.height)),cc=document.createElement('canvas');cc.width=Math.round(imB.width*s);cc.height=Math.round(imB.height*s);cc.getContext('2d').drawImage(imB,0,0,cc.width,cc.height);
-  var o={c:cc,im0:im0};
-  var bb=bbox2(o.c);CU[0]=bb.c;
-  var k=o.im0.width/o.c.width,oc=document.createElement('canvas');oc.width=bb.w;oc.height=bb.h;oc.getContext('2d').drawImage(o.im0,bb.x*k,bb.y*k,bb.w*k,bb.h*k,0,0,bb.w,bb.h);FS_ORIG[0]=oc;
-  th();fsSync();
-  var stEl=document.getElementById('st');if(stEl)stEl.textContent='';
-  var tEnd=performance.now();
-  var line=label+': '+((tEnd-tLoad)/1000).toFixed(1)+' సెకన్లు ('+used+')'+(tLoad-t0>500?' | మొదటి మోడల్ లోడ్: '+((tLoad-t0)/1000).toFixed(1)+'s':'');
-  window.__spdLines.push(line);
-  r.textContent=window.__spdLines.join('\n');
- }catch(err){
-  window.__spdLines.push(label+': విఫలమైంది - '+String(err&&err.message||err).slice(0,60));
-  r.textContent=window.__spdLines.join('\n');
- }finally{window.__jnBusy=false}
-}
-document.getElementById('spdOld').onclick=function(){spdRun(false)};
-document.getElementById('spdNew').onclick=function(){spdRun(true)};
 })();
 </script>
 </body>
