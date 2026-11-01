@@ -74,6 +74,7 @@ canvas{width:100%;max-width:440px;height:auto;border-radius:10px;box-shadow:0 8p
  <input type="file" id="ldF" accept="image/*" style="display:none">
  <div id="st"></div>
  <button class="btn" id="dl">డౌన్‌లోడ్ చేయండి (PNG)</button>
+  <button class="btn" id="sh" style="background:linear-gradient(135deg,#42a5f5,#1e88e5)">షేర్ చేయండి</button>
 </div>
 <div class="card preview-area"><h2>ప్రివ్యూ</h2><div id="wrap"><canvas id="cv" width="1122" height="1402"></canvas><div id="hit"></div><div id="hitn"></div><div id="hitd"></div></div></div>
 </div>
@@ -850,6 +851,8 @@ $('meF').onchange=async function(e){var f=e.target.files[0];e.target.value='';if
  refreshMeBox();draw()}finally{window.__jnBusy=false}};
 async function JNready(){var t=0;while(HYD&&t<25000){await new Promise(function(r){setTimeout(r,200)});t+=200}if(HYD){var m='ఇంకా లోడ్ అవుతోంది, కొద్దిసేపు ఆగి మళ్లీ ప్రయత్నించండి';if(window.toast)toast(m);else{var s=document.getElementById('sv');if(s)s.textContent=m}return false}return true}
 $('dl').onclick=async function(){if(window.__jnBusy){var sb=$('st');sb.className='';sb.textContent='ఫొటో సిద్ధమవుతోంది… అయ్యాక డౌన్‑లోడ్ చేయండి';return}if(!(await JNready()))return;await FS_PEND;EXP=true;await draw();cv.toBlob(function(b){var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='jananetha-poster-'+TPL.id+'.png';a.click();EXP=false;draw()},'image/png')};
+var JN_SHARE_TEXT='ఈ పోస్టర్\u200cను మీ ఫొటో, పేరు, పదవి పెట్టుకుని మీరే తయారు చేసుకోండి.\nhttps://jananetha192-cell.github.io/poster/';
+$('sh').onclick=async function(){if(window.__jnBusy){var sb=$('st');sb.className='';sb.textContent='ఫొటో సిద్ధమవుతోంది… అయ్యాక షేర్ చేయండి';return}if(!(await JNready()))return;await FS_PEND;EXP=true;await draw();cv.toBlob(async function(b){var f=new File([b],'jananetha-poster-'+TPL.id+'.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],text:JN_SHARE_TEXT,title:'జననేత పోస్టర్'})}catch(e){if(e&&e.name!=='AbortError'){var sb2=$('st');sb2.className='';sb2.textContent='షేర్ రాలేదు - మళ్లీ ప్రయత్నించండి'}}}else{var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;a.click();try{await navigator.clipboard.writeText(JN_SHARE_TEXT);var sb3=$('st');sb3.className='';sb3.textContent='PNG డౌన్‌లోడ్ అయింది. మెసేజ్, లింక్ కాపీ అయ్యాయి - పేస్ట్ చేసి పంపండి.'}catch(e2){var sb4=$('st');sb4.className='';sb4.textContent=JN_SHARE_TEXT}}EXP=false;draw()},'image/png')};
 
 // drag + pinch on the photo (pointer events on an overlay box, touch-action:none)
 var hitEl=document.getElementById('hit'),hitN=document.getElementById('hitn'),hitD=document.getElementById('hitd');
