@@ -66,9 +66,9 @@ canvas{width:100%;max-width:440px;height:auto;border-radius:10px;box-shadow:0 8p
  <div class="note" style="color:#FFE9B0;font-weight:700">పోస్టర్ మీద ఫోటో, పేరు, పదవి బాక్స్‌లను వేలితో లాగి కదిలించండి. ఫోటోను రెండు వేళ్లతో పెద్దగా / చిన్నగా చేయవచ్చు.</div>
  <div style="display:none"><input type="range" id="ms" min="30" max="400" value="100"><input type="range" id="mx" min="-1000" max="400" value="0"><input type="range" id="my" min="-1300" max="250" value="0"></div>
  <h2 style="margin-top:16px">3. పైన నాయకుల ఫోటోలు</h2>
- <label>మొత్తం నాయకులు</label><select id="lc" style="width:100%;padding:11px;border-radius:8px;font-size:15px;font-family:inherit"><option value="0">5 మంది</option><option value="1">6 మంది</option><option value="2">7 మంది</option><option value="3">8 మంది</option><option value="4">9 మంది</option></select>
+ <label>మొత్తం నాయకులు</label><select id="lc" style="width:100%;padding:11px;border-radius:8px;font-size:15px;font-family:inherit"><option value="2">2 మంది</option><option value="3">3 మంది</option><option value="4">4 మంది</option><option value="5" selected>5 మంది</option><option value="6">6 మంది</option><option value="7">7 మంది</option><option value="8">8 మంది</option><option value="9">9 మంది</option></select>
  <!-- 2026-11-02 user asked to show only the box model for now; styles 1/2/4 kept in code, restore options from git history when wanted -->
- <label>నాయకుల అమరిక శైలి</label><select id="fsSt" style="width:100%;padding:11px;border-radius:8px;font-size:15px;font-family:inherit"><option value="3" selected>శైలి – బాక్సులు</option></select>
+ <label>నాయకుల అమరిక శైలి</label><select id="fsSt" style="width:100%;padding:11px;border-radius:8px;font-size:15px;font-family:inherit"><option value="5" selected>శైలి – జననేత వరుస</option><option value="3">శైలి – బాక్సులు</option></select>
  <div class="note">ఈ శైలి బీజేపీ టెంప్లేట్ల పై నాయకుల వరుసకు వర్తిస్తుంది. ఫోటో పెట్టగానే ముఖం ఆటోమేటిక్‌గా సరిపడుతుంది.</div>
  <div class="note">ఒక్కో వృత్తంపై నొక్కి ఆ నాయకుడి ఫోటో పెట్టండి (మొదటి రెండు: పెద్ద వృత్తాలు).</div>
  <div id="ldrs"></div>
@@ -139,7 +139,7 @@ window.JN_TEMPLATES.unshift({"id": "pmkisan24-20261029", "title": "పీఎం 
   }
 
   function setStyle(n) {
-    style = Math.max(1, Math.min(4, n | 0));
+    style = Math.max(1, Math.min(5, n | 0));
     return queueDraw();
   }
 
@@ -410,6 +410,7 @@ window.JN_TEMPLATES.unshift({"id": "pmkisan24-20261029", "title": "పీఎం 
       case 2: drawStyle2(list, W, H); break;
       case 3: drawStyle3(list, W, H); break;
       case 4: drawStyle4(list, W, H); break;
+      case 5: drawStyle5(list, W, H); break;
     }
   }
 
@@ -618,6 +619,41 @@ window.JN_TEMPLATES.unshift({"id": "pmkisan24-20261029", "title": "పీఎం 
     });
   }
 
+  // ---- జననేత స్టైల్: ఎడమ పెద్ద కటౌట్ + మధ్య తెల్ల టైళ్ళు + కుడి బంగారు రింగ్ వృత్తం ----
+  function goldCircle(L, x, y, D) {
+    const c = layer(D, D), o = c.getContext("2d"), ringW = D * 0.045;
+    o.beginPath(); o.arc(D/2, D/2, D/2 - ringW*0.6, 0, Math.PI*2); o.fillStyle = "#fff"; o.fill();
+    o.save();
+    o.beginPath(); o.arc(D/2, D/2, D/2 - ringW*1.7, 0, Math.PI*2); o.clip();
+    faceFit(o, L, D, D, 0.44, 0.2);
+    o.restore();
+    [[D/2-ringW*0.55, ringW*1.0, "rgb(154,116,24)"],[D/2-ringW*1.1, ringW*0.75, "rgb(212,175,55)"],[D/2-ringW*1.6, ringW*0.5, "rgb(255,236,170)"]].forEach(v=>{ o.beginPath(); o.arc(D/2,D/2,Math.max(1,v[0]),0,Math.PI*2); o.lineWidth=v[1]; o.strokeStyle=v[2]; o.stroke(); });
+    blit(c, x, y, true);
+  }
+
+  function drawStyle5(list, W, H) {
+    const n = list.length, top = W * 0.045;
+    if (!n) return;
+    if (n === 1) { box(list[0], (W - W*0.1025)/2, top, W*0.1025); return; }
+    const left = list[0], right = list[n-1], mids = list.slice(1, n-1);
+    const tileD0 = W * 0.1025;
+    let D = tileD0, g2 = W * (window.JN5GAP || 0.032);
+    const k = mids.length;
+    if (k) {
+      const availW = W - 2*(W*0.008) - tileD0*0.86 - tileD0 - W*0.03;
+      const fs = fitSizes(k, availW, tileD0, g2);
+      D = fs.size; g2 = fs.gap;
+      const rowW = k * D + (k - 1) * g2;
+      let x = (W - rowW) / 2;
+      mids.forEach(L => { box(L, x, top, D); x += D + g2; });
+    }
+    const lw0 = left.canvas.width * (D / left.canvas.height);
+    const lc = layer(lw0, D), lo = lc.getContext("2d");
+    lo.drawImage(left.canvas, 0, 0, lw0, D);
+    blit(lc, W * 0.008, top);
+    goldCircle(right, W - D - W * 0.008, top, D);
+  }
+
   // ──────────────────────────────────────────────
   // Crop helpers
   // ──────────────────────────────────────────────
@@ -752,7 +788,7 @@ window.JN_TEMPLATES.unshift({"id": "pmkisan24-20261029", "title": "పీఎం 
 (function(){
  FourStyle.init(document.getElementById('cv'));
  FourStyle.setBaseRenderer(function(){return draw0()});
- var st=3; /* 2026-11-02 user: box model only for now; picker has one option; prior choice restored when picker options return */
+ var st=5;
  FourStyle.setStyle(st);
  var sel=document.getElementById('fsSt');
  if(sel){sel.value=String(FourStyle.getStyle());sel.onchange=function(){var n=parseInt(sel.value,10)||2;try{localStorage.setItem('jn_fsstyle',String(n))}catch(e){}FourStyle.setStyle(n);draw()}}
@@ -832,7 +868,7 @@ function bbox2(o){var d=o.getContext('2d').getImageData(0,0,o.width,o.height).da
  for(var y=0;y<o.height;y++)for(var x=0;x<o.width;x++)if(d[(y*o.width+x)*4+3]>40){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
  var w=x1-x0+1,h=y1-y0+1,t=document.createElement('canvas');t.width=w;t.height=h;t.getContext('2d').drawImage(o,x0,y0,w,h,0,0,w,h);return {c:t,x:x0,y:y0,w:w,h:h}}
 function bbox(o){return bbox2(o).c}
-$('lc').onchange=function(){NS=3+(+$('lc').value);mkSL();th();fsSync()};
+$('lc').onchange=function(){NS=(+$('lc').value)-2;mkSL();th();fsSync()};
 function okCutOld(o){var w=o.width,h=o.height,d=o.getContext('2d').getImageData(0,0,w,h).data,n=0,c=0,cn=0;
  for(var y=0;y<h;y+=3)for(var x=0;x<w;x+=3){var a=d[(y*w+x)*4+3]>128;n++;if(a)c++;if(x>w*.3&&x<w*.7&&y>h*.1&&y<h*.5){cn++;}}
  var cc=0;for(y=Math.floor(h*.1);y<h*.5;y+=3)for(x=Math.floor(w*.3);x<w*.7;x+=3){if(d[(y*w+x)*4+3]>128)cc++}
@@ -943,7 +979,7 @@ var _draw=draw;draw=async function(){await _draw();schedSave()};
 async function JNsafeHydrate(fn,ids){var els=ids.map(function(i){return document.getElementById(i)}),ph=els.map(function(e){return e&&e.placeholder}),sv=document.getElementById('sv');function lock(on){els.forEach(function(e,k){if(!e)return;e.disabled=on;e.placeholder=on?'లోడ్ అవుతోంది…':(ph[k]||'')})}lock(true);if(sv){sv.className='note';sv.textContent='మీ వివరాలు లోడ్ అవుతున్నాయి… కొద్దిసేపు ఆగండి'}for(var t=0;t<3;t++){try{await fn();lock(false);return}catch(e){HYD=true;if(sv)sv.textContent='లోడ్ కాలేదు, మళ్లీ ప్రయత్నిస్తున్నాం…';await new Promise(function(r){setTimeout(r,3000)})}}HYD=true;if(sv){sv.className='note warn';sv.innerHTML='⚠ మీ వివరాలు లోడ్ కాలేదు (ఇంటర్నెట్ సమస్య కావచ్చు). <a href="" onclick="location.reload();return false" style="color:#fff;text-decoration:underline">మళ్లీ ప్రయత్నించండి</a>. అప్పటివరకు ఇప్పటి సేవ్ చేసిన వివరాలు మారవు.'}}
 async function hydrate(){HYD=true;var m=await STORE.getMain(UID);
   $('nm').value=(m&&m.name)||'';$('dg').value=(m&&m.desg)||'';
-  if(m&&m.ns){NS=m.ns;$('lc').value=String(NS-3);mkSL()}
+  if(m&&m.ns){NS=m.ns;$('lc').value=String(NS+2);mkSL()}
   var p=m&&m.pos&&m.pos[TPL.id];if(p){$('ms').value=p.ms;$('mx').value=p.mx;$('my').value=p.my;if(p.tx)TX=p.tx}
   var ph=await STORE.getAsset(UID,'photo');ME=ph?await fromUrl(ph):null;SAVED.me=ME;
   for(var i=0;i<9;i++){var u=await STORE.getAsset(UID,'l'+i);CU[i]=u?await fromUrl(u):null;SAVED.cu[i]=CU[i]}
