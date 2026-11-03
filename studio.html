@@ -85,6 +85,7 @@ canvas{width:100%;max-width:440px;height:auto;border-radius:10px;box-shadow:0 8p
 window.JN_TEMPLATES.unshift({"id": "ap-avatarana-temple-20261101", "title": "ఆంధ్రప్రదేశ్ అవతరణ దినోత్సవం 1", "art": "5-ap-avatarana-temple-20261101.jpg"});
 window.JN_TEMPLATES.unshift({"id": "bjp-victory-20261029", "title": "బీజేపీ విజయాలకు అభినందనలు", "frame": "victory", "art": "2-bjp-victory-middle-20261029.jpg"});
 window.JN_TEMPLATES.unshift({"id": "pmkisan24-20261029", "title": "పీఎం కిసాన్ 24వ విడత", "frame": "victory", "art": "1-pmkisan24-middle.jpg"});
+window.JN_TEMPLATES.unshift({"id": "chalo-karimnagar4-20261104", "title": "చలో కరీంనగర్ · మహా పాదయాత్ర 4", "frame": "sq", "w": 1122, "h": 1122, "art": "12-karimnagar4-square-20261104.jpg", "sq": {"plate": false, "circle": [1002,1024,85], "bw": 170, "bh": 170, "pbx": 1087, "pby": 1109, "cx0": 272, "maxW": 640, "nameMax": 60, "dgMax": 31, "nameY": 1003, "dgY": 1070, "maxLeaders": 2, "style": 3, "nameCol": "#ffffff", "dgCol": "#ffd874"}});
 window.JN_TEMPLATES.unshift({"id": "poverty-20261104", "title": "పేదరికంపై పోరులో భారత్ చారిత్రాత్మక ముందడుగు", "frame": "sq", "w": 1122, "h": 1122, "art": "7-poverty-square-20261104.jpg", "sq": {"plate": false, "bw": 235, "bh": 235, "nameY": 955, "dgY": 1028, "nameCol": "#f0b13a", "dgCol": "#ffffff"}});</script>
 <script>
 /**
@@ -835,17 +836,17 @@ var LOTUS_WP='data:image/webp;base64,UklGRgooAABXRUJQVlA4WAoAAAAQAAAA+QAACwEAQUx
 async function drawSq(){
  var c=TPL.sq,art=await img(ART);g.drawImage(art,0,0,W,H);
  if(c.plate){var pr=c.plate===true?[0,1020,W,H-1020]:c.plate;g.fillStyle=c.solid?'rgb(60,18,0)':'rgba(60,18,0,.88)';g.fillRect(pr[0],pr[1],pr[2],pr[3])}
- if(ME){var s2=(+$('ms').value)/100,sc3=Math.min(c.bw/ME.width,c.bh/ME.height)*s2,mw=ME.width*sc3,mh=ME.height*sc3;PB=[1110-mw+(+$('mx').value),H-mh+(+$('my').value),mw,mh];g.drawImage(ME,PB[0],PB[1],mw,mh)}
- else if(!EXP){PB=null;var bx=1110-c.bw,by=H-c.bh;g.save();g.setLineDash([10,8]);g.strokeStyle='rgba(255,216,116,.85)';g.lineWidth=3;g.strokeRect(bx,by,c.bw,c.bh);g.fillStyle='rgba(255,216,116,.9)';g.font='700 '+(c.bw<150?14:26)+'px "Noto Sans Telugu",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('మీ ఫోటో',bx+c.bw/2,by+c.bh/2);g.restore()}
+ if(ME){var s2=(+$('ms').value)/100,sc3=Math.min(c.bw/ME.width,c.bh/ME.height)*s2,mw=ME.width*sc3,mh=ME.height*sc3;PB=[(c.pbx||1110)-mw+(+$('mx').value),(c.pby||H)-mh+(+$('my').value),mw,mh];if(c.circle){g.save();g.beginPath();g.arc(c.circle[0],c.circle[1],c.circle[2],0,6.2832);g.clip();g.drawImage(ME,PB[0],PB[1],mw,mh);g.restore()}else g.drawImage(ME,PB[0],PB[1],mw,mh)}
+ else if(!EXP){PB=null;var bx=(c.pbx||1110)-c.bw,by=(c.pby||H)-c.bh;g.save();g.setLineDash([10,8]);g.strokeStyle='rgba(255,216,116,.85)';g.lineWidth=3;g.strokeRect(bx,by,c.bw,c.bh);g.fillStyle='rgba(255,216,116,.9)';g.font='700 '+(c.bw<150?14:26)+'px "Noto Sans Telugu",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('మీ ఫోటో',bx+c.bw/2,by+c.bh/2);g.restore()}
  var nm=$('nm').value||(EXP?'':'మీ పేరు'),dg=$('dg').value||(EXP?'':'మీ పదవి');g.textAlign='left';g.textBaseline='top';NB=null;DB=null;
 if(c.wrap){var mw0=c.maxW,x0=c.x0||14,ww=function(t,font){g.font=font;var wd=t.split(' '),ln=[],cur='';wd.forEach(function(w){var tt=cur?cur+' '+w:w;if(cur&&g.measureText(tt).width>mw0){ln.push(cur);cur=w}else cur=tt});if(cur)ln.push(cur);return ln};
   var nm0=$('nm').value||(EXP?'':'మీ పేరు'),dg0=$('dg').value||(EXP?'':'మీ పదవి'),y=c.nameY;g.textAlign='left';g.textBaseline='top';NB=null;DB=null;
   if(nm0){var nf=c.nameSize,nfont=nf+'px Ramabhadra, "Noto Sans Telugu", sans-serif',nl=ww(nm0,nfont);g.font=nfont;g.fillStyle=$('nm').value?c.nameCol:'rgba(255,255,255,.6)';var ny0=y+TX.nm[1],nw0=0;nl.forEach(function(l,i){g.fillText(l,x0+TX.nm[0],ny0+i*nf*1.3);nw0=Math.max(nw0,g.measureText(l).width)});NB=[x0+TX.nm[0],ny0,nw0,nl.length*nf*1.3];y+=nl.length*nf*1.3+6}
   if(dg0){var df=c.dgSize,dfont='700 '+df+'px "Noto Sans Telugu",sans-serif',dl=ww(dg0,dfont);g.font=dfont;g.fillStyle=$('dg').value?c.dgCol:'rgba(255,255,255,.6)';var dy0=y+TX.dg[1],dw0=0;dl.forEach(function(l,i){g.fillText(l,x0+TX.dg[0],dy0+i*df*1.4);dw0=Math.max(dw0,g.measureText(l).width)});DB=[x0+TX.dg[0],dy0,dw0,dl.length*df*1.4]}
   return}
- var maxW=c.maxW||(c.plate?(1110-c.bw-60):740),cx0=c.plate?30:44;
- if(nm){var p=Math.round(fit(nm,'Ramabhadra, "Noto Sans Telugu"','400',maxW,c.plate?44:56,22)*TX.nm[2]);g.font=p+'px Ramabhadra, "Noto Sans Telugu", sans-serif';var nw=g.measureText(nm).width,nx=(c.plate?cx0:cx0+(maxW-nw)/2)+TX.nm[0],ny=c.nameY+TX.nm[1];g.fillStyle=$('nm').value?c.nameCol:'rgba(255,255,255,.6)';g.fillText(nm,nx,ny);NB=[nx,ny,nw,p*1.35]}
- if(dg){var q2=Math.round(fit(dg,'"Noto Sans Telugu"','700',maxW,c.plate?26:30,16)*TX.dg[2]);g.font='700 '+q2+'px "Noto Sans Telugu",sans-serif';var dw=g.measureText(dg).width,dx2=(c.plate?cx0:cx0+(maxW-dw)/2)+TX.dg[0],dy2=c.dgY+TX.dg[1];g.fillStyle=$('dg').value?c.dgCol:'rgba(255,255,255,.6)';g.fillText(dg,dx2,dy2);DB=[dx2,dy2,dw,q2*1.5]}
+ var maxW=c.maxW||(c.plate?(1110-c.bw-60):740),cx0=c.cx0!=null?c.cx0:(c.plate?30:44);
+ if(nm){var p=Math.round(fit(nm,'Ramabhadra, "Noto Sans Telugu"','400',maxW,c.nameMax||(c.plate?44:56),22)*TX.nm[2]);g.font=p+'px Ramabhadra, "Noto Sans Telugu", sans-serif';var nw=g.measureText(nm).width,nx=(c.plate?cx0:cx0+(maxW-nw)/2)+TX.nm[0],ny=c.nameY+TX.nm[1];g.fillStyle=$('nm').value?c.nameCol:'rgba(255,255,255,.6)';g.fillText(nm,nx,ny);NB=[nx,ny,nw,p*1.35]}
+ if(dg){var q2=Math.round(fit(dg,'"Noto Sans Telugu"','700',maxW,c.dgMax||(c.plate?26:30),16)*TX.dg[2]);g.font='700 '+q2+'px "Noto Sans Telugu",sans-serif';var dw=g.measureText(dg).width,dx2=(c.plate?cx0:cx0+(maxW-dw)/2)+TX.dg[0],dy2=c.dgY+TX.dg[1];g.fillStyle=$('dg').value?c.dgCol:'rgba(255,255,255,.6)';g.fillText(dg,dx2,dy2);DB=[dx2,dy2,dw,q2*1.5]}
 }
 async function draw0(){
  try{await document.fonts.load('40px Ramabhadra','తెలుగు');await document.fonts.load('700 30px "Noto Sans Telugu"','తెలుగు')}catch(e){}
