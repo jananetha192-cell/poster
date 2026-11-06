@@ -55,7 +55,7 @@ dialog{margin:auto;max-width:min(440px,calc(100% - 28px));max-height:90vh;overfl
 <footer style="text-align:center;margin:20px 14px 8px"><a href="privacy.html" style="color:#d8b596;font-size:13px">గోప్యతా విధానం</a></footer>
 </main>
 <dialog id="inviteDialog" aria-labelledby="inviteTitle"><h2 id="inviteTitle">మీ స్నేహితులను ఆహ్వానించండి</h2><p>హాయ్, పండుగ శుభాకాంక్షలు, నాయకుల జయంతులు, రాజకీయ కార్యక్రమాలు, ఓటరు నమోదు వంటి తెలుగు పోస్టర్ల కోసం <strong>జననేత</strong> వెబ్‌సైట్ చూడండి.</p><p>మీకు నచ్చిన పోస్టర్ ఎంచుకుని, మీ ఫోటో, పేరు, పదవి, నాయకుల ఫోటోలు పెట్టి డౌన్‌లోడ్ చేసుకోవచ్చు. మీరు కూడా ట్రై చేయండి, మీ స్నేహితులకు షేర్ చేయండి.</p><p>స్టూడియోలో మీ పేరు, ఫొటో పెట్టి, పబ్లిక్‌గా చూపించడానికి ఒప్పుకున్న తర్వాత మీ వ్యక్తిగత ఆహ్వాన లింక్ సృష్టించుకోండి.</p><p>మీ హోదా, లీడర్ ఫొటోలు, మిగతా ప్రొఫైల్ ప్రైవేట్‌గానే ఉంటాయి. ఆహ్వాన లింక్‌ను ఎప్పుడైనా నిలిపివేయవచ్చు.</p><a class="go" href="studio.html">నా ఆహ్వాన లింక్ సృష్టించండి</a><form method="dialog"><button class="dialog-close">మూసివేయండి</button></form></dialog>
-<script src="posters.js?v=202610252054"></script>
+<script src="posters.js?v=202611060643"></script>
 <script>
 /* Critical home records travel with this page to prevent mixed-version data. */
 POSTERS=POSTERS.filter(function(p){return !/studio.html\?template=/.test(p.href||'')});
@@ -95,9 +95,11 @@ document.addEventListener('click',async function(e){var btn=e.target.closest('[d
 var DAYS=[{label:'ఇంతకు ముందువి',off:-1},{label:'ఈ రోజు పోస్టర్లు',off:0},{label:'రాబోయే పోస్టర్లు',off:1}];
 var tr=document.getElementById('track'),dots=document.getElementById('dots'),cnt=document.getElementById('count');
 var todayKey=istDate(0);
+/* విభాగం అధిభర్తీ: entry యొక్క cat ('past'|'today'|'upcoming') ఉంటే తేదీ లెక్కను అధిగమిస్తుంది; లేకపోతే తేదీ ఆధారంగానే */
+function pcat(p){return p.cat||(p.date===todayKey?'today':(p.date<todayKey?'past':'upcoming'))}
 function posterCard(p,label){return '<div class="pcard"><div class="daybadge">'+label+'</div><img src="'+p.img+'" alt="'+p.title+'" loading="lazy"><div class="ptitle">'+p.title+'</div><div class="psub">'+p.sub+'</div><a class="go" href="'+p.href+'">పోస్టర్ చేసుకోండి</a>'+amitActions(p)+'<div class="pdate">'+teDate(p.date)+'</div></div>'}
 DAYS.forEach(function(day,i){
- var items=i===1?POSTERS.filter(function(p){return p.date===todayKey}):POSTERS.filter(function(p){return /^\d{4}-\d{2}-\d{2}$/.test(p.date)&&(i===0?p.date<todayKey:p.date>todayKey)}).sort(function(a,b){return i===0?b.date.localeCompare(a.date):a.date.localeCompare(b.date)});
+ var items=i===1?POSTERS.filter(function(p){return pcat(p)==='today'}):POSTERS.filter(function(p){return /^\d{4}-\d{2}-\d{2}$/.test(p.date)&&pcat(p)===(i===0?'past':'upcoming')}).sort(function(a,b){return i===0?b.date.localeCompare(a.date):a.date.localeCompare(b.date)});
  var d=document.createElement('div');d.className='slide';d.dataset.items=items.length;
  if(items.length){d.innerHTML=items.map(function(p){return posterCard(p,day.label)}).join('')}
  else{var msg=i===0?'ఇంతకు ముందు పోస్టర్లు లేవు':(i===2?'కొత్త పోస్టర్లు త్వరలో…':'ఈ రోజు పోస్టర్ త్వరలో…');d.innerHTML='<div class="pcard"><div class="daybadge">'+day.label+'</div><div class="empty"><div class="big">🖼️</div><div class="msg">'+msg+'</div><div class="sub">'+(i===1?teDate(todayKey)+'<br>':'')+'పాత పోస్టర్ల కొరకు కింది ఆర్కైవ్ చూడండి</div></div></div>'}
