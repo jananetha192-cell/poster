@@ -723,7 +723,7 @@ function exShow(){
 ['pn','pt'].forEach(function(i){$(i).value=ST[i];$(i).addEventListener('input',function(){ST[i]=$(i).value;save();draw()})});
 
 $('dl').onclick=function(){EXP=true;draw().then(function(){cv.toBlob(function(bl){try{if(bl){var a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download='tgfunds-poster.png';a.click()}}finally{EXP=false;draw()}},'image/png')})};
-$('wa').onclick=function(){window.open('https://wa.me/?text='+encodeURIComponent('🚩 తెలంగాణకు ముందస్తు కేంద్ర నిధులు పోస్టర్ - మీ పేరు, పదవి, ఫోటోతో ఫ్రీగా చేసుకోండి: https://jananetha192-cell.github.io/poster/tgfunds-poster.html?v=20261106'),'_blank')};
+$('wa').onclick=function(){var t='🚩 తెలంగాణకు ముందస్తు కేంద్ర నిధులు పోస్టర్ - మీ పేరు, పదవి, ఫోటోతో ఫ్రీగా చేసుకోండి: https://jananetha192-cell.github.io/poster/tgfunds-poster.html?v=20261106';if(navigator.share){navigator.share({text:t}).catch(function(){})}else{var ok=function(){toast('షేర్ టెక్స్ట్ కాపీ అయ్యింది! వాట్సాప్ తెరిచి పేస్ట్ చేయండి')};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,function(){})}else{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok()}catch(e){}document.body.removeChild(ta)}}};
 
 /* serialize draws: a slow in-flight draw must not repaint over a newer one */
 var drawQ=Promise.resolve();
