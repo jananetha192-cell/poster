@@ -114,6 +114,19 @@ new ResizeObserver(function(){upd()}).observe(document.querySelector('main'));tr
 document.querySelectorAll('#daytabs button').forEach(function(t,i){t.onclick=function(){tr.scrollTo({left:i*tr.clientWidth,behavior:'smooth'})}});
 document.getElementById('inviteOpen').onclick=function(){document.getElementById('inviteDialog').showModal()};
 </script>
+<script>
+/* సైట్ వెర్షన్ చెక్: కొత్త వెర్షన్ అందుబాటులోకి వస్తే తెరిచిన ట్యాబ్ స్వయంచాలకంగా రీలోడ్ అవుతుంది */
+var SITE_V='202611060652';
+function siteVerCheck(){
+ if(document.hidden)return;
+ fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){
+  if(j&&j.v&&j.v!==SITE_V){location.reload()}
+ }).catch(function(){});
+}
+setInterval(siteVerCheck,120000);
+document.addEventListener('visibilitychange',siteVerCheck);
+window.addEventListener('pageshow',function(e){if(e.persisted)siteVerCheck()});
+</script>
 <script src="jn-stats.js" defer></script></body>
 </html>
 
