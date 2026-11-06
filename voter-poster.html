@@ -723,7 +723,7 @@ function exShow(){
 ['pn','pt'].forEach(function(i){$(i).value=ST[i];$(i).addEventListener('input',function(){ST[i]=$(i).value;save();draw()})});
 
 $('dl').onclick=function(){EXP=true;draw().then(function(){cv.toBlob(function(bl){try{if(bl){var a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download='voter-poster.png';a.click()}}finally{EXP=false;draw()}},'image/png')})};
-$('wa').onclick=function(){window.open('https://wa.me/?text='+encodeURIComponent('🚩 ఓటరు జాబితా అవగాహన పోస్టర్ - మీ పేరు, పదవి, ఫోటోతో ఫ్రీగా చేసుకోండి: https://jananetha192-cell.github.io/poster/voter-poster.html'),'_blank')};
+$('wa').onclick=function(){window.open('https://wa.me/?text='+encodeURIComponent('🚩 ఓటరు జాబితా అవగాహన పోస్టర్ - మీ పేరు, పదవి, ఫోటోతో ఫ్రీగా చేసుకోండి: https://jananetha192-cell.github.io/poster/voter-poster.html?v=20261106'),'_blank')};
 
 /* serialize draws: a slow in-flight draw must not repaint over a newer one */
 var drawQ=Promise.resolve();
