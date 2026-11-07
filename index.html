@@ -77,6 +77,8 @@ POSTERS.unshift({date:'2026-11-04',title:'మోదీ ప్రభుత్వ�
 POSTERS.unshift({date:'2026-11-07',cat:'upcoming',title:'దీపావళి శుభాకాంక్షలు · శ్రీరామ దీపం',sub:'మీ పేరు, మీ ఫోటోతో పోస్టర్',href:'studio.html?template=ram-diwali-20261107',img:'31-ram-diwali-20261107.jpg',home:true});
 POSTERS.unshift({date:'2026-11-07',title:'సి.వి. రామన్ జయంతి',sub:'జయంతి శుభాకాంక్షలు పోస్టర్',href:'studio.html?template=cv-raman-common-20261107',img:'raman-middle-20-60-20.jpg',home:true});
 
+POSTERS.unshift({date:'2026-11-07',cat:'upcoming',kind:'video',title:'దీపావళి శుభాకాంక్షలు · వీడియో పోస్టర్',sub:'మీ ఫోటో, పేరు, నాయకులతో 51 సెకన్ల వీడియో',href:'studio.html?video=diwali-20261107',img:'diwali-video-preview-20261107.jpg',home:true});
+
 </script>
 <script>
 /* మూడు స్లయిడ్‌లు: నిన్న / ఈ రోజు / రేపు – తేదీ ఆధారంగా ఆర్కైవ్ (posters.js) నుండి ఆటోమేటిక్ ఎంపిక */
@@ -99,7 +101,7 @@ var tr=document.getElementById('track'),dots=document.getElementById('dots'),cnt
 var todayKey=istDate(0);
 /* విభాగం అధిభర్తీ: entry యొక్క cat ('past'|'today'|'upcoming') ఉంటే తేదీ లెక్కను అధిగమిస్తుంది; లేకపోతే తేదీ ఆధారంగానే */
 function pcat(p){return p.cat||(p.date===todayKey?'today':(p.date<todayKey?'past':'upcoming'))}
-function posterCard(p,label){return '<div class="pcard"><div class="daybadge">'+label+'</div><img src="'+p.img+'" alt="'+p.title+'" loading="lazy"><div class="ptitle">'+p.title+'</div><div class="psub">'+p.sub+'</div><a class="go" href="'+p.href+'">పోస్టర్ చేసుకోండి</a>'+amitActions(p)+'<div class="pdate">'+teDate(p.date)+'</div></div>'}
+function posterCard(p,label){return '<div class="pcard"><div class="daybadge">'+(p.kind==='video'?'▶ వీడియో · ':'')+label+'</div><img src="'+p.img+'" alt="'+p.title+'" loading="lazy"><div class="ptitle">'+p.title+'</div><div class="psub">'+p.sub+'</div><a class="go" href="'+p.href+'">'+(p.kind==='video'?'వీడియో చేసుకోండి':'పోస్టర్ చేసుకోండి')+'</a>'+amitActions(p)+'<div class="pdate">'+teDate(p.date)+'</div></div>'}
 DAYS.forEach(function(day,i){
  var items=i===1?POSTERS.filter(function(p){return pcat(p)==='today'}):POSTERS.filter(function(p){return /^\d{4}-\d{2}-\d{2}$/.test(p.date)&&pcat(p)===(i===0?'past':'upcoming')}).sort(function(a,b){return i===0?b.date.localeCompare(a.date):a.date.localeCompare(b.date)});
  var d=document.createElement('div');d.className='slide';d.dataset.items=items.length;
