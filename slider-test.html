@@ -158,6 +158,7 @@ window.addEventListener('pageshow',function(e){if(e.persisted)siteVerCheck()});
 <script>
 /* పైన స్లయిడర్ (టెస్ట్): ఈ రోజు + రాబోయే పోస్టర్లు ఒకటొకటిగా స్వయంచాలక స్క్రోల్; నొక్కితే ఆ టెంప్లేట్ */
 (function(){
+ var FULLART={'tgfunds-poster.html':'tgfunds-nomid.webp','voter-poster.html':'voter-nomid.webp','bandi-poster.html':'bandi-nomid.webp'};
  var track=document.getElementById('tsTrack'),dots=document.getElementById('tsDots');
  var items=POSTERS.filter(function(p){return /^\d{4}-\d{2}-\d{2}$/.test(p.date)&&(pcat(p)==='today'||pcat(p)==='upcoming')})
   .sort(function(a,b){return (pcat(a)===pcat(b))?a.date.localeCompare(b.date):(pcat(a)==='today'?-1:1)});
@@ -165,7 +166,8 @@ window.addEventListener('pageshow',function(e){if(e.persisted)siteVerCheck()});
  items.forEach(function(p,i){
   var a=document.createElement('a');a.className='tsSlide';a.href=p.href;
   var lbl=pcat(p)==='today'?'ఈ రోజు':'రాబోయే';if(p.kind==='video')lbl='▶ వీడియో · '+lbl;
-  a.innerHTML='<span class="tsbadge">'+lbl+'</span><img src="'+p.img+'" alt="'+p.title+'" loading="'+(i<2?'eager':'lazy')+'"><span class="tstitle">'+p.title+'</span>';
+  var img=FULLART[p.href]||p.img;
+  a.innerHTML='<span class="tsbadge">'+lbl+'</span><img src="'+img+'" alt="'+p.title+'" loading="'+(i<2?'eager':'lazy')+'"><span class="tstitle">'+p.title+'</span>';
   track.appendChild(a);
   var d=document.createElement('i');if(i===0)d.className='on';dots.appendChild(d);
   d.onclick=function(){stop();track.scrollTo({left:i*track.clientWidth,behavior:'smooth'});start()};
