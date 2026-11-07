@@ -65,7 +65,7 @@ canvas{width:100%;max-width:440px;height:auto;border-radius:10px;box-shadow:0 8p
  <div class="note">ఫోటో బ్యాక్‌గ్రౌండ్ ఆటోమేటిక్‌గా తొలగిపోతుంది (మొదటిసారి కొంచెం సమయం పడుతుంది).</div>
  <button type="button" class="btn" id="crpBtn" style="display:none;background:linear-gradient(135deg,#efbf59,#d98e00);color:#1b1b1b">✂️ ఫొటో కట్ చేయండి (అవసరమైన భాగం మాత్రమే)</button>
  <div class="note" style="color:#FFE9B0;font-weight:700">పోస్టర్ మీద ఫోటో, పేరు, పదవి బాక్స్‌లను వేలితో లాగి కదిలించండి. ఫోటోను రెండు వేళ్లతో పెద్దగా / చిన్నగా చేయవచ్చు.</div>
- <div style="display:none"><input type="range" id="ms" min="30" max="400" value="100"><input type="range" id="mx" min="-1000" max="400" value="0"><input type="range" id="my" min="-1300" max="250" value="0"></div>
+ <div style="display:none"><input type="range" id="ms" min="30" max="400" value="100"><input type="range" id="mx" min="-1000" max="400" value="0"><input type="range" id="my" min="-1300" max="1402" value="0"></div>
  <h2 style="margin-top:16px">3. పైన నాయకుల ఫోటోలు</h2>
  <label>మొత్తం నాయకులు</label><select id="lc" style="width:100%;padding:11px;border-radius:8px;font-size:15px;font-family:inherit"><option value="2">2 మంది</option><option value="3">3 మంది</option><option value="4">4 మంది</option><option value="5" selected>5 మంది</option><option value="6">6 మంది</option><option value="7">7 మంది</option><option value="8">8 మంది</option><option value="9">9 మంది</option></select>
  <!-- 2026-11-02 user asked to show only the box model for now; styles 1/2/4 kept in code, restore options from git history when wanted -->
@@ -1106,7 +1106,58 @@ function placeHit(){placeBox(hitEl,ME?PB:null);placeBox(hitN,NB);placeBox(hitD,D
   el.addEventListener('contextmenu',function(e){e.preventDefault()});
   if(el===hitEl)el.addEventListener('wheel',function(e){e.preventDefault();setS(getS()*(e.deltaY<0?1.06:0.94));draw()},{passive:false});
  }
- bind(hitEl,function(x,y){setv('mx',+$('mx').value+x);setv('my',+$('my').value+y)},function(){return +$('ms').value},function(v){setv('ms',v)});
+ /* One pointer owner for photo movement, edge crop and pinch. */
+(function(){
+ var wrap=$('wrap'),el=hitEl,P={},drag=null,pin=null,mode=null;
+ function ids(){return Object.keys(P)}
+ function factor(){return W/cv.getBoundingClientRect().width}
+ function setv(id,v){var e=$(id);e.value=Math.max(+e.min,Math.min(+e.max,Math.round(v)))}
+ function downLimit(){
+  var my=$('my');
+  if(ME&&PB){var cr=CROP||{x:0,y:0,w:ME.width,h:ME.height};
+   var bottom=PB[1]-(+my.value)+(cr.y+cr.h)*PB[2]/ME.width;
+   my.max=String(Math.ceil(Math.max(250,H-bottom)));
+  }
+ }
+ function start(e){
+  var ks=ids();if(!ks.length&&e.target!==el)return;
+  e.preventDefault();try{wrap.setPointerCapture(e.pointerId)}catch(x){}
+  P[e.pointerId]=[e.clientX,e.clientY];ks=ids();
+  if(ks.length===1){
+   var r=el.getBoundingClientRect();
+   mode=e.clientY>=r.bottom-30?'pending':'move';
+   drag={x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY,crop:CROP?{x:CROP.x,y:CROP.y,w:CROP.w,h:CROP.h}:{x:0,y:0,w:ME.width,h:ME.height},scale:PB[2]/ME.width};pin=null;
+  }else if(ks.length===2){var a=P[ks[0]],b=P[ks[1]];mode='pinch';pin={d:Math.hypot(a[0]-b[0],a[1]-b[1]),s:+$('ms').value}}
+ }
+ function move(e){
+  if(!(e.pointerId in P))return;e.preventDefault();P[e.pointerId]=[e.clientX,e.clientY];var ks=ids();
+  if(ks.length>=2&&pin){var a=P[ks[0]],b=P[ks[1]],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pin.d>4){setv('ms',pin.s*d/pin.d);draw()}return}
+  if(!drag||ks.length!==1)return;
+  var dx=e.clientX-drag.sx,dy=e.clientY-drag.sy;
+  if(mode==='pending'){
+   if(Math.abs(dx)<6&&Math.abs(dy)<6)return;
+   mode=dy<=-6&&Math.abs(dy)>=Math.abs(dx)?'crop':'move';
+  }
+  if(mode==='crop'){
+   var c=drag.crop,h=Math.max(24,Math.min(ME.height-c.y,Math.round(c.h+dy*factor()/drag.scale)));
+   CROP={x:c.x,y:c.y,w:c.w,h:h};
+   if(CROP.x<=1&&CROP.y<=1&&CROP.w>=ME.width-1&&CROP.h>=ME.height-1)CROP=null;
+  }else{
+   downLimit();setv('mx',+$('mx').value+(e.clientX-drag.x)*factor());setv('my',+$('my').value+(e.clientY-drag.y)*factor());
+  }
+  drag.x=e.clientX;drag.y=e.clientY;draw();
+ }
+ function end(e){
+  if(!(e.pointerId in P))return;delete P[e.pointerId];var ks=ids();pin=null;
+  if(ks.length===1){var a=P[ks[0]];mode='move';drag={x:a[0],y:a[1],sx:a[0],sy:a[1]}}
+  else{drag=null;mode=null}
+ }
+ wrap.addEventListener('pointerdown',start);wrap.addEventListener('pointermove',move);
+ wrap.addEventListener('pointerup',end);wrap.addEventListener('pointercancel',end);wrap.addEventListener('lostpointercapture',end);
+ el.addEventListener('contextmenu',function(e){e.preventDefault()});
+ el.addEventListener('wheel',function(e){e.preventDefault();setv('ms',+$('ms').value*(e.deltaY<0?1.06:.94));draw()},{passive:false});
+})();
+
  function tb(key){return function(x,y){TX[key][0]=cl(TX[key][0]+x,-900,900);TX[key][1]=cl(TX[key][1]+y,-1300,120)}}
  bind(hitN,tb('nm'),function(){return 1},function(){});
  bind(hitD,tb('dg'),function(){return 1},function(){});
@@ -1117,79 +1168,8 @@ var requestedTemplate=new URLSearchParams(location.search).get('template');var s
 var TPL=selectedTemplate,STORE=null,UID=null,HYD=true,saveT=null,SAVED={me:null,cu:[]},LAST='';if(TPL.w){cv.width=TPL.w;cv.height=TPL.h;W=TPL.w;H=TPL.h}
 function showTpls(){var d=$('tpls');d.innerHTML='';window.JN_TEMPLATES.forEach(function(t){var e=document.createElement('div');e.className='tp'+(t.id==TPL.id?' on':'');e.innerHTML='<img src="'+t.art+'"><div>'+t.title+'</div>';e.onclick=function(){useTpl(t)};d.appendChild(e)})}
 function useTpl(t){if(t.url){location.href=t.url;return}TPL=t;ART=t.art;cv.width=W=TPL.w||1122;cv.height=H=TPL.h||1402;mkSL();th();showTpls();fsSync()}
-/* photoBottomCrop v2 (preview): drag the photo box's bottom edge upward on the
-   preview to crop the lower part directly. Direction-aware: the gesture is
-   claimed for cropping only once the finger moves UP; a downward or sideways
-   drag from the same spot is handed back to the normal photo-move handler, so
-   the photo still moves when grabbed near its bottom edge. Two-finger pinch
-   is left untouched. */
-(function(){
- if(window.__bottomCropV2)return;window.__bottomCropV2=true;
- var _placeHit=window.placeHit;
- window.placeHit=function(){
-  if(window.ME&&window.CROP&&window.PB){var s9=PB[2]/ME.width;
-   placeBox(document.getElementById('hit'),[PB[0]+CROP.x*s9,PB[1]+CROP.y*s9,CROP.w*s9,CROP.h*s9]);
-   placeBox(document.getElementById('hitn'),window.NB);placeBox(document.getElementById('hitd'),window.DB);
-  }else _placeHit();
- };
- var hitEl=document.getElementById('hit'),wrap=document.getElementById('wrap'),cv=document.getElementById('cv');
- if(!hitEl||!wrap||!cv)return;
- var st=null; /* {id,sx,sy,mode:'wait'|'crop'|'pass'} */
- function bottomZone(x,y){var r=hitEl.getBoundingClientRect();return y>=r.bottom-30&&y<=r.bottom+10&&x>=r.left-6&&x<=r.right+6}
- function applyCrop(clientY){
-  if(!window.PB||!window.ME)return;
-  if(!window.CROP)CROP={x:0,y:0,w:ME.width,h:ME.height};
-  var s9=PB[2]/ME.width;if(!(s9>0))return;
-  var r=cv.getBoundingClientRect();
-  var posterY=(clientY-r.top)*cv.height/r.height;
-  var h=Math.round((posterY-(PB[1]+CROP.y*s9))/s9);
-  h=Math.max(24,Math.min(ME.height-CROP.y,h));
-  if(h!==CROP.h){CROP={x:CROP.x,y:CROP.y,w:CROP.w,h:h};draw()}
- }
- wrap.addEventListener('pointerdown',function(e){
-  if(st||!window.ME||hitEl.style.display==='none')return;
-  if(!bottomZone(e.clientX,e.clientY))return;
-  st={id:e.pointerId,sx:e.clientX,sy:e.clientY,mode:'wait'};
-  /* hold the gesture while undecided so neither handler acts early */
-  e.stopImmediatePropagation();e.preventDefault();
-  try{wrap.setPointerCapture(e.pointerId)}catch(x){}
- },true);
- wrap.addEventListener('pointermove',function(e){
-  if(!st||e.pointerId!==st.id)return;
-  if(st.mode==='pass')return; /* handed back: let the move handler work */
-  var dx=e.clientX-st.sx,dy=e.clientY-st.sy;
-  if(st.mode==='wait'){
-   if(dy>-6&&dy<6&&dx>-6&&dx<6){e.stopImmediatePropagation();e.preventDefault();return}
-   if(dy<=-6){
-    st.mode='crop';
-    e.stopImmediatePropagation();e.preventDefault();
-    applyCrop(e.clientY);return;
-   }
-   /* down or sideways: hand the whole gesture to the normal move handler */
-   st.mode='pass';
-   try{wrap.releasePointerCapture(e.pointerId)}catch(x){}
-   try{
-    hitEl.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true,pointerId:e.pointerId,clientX:st.sx,clientY:st.sy,isPrimary:e.isPrimary,pointerType:e.pointerType,button:0,buttons:1}));
-    hitEl.dispatchEvent(new PointerEvent('pointermove',{bubbles:true,cancelable:true,pointerId:e.pointerId,clientX:e.clientX,clientY:e.clientY,isPrimary:e.isPrimary,pointerType:e.pointerType,button:0,buttons:1}));
-   }catch(x){}
-   return; /* the real move event itself continues to the move handler */
-  }
-  /* crop mode */
-  e.stopImmediatePropagation();e.preventDefault();
-  applyCrop(e.clientY);
- },true);
- function up(e){
-  if(!st||e.pointerId!==st.id)return;
-  var wasCrop=st.mode==='crop';
-  st=null;
-  if(wasCrop){
-   e.stopImmediatePropagation();e.preventDefault();
-   if(window.CROP&&window.ME){var c=CROP;if(c.x<=1&&c.y<=1&&c.w>=ME.width-1&&c.h>=ME.height-1){CROP=null;draw()}}
-  }
- }
- wrap.addEventListener('pointerup',up,true);
- wrap.addEventListener('pointercancel',up,true);
-})();
+/* Keep hit region aligned to the visible crop. */
+(function(){var old=placeHit;placeHit=function(){if(ME&&CROP&&PB){var s=PB[2]/ME.width;placeBox(hitEl,[PB[0]+CROP.x*s,PB[1]+CROP.y*s,CROP.w*s,CROP.h*s]);placeBox(hitN,NB);placeBox(hitD,DB)}else old()}})();
 function enc(c,mx){var s=Math.min(1,mx/Math.max(c.width,c.height)),t=document.createElement('canvas');t.width=Math.max(1,Math.round(c.width*s));t.height=Math.max(1,Math.round(c.height*s));t.getContext('2d').drawImage(c,0,0,t.width,t.height);
  var u=t.toDataURL('image/webp',.82);if(u.indexOf('image/webp')<0)u=t.toDataURL('image/png');return u}
 function encFit(c,mx){var u=enc(c,mx),k=0;while(u.length>700000&&k<4){mx=Math.round(mx*.75);u=enc(c,mx);k++}return u}
@@ -1325,4 +1305,4 @@ g.save();g.font='700 '+c[2]+'px "Noto Sans Telugu",sans-serif';g.textAlign='cent
 })();
 </script>
 </body>
-</html>
+                                                                                                                                                       </html>
