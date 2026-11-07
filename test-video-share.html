@@ -79,7 +79,7 @@
   </div>
   <div id="prog" hidden>
     <progress id="bar" max="100" value="0"></progress>
-    <p class="note" id="progTxt">వీడియో తయారవుతోంది… పూర్తయ్యే వరకు ఈ పేజీని మూయకండి.</p>
+    <p class="note" id="progTxt">వీడియో తయారవుతోంది… పూర్తయ్యే వరకు ఈ పేజీని మూయకండి, స్క్రీన్ ఆఫ్ చేయకండి, వేరే యాప్‌కి వెళ్లకండి.</p>
   </div>
   <p class="note">వీడియో డౌన్‌లోడ్ కావడానికి వీడియో నిడివి అంత సమయం పడుతుంది. మీరు ఎంచుకున్న ఫోటోలు, పేరు ఈ ఫోన్‌లోనే ఉంటాయి, ఎక్కడికీ అప్‌లోడ్ కావు.</p>
 </div>
@@ -889,10 +889,37 @@ async function autoFitPhoto(p){
  const c=document.createElement('canvas');c.width=p.img.width;c.height=p.img.height;c.getContext('2d').drawImage(p.img,0,0);
  const L=await VideoFit.fitPhoto(c);p.face=L.face;p.fitVersion=1;p.fitStatus=L.status;
 }
+/* Standalone background removal: same engine the poster studio uses
+   (@imgly/background-removal@1.5.5, isnet_quint8), loaded in-page only when the
+   studio iframe parent is absent (test copy opened directly). */
+var localImglyP=null;
+function loadLocalImgly(){if(!localImglyP)localImglyP=import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm').catch(function(e){localImglyP=null;throw e});return localImglyP}
+function bboxLocal(o){var d=o.getContext('2d').getImageData(0,0,o.width,o.height).data,x0=o.width,x1=0,y0=o.height,y1=0;
+ for(var y=0;y<o.height;y++)for(var x=0;x<o.width;x++)if(d[(y*o.width+x)*4+3]>40){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+ if(x1<x0)return o;
+ var w=x1-x0+1,h=y1-y0+1,t=document.createElement('canvas');t.width=w;t.height=h;t.getContext('2d').drawImage(o,x0,y0,w,h,0,0,w,h);return t}
+async function cutLocal(f,onProg){
+ var m=await loadLocalImgly();
+ var u0=URL.createObjectURL(f),im0=await new Promise(function(r,j){var i=new Image();i.onload=function(){r(i)};i.onerror=j;i.src=u0});
+ var inp=f;
+ if(Math.max(im0.width,im0.height)>1500){var rs=1500/Math.max(im0.width,im0.height),rc=document.createElement('canvas');rc.width=Math.round(im0.width*rs);rc.height=Math.round(im0.height*rs);rc.getContext('2d').drawImage(im0,0,0,rc.width,rc.height);inp=await new Promise(function(r){rc.toBlob(r,'image/jpeg',0.92)})}
+ var blob=await Promise.race([m.removeBackground(inp,{model:'isnet_quint8',output:{format:'image/png'},progress:onProg}),new Promise(function(_,j){setTimeout(function(){j(new Error('timeout'))},300000)})]);
+ var u=URL.createObjectURL(blob);
+ var im=await new Promise(function(r,j){var i=new Image();i.onload=function(){r(i)};i.onerror=j;i.src=u});
+ var s=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+ return {c:c,im0:im0}}
 async function removePhotoBackground(f){
-  if(!window.parent||typeof window.parent.cut!=='function')throw new Error('background-removal unavailable');
-  const result=await window.parent.cut(f);
-  const source=typeof window.parent.bbox==='function'?window.parent.bbox(result.c):result.c;
+  let result, source;
+  if(window.parent&&typeof window.parent.cut==='function'){
+    result=await window.parent.cut(f);
+    source=typeof window.parent.bbox==='function'?window.parent.bbox(result.c):result.c;
+  }else{
+    result=await cutLocal(f,function(key,cur,total){
+      if(key&&key.indexOf('fetch')===0)photoStatus.textContent=total>0?('బ్యాక్‌గ్రౌండ్ తొలగింపు మోడల్ డౌన్‌లోడ్ అవుతోంది… '+Math.round(cur/total*100)+'% (మొదటిసారి మాత్రమే)'):'బ్యాక్‌గ్రౌండ్ తొలగింపు మోడల్ డౌన్‌లోడ్ అవుతోంది… మొదటిసారి మాత్రమే కొంచెం ఎక్కువ సమయం పడుతుంది';
+      else photoStatus.textContent='ఫోటో బ్యాక్‌గ్రౌండ్ తొలగిస్తున్నాం… దయచేసి వేచి ఉండండి.';
+    });
+    source=bboxLocal(result.c);
+  }
   const c=document.createElement('canvas'),scale=Math.min(1,1000/Math.max(source.width,source.height));
   c.width=Math.round(source.width*scale);c.height=Math.round(source.height*scale);c.getContext('2d').drawImage(source,0,0,c.width,c.height);
   const url=c.toDataURL('image/png');const im=await imageFromUrl(url);
@@ -1163,14 +1190,28 @@ function pickMime() {
   return window.MediaRecorder ? list.find(t => MediaRecorder.isTypeSupported(t)) : null;
 }
 let lastVideo = null; /* చివరిగా తయారైన వీడియో - షేర్ కోసం మళ్ళీ రికార్డ్ చేయనవసరం లేదు */
+let wakeLock = null;
+/* ఎక్స్‌పోర్ట్ ~51 సెకన్లు పడుతుంది - స్క్రీన్ ఆఫ్ అయితే ఫ్రేమ్‌లు ఆగిపోతాయి, కాబట్టి స్క్రీన్ మెరుస్తూనే ఉంచుతాం */
+async function keepScreenOn() {
+  if (!('wakeLock' in navigator)) return;
+  try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
+}
+async function releaseScreenLock() {
+  try { if (wakeLock) await wakeLock.release(); } catch (e) {}
+  wakeLock = null;
+}
+document.addEventListener('visibilitychange', () => { if (exporting && !document.hidden) keepScreenOn(); });
 async function produceVideo(bar) {
-  let blob = null, ext = 'mp4', compatible = true;
-  if (window.VideoEncoder && window.Mp4Muxer && window.MP4Box) {
-    try { blob = await exportPhoneMp4(bar); } catch (e) { compatible = false; }
-  } else compatible = false;
-  if (!blob) { const r = await exportRecorder(bar); blob = r.blob; ext = r.ext; compatible = false; }
-  lastVideo = { blob: blob, ext: ext };
-  return { blob: blob, ext: ext, compatible: compatible };
+  await keepScreenOn();
+  try {
+    let blob = null, ext = 'mp4', compatible = true;
+    if (window.VideoEncoder && window.Mp4Muxer && window.MP4Box) {
+      try { blob = await exportPhoneMp4(bar); } catch (e) { compatible = false; }
+    } else compatible = false;
+    if (!blob) { const r = await exportRecorder(bar); blob = r.blob; ext = r.ext; compatible = false; }
+    lastVideo = { blob: blob, ext: ext };
+    return { blob: blob, ext: ext, compatible: compatible };
+  } finally { releaseScreenLock(); }
 }
 const vidBtn = document.getElementById('vidBtn');
 vidBtn.onclick = async () => {
