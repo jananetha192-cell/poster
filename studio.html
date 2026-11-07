@@ -325,8 +325,22 @@ window.JN_TEMPLATES.unshift({"id": "dhanteras-lakshmi-20261105", "title": "à°§à°
       g.fillStyle = "#888"; g.fillRect(0, 0, c.width, c.height);
       g.drawImage(source, r.x, r.y, r.w, r.h, 0, 0, c.width, c.height);
       try {
-        const det = await faceapi.detectSingleFace(c,
+        let det = await faceapi.detectSingleFace(c,
           new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.25 }));
+        if (!det) {
+          /* v8: dark/low-quality photo retry - contrast-stretch the detection input once.
+             Runs only when the normal pass finds nothing; good photos never reach this. */
+          const id2 = g.getImageData(0, 0, c.width, c.height), d2 = id2.data;
+          let mn2 = 255, mx2 = 0;
+          for (let i = 0; i < d2.length; i += 4) { const l = (d2[i]*.299 + d2[i+1]*.587 + d2[i+2]*.114)|0; if (l<mn2) mn2=l; if (l>mx2) mx2=l; }
+          if (mx2 - mn2 >= 24 && mx2 - mn2 < 250) {
+            const sc2 = 255 / (mx2 - mn2);
+            for (let i = 0; i < d2.length; i += 4) { d2[i]=Math.min(255,(d2[i]-mn2)*sc2); d2[i+1]=Math.min(255,(d2[i+1]-mn2)*sc2); d2[i+2]=Math.min(255,(d2[i+2]-mn2)*sc2); }
+            g.putImageData(id2, 0, 0);
+            det = await faceapi.detectSingleFace(c,
+              new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.25 }));
+          }
+        }
         if (det) { const b = det.box;
           return { x: r.x + b.x / k, y: r.y + b.y / k, w: b.width / k, h: b.height / k, score: det.score }; }
       } catch (e) { console.warn("face fail", e); }
