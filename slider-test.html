@@ -179,7 +179,7 @@ window.addEventListener('pageshow',function(e){if(e.persisted)siteVerCheck()});
  function step(){if(document.hidden||touching)return;
   var n=cur+1>=items.length?0:cur+1;
   track.scrollTo({left:n*track.clientWidth,behavior:'smooth'})}
- function start(){if(timer||items.length<2)return;timer=setInterval(step,4000)}
+ function start(){if(timer||items.length<2)return;timer=setInterval(step,10000)}
  function stop(){if(timer){clearInterval(timer);timer=null}}
  track.addEventListener('pointerdown',function(){touching=true;stop()});
  track.addEventListener('pointerup',function(){touching=false;setTimeout(start,3000)});
