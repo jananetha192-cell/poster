@@ -138,7 +138,7 @@ document.getElementById('inviteOpen').onclick=function(){document.getElementById
 </script>
 <script>
 /* సైట్ వెర్షన్ చెక్: కొత్త వెర్షన్ అందుబాటులోకి వస్తే తెరిచిన ట్యాబ్ స్వయంచాలకంగా రీలోడ్ అవుతుంది */
-var SITE_V='202611072348';
+var SITE_V='202611072358';
 function siteVerCheck(){
  if(document.hidden)return;
  fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){
@@ -157,7 +157,7 @@ window.addEventListener('pageshow',function(e){if(e.persisted)siteVerCheck()});
 </script>
 
 <script>
-/* పైన స్లయిడర్: ఈ రోజు + రాబోయే పోస్టర్లు ఒకటొకటిగా స్వయంచాలక స్క్రోల్ (ఒక్కొక్కటి 10 సెకన్లు); నొక్కితే ఆ టెంప్లేట్ */
+/* పైన స్లయిడర్: ఈ రోజు + రాబోయే పోస్టర్లు ఒకటొకటిగా స్వయంచాలక స్క్రోల్ (ఒక్కొక్కటి 3 సెకన్లు); నొక్కితే ఆ టెంప్లేట్ */
 (function(){
  var FULLART={'tgfunds-poster.html':'tgfunds-nomid.webp','voter-poster.html':'voter-nomid.webp','bandi-poster.html':'bandi-nomid.webp'};
  var track=document.getElementById('tsTrack'),dots=document.getElementById('tsDots');
@@ -180,7 +180,7 @@ window.addEventListener('pageshow',function(e){if(e.persisted)siteVerCheck()});
  function step(){if(document.hidden||touching)return;
   var n=cur+1>=items.length?0:cur+1;
   track.scrollTo({left:n*track.clientWidth,behavior:'smooth'})}
- function start(){if(timer||items.length<2)return;timer=setInterval(step,10000)}
+ function start(){if(timer||items.length<2)return;timer=setInterval(step,3000)}
  function stop(){if(timer){clearInterval(timer);timer=null}}
  track.addEventListener('pointerdown',function(){touching=true;stop()});
  track.addEventListener('pointerup',function(){touching=false;setTimeout(start,3000)});
