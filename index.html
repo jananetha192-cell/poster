@@ -2,6 +2,9 @@
 <html lang="te">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>జననేత – రోజువారీ పోస్టర్లు</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -120,17 +123,22 @@ document.getElementById('inviteOpen').onclick=function(){document.getElementById
 </script>
 <script>
 /* సైట్ వెర్షన్ చెక్: కొత్త వెర్షన్ అందుబాటులోకి వస్తే తెరిచిన ట్యాబ్ స్వయంచాలకంగా రీలోడ్ అవుతుంది */
-var SITE_V='202611071855';
+var SITE_V='202611072205';
 function siteVerCheck(){
  if(document.hidden)return;
  fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){
-  if(j&&j.v&&j.v!==SITE_V){location.reload()}
+  if(j&&j.v&&j.v!==SITE_V){
+   /* పాత కాష్‌డ్ HTML ఉన్నప్పుడు reload సరిపోదు - కొత్త URL (?v=కొత్తవెర్షన్)తో ఫ్రెష్ పేజీ తీసుకురండి.
+      ఇప్పటికే ఆ URLలో ఉంటే (సర్వర్ అప్‌డేట్ ఆలస్యం) మళ్లీ మళ్లీ రీలోడ్ కాకుండా ఆగు. */
+   var cb='v='+encodeURIComponent(j.v);
+   if(location.search.indexOf(cb)===-1){location.replace(location.pathname+'?'+cb)}
+  }
  }).catch(function(){});
 }
 setInterval(siteVerCheck,120000);
+window.addEventListener('load',function(){setTimeout(siteVerCheck,1500)});
 document.addEventListener('visibilitychange',siteVerCheck);
 window.addEventListener('pageshow',function(e){if(e.persisted)siteVerCheck()});
 </script>
 <script src="jn-stats.js" defer></script></body>
 </html>
-
