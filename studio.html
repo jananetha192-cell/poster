@@ -91,7 +91,7 @@ canvas{width:100%;max-width:440px;height:auto;border-radius:10px;box-shadow:0 8p
   <button class="btn" id="crpNo" style="background:linear-gradient(135deg,#616161,#424242)">రద్దు</button>
  </div>
 </div>
-<script src="studio-config-20261104.js?v=202611071500"></script>
+<script src="studio-config-20261104.js?v=202611071855"></script>
 <script src="studio-templates.js?v=20261104"></script><script src="studio-templates-more.js?v=20261104"></script><script>window.JN_TEMPLATES.unshift({"id": "diwali-saffron-20261107", "title": "దీపావళి శుభాకాంక్షలు", "frame": "sq", "w": 1122, "h": 1402, "art": "30-diwali-saffron-20261107.jpg", "sq": {"commonFrame": true, "headFit": true}});
 JN_TEMPLATES.unshift({"id": "cv-raman-common-20261107", "title": "\u0c38\u0c3f.\u0c35\u0c3f. \u0c30\u0c3e\u0c2e\u0c28\u0c4d \u0c1c\u0c2f\u0c02\u0c24\u0c3f", "frame": "sq", "w": 1122, "h": 1402, "art": "raman-middle-20-60-20.jpg", "sq": {"commonFrame": true, "headFit": true}});
 window.JN_TEMPLATES.unshift({"id": "ram-diwali-20261107", "title": "దీపావళి శుభాకాంక్షలు · శ్రీరామ దీపం", "frame": "sq", "w": 1122, "h": 1402, "art": "31-ram-diwali-20261107.jpg", "sq": {"commonFrame": true, "headFit": true}});window.JN_TEMPLATES.unshift({"id": "ap-avatarana-fields-20261101", "title": "ఆంధ్రప్రదేశ్ అవతరణ దినోత్సవం 2", "art": "6-ap-avatarana-fields-20261101.jpg"});
@@ -922,6 +922,12 @@ async function drawCommonFrame(){
   var scale=(+$('ms').value)/100;mw=Math.round(mw*scale);mh=Math.round(mh*scale);
   pX=fit?(W1-16-mw):(W1-10-mw);
  }
+ /* visitor photo first: name/designation plates and their text paint over it (user-ordered layering) */
+ if(meIm){
+  var cr9=CROP||{x:0,y:0,w:meIm.width,h:meIm.height},s9=mw/meIm.width;
+  if(fit){g.drawImage(meIm,cr9.x,cr9.y,cr9.w,cr9.h,pX+cr9.x*s9,H1-16-mh+cr9.y*s9,cr9.w*s9,cr9.h*s9)}
+  else{g.drawImage(meIm,cr9.x,cr9.y,cr9.w,cr9.h,pX+(+$('mx').value)+cr9.x*s9,H1-mh+(+$('my').value)+cr9.y*s9,cr9.w*s9,cr9.h*s9)}
+ }
  /* frame plates: white name board full width + orange designation board fitted to the free zone */
  var freeR=meIm?((W1-10-Math.min(325,Math.round(meIm.width*309/meIm.height)))-24):1113;
  var nm=$('nm').value||(EXP?'':'మీ పేరు');
@@ -932,12 +938,6 @@ async function drawCommonFrame(){
  g.save();g.shadowColor='rgba(0,0,0,0.3)';g.shadowBlur=8;g.shadowOffsetY=3;
  var og=g.createLinearGradient(152,0,opR,0);og.addColorStop(0,'rgb(235,128,62)');og.addColorStop(0.5,'rgb(253,192,112)');og.addColorStop(1,'rgb(235,128,62)');
  rr(g,152,1324,opR-152,64,14);g.fillStyle=og;g.fill();g.restore();
- /* the person stands in front of the boards */
- if(meIm){
-  var cr9=CROP||{x:0,y:0,w:meIm.width,h:meIm.height},s9=mw/meIm.width;
-  if(fit){g.drawImage(meIm,cr9.x,cr9.y,cr9.w,cr9.h,pX+cr9.x*s9,H1-16-mh+cr9.y*s9,cr9.w*s9,cr9.h*s9)}
-  else{g.drawImage(meIm,cr9.x,cr9.y,cr9.w,cr9.h,pX+(+$('mx').value)+cr9.x*s9,H1-mh+(+$('my').value)+cr9.y*s9,cr9.w*s9,cr9.h*s9)}
- }
  PB=meIm?[pX+(+$('mx').value),H1-mh+(+$('my').value),mw,mh]:null;
  g.textAlign='center';g.textBaseline='middle';
  var cxT=(9+freeR)/2;
