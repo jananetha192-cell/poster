@@ -137,9 +137,9 @@ function siteVerCheck(){
  }).catch(function(){});
 }
 setInterval(siteVerCheck,120000);
+window.addEventListener('load',function(){setTimeout(siteVerCheck,1500)});  /* ఓపెన్ అవగానే వెంటనే ఒక్క చెక్ */
 document.addEventListener('visibilitychange',siteVerCheck);
 window.addEventListener('pageshow',function(e){if(e.persisted)siteVerCheck()});
 </script>
 <script src="jn-stats.js" defer></script></body>
 </html>
-
