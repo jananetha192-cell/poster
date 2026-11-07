@@ -42,11 +42,24 @@ main{max-width:520px;margin:0 auto;padding:14px 0 24px}
 .below-actions{display:grid;grid-template-columns:1fr 1.5fr;gap:9px;margin:16px 14px 0}.below-actions a,.below-actions button{border:1px solid #f6871f;border-radius:12px;background:#3d2110;color:#ffc63f;padding:15px 10px;min-height:63px;display:grid;place-items:center;text-align:center;font:inherit;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer}.below-actions button{background:#f6871f;color:#fff}
 dialog{margin:auto;max-width:min(440px,calc(100% - 28px));max-height:90vh;overflow-y:auto;background:#3d2110;color:#ffeedd;border:1px solid #b96a2f;border-radius:18px;padding:22px;font:inherit}dialog::backdrop{background:#000b}dialog h2{font-size:20px;color:#ffc63f}dialog p{font-size:14px;line-height:1.8;margin:16px 0}.dialog-close{width:100%;min-height:44px;margin-top:12px;border:1px solid #b96a2f;background:transparent;color:#ffc63f;border-radius:10px;font:inherit;cursor:pointer}
 .poster-actions{display:flex;gap:8px;margin-top:10px}.poster-actions button{flex:1;min-height:44px;padding:10px 5px;border:1px solid #b96a2f;border-radius:10px;background:#5a341b;color:#ffeedd;font:inherit;font-size:14px;font-weight:700;cursor:pointer}.poster-action-status{font-size:12px;line-height:1.7;margin-top:8px;color:#ffc63f}
+
+#topslider{margin:2px 0 16px}
+#tsTrack{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#tsTrack::-webkit-scrollbar{display:none}
+.tsSlide{min-width:calc(100% - 28px);margin:0 14px;scroll-snap-align:center;position:relative;display:block;border-radius:18px;overflow:hidden;background:#3d2110;border:1px solid #5a3a1e;text-decoration:none;align-self:flex-start}
+.tsSlide img{width:100%;height:auto;display:block}
+.tsbadge{position:absolute;top:10px;left:10px;z-index:2;background:#f6871f;color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.tstitle{display:block;font-size:14px;font-weight:700;color:#ffc63f;padding:9px 12px}
+#tsDots{display:flex;gap:7px;justify-content:center;margin-top:9px}
+#tsDots i{width:8px;height:8px;border-radius:50%;background:#5a3a1e;transition:.2s}
+#tsDots i.on{background:#f6871f;transform:scale(1.25)}
+.tsNote{text-align:center;font-size:12px;color:#d8b596;margin-top:6px}
 </style>
 </head>
 <body>
 <header><h1>జననేత</h1><p>రోజువారీ పోస్టర్లు – మీ పేరు, మీ ఫోటోతో</p></header>
 <main>
+<section id="topslider" aria-label="ఈ రోజు మరియు రాబోయే పోస్టర్లు"><div id="tsTrack"></div><div id="tsDots"></div><div class="tsNote">⇦ పోస్టర్లు ఒకటొకటిగా స్వయంచాలకంగా మారుతాయి · తాకి చూడండి, పోస్టర్ మీద నొక్కితే అదే టెంప్లేట్ తెరుస్తుంది ⇨</div></section>
 <div id="daytabs" aria-label="పోస్టర్ రోజు"><button type="button" data-day="0">ఇంతకు ముందువి</button><button type="button" data-day="1" class="selected" aria-pressed="true">ఈ రోజు పోస్టర్లు</button><button type="button" data-day="2">రాబోయే పోస్టర్లు</button></div><div id="track"></div>
 <div id="dots"></div>
 <div id="count"></div>
@@ -125,7 +138,7 @@ document.getElementById('inviteOpen').onclick=function(){document.getElementById
 </script>
 <script>
 /* సైట్ వెర్షన్ చెక్: కొత్త వెర్షన్ అందుబాటులోకి వస్తే తెరిచిన ట్యాబ్ స్వయంచాలకంగా రీలోడ్ అవుతుంది */
-var SITE_V='202611072210';
+var SITE_V='202611072348';
 function siteVerCheck(){
  if(document.hidden)return;
  fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){
@@ -141,6 +154,40 @@ setInterval(siteVerCheck,120000);
 window.addEventListener('load',function(){setTimeout(siteVerCheck,1500)});
 document.addEventListener('visibilitychange',siteVerCheck);
 window.addEventListener('pageshow',function(e){if(e.persisted)siteVerCheck()});
+</script>
+
+<script>
+/* పైన స్లయిడర్: ఈ రోజు + రాబోయే పోస్టర్లు ఒకటొకటిగా స్వయంచాలక స్క్రోల్ (ఒక్కొక్కటి 10 సెకన్లు); నొక్కితే ఆ టెంప్లేట్ */
+(function(){
+ var FULLART={'tgfunds-poster.html':'tgfunds-nomid.webp','voter-poster.html':'voter-nomid.webp','bandi-poster.html':'bandi-nomid.webp'};
+ var track=document.getElementById('tsTrack'),dots=document.getElementById('tsDots');
+ var items=POSTERS.filter(function(p){return /^\d{4}-\d{2}-\d{2}$/.test(p.date)&&(pcat(p)==='today'||pcat(p)==='upcoming')})
+  .sort(function(a,b){return (pcat(a)===pcat(b))?a.date.localeCompare(b.date):(pcat(a)==='today'?-1:1)});
+ if(!items.length){document.getElementById('topslider').style.display='none';return}
+ items.forEach(function(p,i){
+  var a=document.createElement('a');a.className='tsSlide';a.href=p.href;
+  var lbl=pcat(p)==='today'?'ఈ రోజు':'రాబోయే';if(p.kind==='video')lbl='▶ వీడియో · '+lbl;
+  var img=FULLART[p.href]||p.img;
+  a.innerHTML='<span class="tsbadge">'+lbl+'</span><img src="'+img+'" alt="'+p.title+'" loading="'+(i<2?'eager':'lazy')+'"><span class="tstitle">'+p.title+'</span>';
+  track.appendChild(a);
+  var d=document.createElement('i');if(i===0)d.className='on';dots.appendChild(d);
+  d.onclick=function(){stop();track.scrollTo({left:i*track.clientWidth,behavior:'smooth'});start()};
+ });
+ var cur=0,timer=null,touching=false;
+ function sync(){cur=Math.round(track.scrollLeft/track.clientWidth);cur=Math.max(0,Math.min(items.length-1,cur));
+  [].forEach.call(dots.children,function(d,j){d.className=j===cur?'on':''})}
+ track.addEventListener('scroll',function(){requestAnimationFrame(sync)});
+ function step(){if(document.hidden||touching)return;
+  var n=cur+1>=items.length?0:cur+1;
+  track.scrollTo({left:n*track.clientWidth,behavior:'smooth'})}
+ function start(){if(timer||items.length<2)return;timer=setInterval(step,10000)}
+ function stop(){if(timer){clearInterval(timer);timer=null}}
+ track.addEventListener('pointerdown',function(){touching=true;stop()});
+ track.addEventListener('pointerup',function(){touching=false;setTimeout(start,3000)});
+ track.addEventListener('pointercancel',function(){touching=false;setTimeout(start,3000)});
+ document.addEventListener('visibilitychange',function(){document.hidden?stop():start()});
+ start();
+})();
 </script>
 <script src="jn-stats.js" defer></script></body>
 </html>
