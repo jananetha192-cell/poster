@@ -138,7 +138,7 @@ document.getElementById('inviteOpen').onclick=function(){document.getElementById
 </script>
 <script>
 /* సైట్ వెర్షన్ చెక్: కొత్త వెర్షన్ అందుబాటులోకి వస్తే తెరిచిన ట్యాబ్ స్వయంచాలకంగా రీలోడ్ అవుతుంది */
-var SITE_V='202611081500';
+var SITE_V='202611081622';
 function siteVerCheck(){
  if(document.hidden)return;
  fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){
