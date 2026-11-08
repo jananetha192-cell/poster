@@ -181,7 +181,7 @@ document.getElementById('pubBtn').onclick=function(){
     .then(function(){return JNFS.writeDoc('jn_templates',id,{title:title,date:date,sub:document.getElementById('subline').value.trim()||'మీ పేరు, మీ ఫోటోతో పోస్టర్',thumb:artThumb,created:Date.now(),live:true})})
     .then(function(){return JNFS.bumpManifest()})
     .then(function(){
-      setSt(st,'ప్రచురించాం ✓ హోమ్ పేజీ, స్టూడియోలో కనిపిస్తుంది: jananetha192-cell.github.io/poster/');
+      setSt(st,'ప్రచురించాం ✓ పరీక్ష హోమ్ పేజీ, స్టూడియోలో కనిపిస్తుంది: jananetha192-cell.github.io/poster/index-test.html');
       artFull=null;artThumb=null;
       document.getElementById('art').value='';document.getElementById('title').value='';
       document.getElementById('previewWrap').classList.add('hidden');
