@@ -60,14 +60,15 @@ dialog{margin:auto;max-width:min(440px,calc(100% - 28px));max-height:90vh;overfl
 <header><h1>జననేత</h1><p>రోజువారీ పోస్టర్లు – మీ పేరు, మీ ఫోటోతో</p></header>
 <main>
 <section id="topslider" aria-label="ఈ రోజు మరియు రాబోయే పోస్టర్లు"><div id="tsTrack"></div><div id="tsDots"></div><div class="tsNote">⇦ పోస్టర్లు ఒకటొకటిగా స్వయంచాలకంగా మారుతాయి · తాకి చూడండి, పోస్టర్ మీద నొక్కితే అదే టెంప్లేట్ తెరుస్తుంది ⇨</div></section>
-<div id="daytabs" aria-label="పోస్టర్ రోజు"><button type="button" data-day="0">ఇంతకు ముందువి</button><button type="button" data-day="1" class="selected" aria-pressed="true">ఈ రోజు పోస్టర్లు</button><button type="button" data-day="2">రాబోయే పోస్టర్లు</button></div><div id="track"></div>
+<div id="daytabs" aria-label="పోస్టర్ రోజు"><button type="button" data-day="0">నిన్నటివి</button><button type="button" data-day="1" class="selected" aria-pressed="true">ఈ రోజు పోస్టర్లు</button><button type="button" data-day="2">రాబోయే పోస్టర్లు</button></div><div id="track"></div>
 <div id="dots"></div>
 <div id="count"></div>
 <div id="newPosters" style="margin:16px 14px 0"></div>
+<details id="oldFolder" style="margin:16px 14px 0;background:#3d2110;border:1px solid #5a3a1e;border-radius:14px;padding:4px 12px;display:none"><summary style="cursor:pointer;font-weight:700;font-size:15px;color:#ffc63f;padding:10px 0">పాత పోస్టర్లు (ఫోల్డర్) <span id="oldCount"></span></summary><div id="oldList" style="padding-bottom:12px"></div></details>
 <div class="below-actions"><a href="studio.html">నా ప్రొఫైల్</a><button type="button" id="inviteOpen">మీ స్నేహితులను ఆహ్వానించండి</button></div>
 <a class="arch" href="admin.html">అన్ని పోస్టర్లు (ఆర్కైవ్) చూడండి →</a>
 
-<div class="hint">⇦ ఇంతకు ముందువి / ఈ రోజు / రాబోయేవి చూడండి ⇨</div>
+<div class="hint">⇦ నిన్నటివి / ఈ రోజు / రాబోయేవి చూడండి ⇨</div>
 <footer style="text-align:center;margin:20px 14px 8px"><a href="privacy.html" style="color:#d8b596;font-size:13px">గోప్యతా విధానం</a></footer>
 </main>
 <dialog id="inviteDialog" aria-labelledby="inviteTitle"><h2 id="inviteTitle">మీ స్నేహితులను ఆహ్వానించండి</h2><p>హాయ్, పండుగ శుభాకాంక్షలు, నాయకుల జయంతులు, రాజకీయ కార్యక్రమాలు, ఓటరు నమోదు వంటి తెలుగు పోస్టర్ల కోసం <strong>జననేత</strong> వెబ్‌సైట్ చూడండి.</p><p>మీకు నచ్చిన పోస్టర్ ఎంచుకుని, మీ ఫోటో, పేరు, పదవి, నాయకుల ఫోటోలు పెట్టి డౌన్‌లోడ్ చేసుకోవచ్చు. మీరు కూడా ట్రై చేయండి, మీ స్నేహితులకు షేర్ చేయండి.</p><p>స్టూడియోలో మీ పేరు, ఫొటో పెట్టి, పబ్లిక్‌గా చూపించడానికి ఒప్పుకున్న తర్వాత మీ వ్యక్తిగత ఆహ్వాన లింక్ సృష్టించుకోండి.</p><p>మీ హోదా, లీడర్ ఫొటోలు, మిగతా ప్రొఫైల్ ప్రైవేట్‌గానే ఉంటాయి. ఆహ్వాన లింక్‌ను ఎప్పుడైనా నిలిపివేయవచ్చు.</p><a class="go" href="studio.html">నా ఆహ్వాన లింక్ సృష్టించండి</a><form method="dialog"><button class="dialog-close">మూసివేయండి</button></form></dialog>
@@ -115,19 +116,25 @@ function amitActions(p){return /3-studio-amit\.html|template=amit-padayatra/.tes
 var AMIT_INVITE="ఈ అమిత్ షా పోస్టర్‌ను మీ ఫోటో, పేరు, పదవి పెట్టుకుని మీరే తయారు చేసుకోండి.\n\nకింది లింక్ తెరిచి ‘ఈ రోజు’లో ‘పోస్టర్ చేసుకోండి’ నొక్కండి. మీ వివరాలు పెట్టి పోస్టర్ డౌన్‌లోడ్ చేసుకోండి.\n👇👇👇\nhttps://jananetha192-cell.github.io/poster/";
 function saveAmitBlob(b){var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='jananetha-amit-poster.png';a.click();setTimeout(function(){URL.revokeObjectURL(u)},60000)}
 document.addEventListener('click',async function(e){var btn=e.target.closest('[data-amit-action]');if(!btn)return;var card=btn.closest('.pcard'),status=card.querySelector('.poster-action-status');btn.disabled=true;try{var res=await fetch(card.querySelector('img').src);if(!res.ok)throw Error('image');var b=await res.blob();if(btn.dataset.amitAction==='share'){var f=new File([b],'jananetha-amit-poster.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:AMIT_INVITE,title:'అమిత్ షా · మహా పాదయాత్ర'});status.textContent=''}else{saveAmitBlob(b);try{await navigator.clipboard.writeText(AMIT_INVITE);status.textContent='PNG డౌన్‌లోడ్ అయింది. మెసేజ్, లింక్ కాపీ అయ్యాయి.'}catch(err){status.textContent=AMIT_INVITE}}}else{saveAmitBlob(b);status.textContent='PNG సిద్ధం.'}}catch(err){if(err.name!=='AbortError')status.textContent='మళ్లీ ప్రయత్నించండి.'}finally{btn.disabled=false}});
-var DAYS=[{label:'ఇంతకు ముందువి',off:-1},{label:'ఈ రోజు పోస్టర్లు',off:0},{label:'రాబోయే పోస్టర్లు',off:1}];
+var DAYS=[{label:'నిన్నటివి',off:-1},{label:'ఈ రోజు పోస్టర్లు',off:0},{label:'రాబోయే పోస్టర్లు',off:1}];
 var tr=document.getElementById('track'),dots=document.getElementById('dots'),cnt=document.getElementById('count');
-var todayKey=istDate(0);
+var todayKey=istDate(0),yesterdayKey=istDate(-1);
 /* విభాగం అధిభర్తీ: entry యొక్క cat ('past'|'today'|'upcoming') ఉంటే తేదీ లెక్కను అధిగమిస్తుంది; లేకపోతే తేదీ ఆధారంగానే */
 function pcat(p){return p.cat||(p.date===todayKey?'today':(p.date<todayKey?'past':'upcoming'))}
 function posterCard(p,label){return '<div class="pcard"><div class="daybadge">'+(p.kind==='video'?'▶ వీడియో · ':'')+label+'</div><img src="'+p.img+'" alt="'+p.title+'" loading="lazy"><div class="ptitle">'+p.title+'</div><div class="psub">'+p.sub+'</div><a class="go" href="'+p.href+'">'+(p.kind==='video'?'వీడియో చేసుకోండి':'పోస్టర్ చేసుకోండి')+'</a>'+amitActions(p)+'<div class="pdate">'+teDate(p.date)+'</div></div>'}
 DAYS.forEach(function(day,i){
- var items=i===1?POSTERS.filter(function(p){return pcat(p)==='today'}):POSTERS.filter(function(p){return /^\d{4}-\d{2}-\d{2}$/.test(p.date)&&pcat(p)===(i===0?'past':'upcoming')}).sort(function(a,b){return i===0?b.date.localeCompare(a.date):a.date.localeCompare(b.date)});
+ var items=i===1?POSTERS.filter(function(p){return pcat(p)==='today'}):POSTERS.filter(function(p){return /^\d{4}-\d{2}-\d{2}$/.test(p.date)&&pcat(p)===(i===0?'past':'upcoming')&&(i!==0||p.date===yesterdayKey)}).sort(function(a,b){return i===0?b.date.localeCompare(a.date):a.date.localeCompare(b.date)});
  var d=document.createElement('div');d.className='slide';d.dataset.items=items.length;
  if(items.length){d.innerHTML=items.map(function(p){return posterCard(p,day.label)}).join('')}
- else{var msg=i===0?'ఇంతకు ముందు పోస్టర్లు లేవు':(i===2?'కొత్త పోస్టర్లు త్వరలో…':'ఈ రోజు పోస్టర్ త్వరలో…');d.innerHTML='<div class="pcard"><div class="daybadge">'+day.label+'</div><div class="empty"><div class="big">🖼️</div><div class="msg">'+msg+'</div><div class="sub">'+(i===1?teDate(todayKey)+'<br>':'')+'పాత పోస్టర్ల కొరకు కింది ఆర్కైవ్ చూడండి</div></div></div>'}
+ else{var msg=i===0?'నిన్నటి పోస్టర్లు లేవు':(i===2?'కొత్త పోస్టర్లు త్వరలో…':'ఈ రోజు పోస్టర్ త్వరలో…');d.innerHTML='<div class="pcard"><div class="daybadge">'+day.label+'</div><div class="empty"><div class="big">🖼️</div><div class="msg">'+msg+'</div><div class="sub">'+(i===1?teDate(todayKey)+'<br>':'')+'పాత పోస్టర్ల కొరకు కింది ఆర్కైవ్ చూడండి</div></div></div>'}
  tr.appendChild(d);var dot=document.createElement('i');if(i==1)dot.className='on';dots.appendChild(dot);dot.onclick=function(){tr.scrollTo({left:i*tr.clientWidth,behavior:'smooth'})};
 });
+/* పాత పోస్టర్ల ఫోల్డర్: నిన్నటికంటే పాతవి (తొలగించకుండా) - తేదీ ప్రకారం తనంతట అదే మారుతుంది */
+(function(){var old=POSTERS.filter(function(p){return /^\d{4}-\d{2}-\d{2}$/.test(p.date)&&pcat(p)==='past'&&p.date!==yesterdayKey}).sort(function(a,b){return b.date.localeCompare(a.date)});
+ var f=document.getElementById('oldFolder');if(!f||!old.length)return;
+ document.getElementById('oldCount').textContent='('+old.length+')';
+ var l=document.getElementById('oldList');l.innerHTML=old.map(function(p){return '<div style="margin-top:12px">'+posterCard(p,'పాత పోస్టర్లు')+'</div>'}).join('');
+ f.style.display='block'})();
 function upd(){var i=Math.round(tr.scrollLeft/tr.clientWidth);i=Math.max(0,Math.min(DAYS.length-1,i));
  [].forEach.call(dots.children,function(d,j){d.className=j==i?'on':''});
  tr.style.height=tr.children[i].scrollHeight+'px';cnt.textContent=(i+1)+' / '+DAYS.length;document.querySelectorAll('#daytabs button').forEach(function(t,j){t.classList.toggle('selected',i===j);t.setAttribute('aria-pressed',String(i===j))})}
@@ -191,6 +198,12 @@ window.addEventListener('pageshow',function(e){if(e.persisted)siteVerCheck()});
 })();
 </script>
 <script src="jn-stats.js" defer></script><script src="jn-shared.js"></script><script src="jn-admin-sync.js"></script>
+<script>
+/* తెరిచి ఉన్న పేజీ అర్ధరాత్రి (IST) దాటితే తనంతట అదే తాజా పరచుకుంటుంది: నిన్న / ఈ రోజు / రాబోయే / ఫోల్డర్ సరిగ్గా మారడానికి */
+(function(){function chk(){if(istDate(0)!==todayKey)location.reload()}
+document.addEventListener('visibilitychange',function(){if(!document.hidden)chk()});
+window.addEventListener('pageshow',chk);window.addEventListener('focus',chk);setInterval(chk,60000)})();
+</script>
 <script>
 /* జననేత పేరును 3 సార్లు త్వరగా నొక్కితే అడ్మిన్ పేజీ తెరుచుకుంటుంది (సైన్ ఇన్ అలాగే ఉంటుంది) */
 (function(){var h=document.querySelector('header h1');if(!h)return;
