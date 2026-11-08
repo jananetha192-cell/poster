@@ -191,5 +191,13 @@ window.addEventListener('pageshow',function(e){if(e.persisted)siteVerCheck()});
 })();
 </script>
 <script src="jn-stats.js" defer></script><script src="jn-shared.js"></script><script src="jn-admin-sync.js"></script>
+<script>
+/* జననేత పేరును 3 సార్లు త్వరగా నొక్కితే అడ్మిన్ పేజీ తెరుచుకుంటుంది (సైన్ ఇన్ అలాగే ఉంటుంది) */
+(function(){var h=document.querySelector('header h1');if(!h)return;
+h.style.touchAction='manipulation';h.style.webkitTapHighlightColor='transparent';h.style.userSelect='none';h.style.webkitUserSelect='none';
+var n=0,t=0;
+h.addEventListener('click',function(){var now=Date.now();n=(now-t<700)?n+1:1;t=now;if(n>=3){n=0;location.href='jn-admin.html'}});
+})();
+</script>
 </body>
 </html>
