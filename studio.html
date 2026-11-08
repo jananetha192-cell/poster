@@ -942,10 +942,10 @@ async function drawCommonFrame(){
  g.fillStyle=og;g.fillRect(9,1310,1104,78);g.restore();
  PB=meIm?[pX+(+$('mx').value),H1-mh+(+$('my').value),mw,mh]:null;
  g.textAlign='center';g.textBaseline='middle';
- if(nm){var np=fitFont('Ramabhadra, "Noto Sans Telugu"','400',nm,1064,46,20);
+ if(nm){var np=fitFont('Ramabhadra, "Noto Sans Telugu"','400',nm,1064,50,20);
   g.font=np+'px Ramabhadra, "Noto Sans Telugu", sans-serif';
   g.fillStyle='rgb(38,40,84)';g.fillText(nm,561+TX.nm[0],1276+TX.nm[1]);NB=[561-g.measureText(nm).width/2+TX.nm[0],1250+TX.nm[1],g.measureText(nm).width,np*1.35]}
- if(tt){var tp=fitFont('Ramabhadra, "Noto Sans Telugu"','400',tt,1064,46,22);
+ if(tt){var tp=fitFont('Ramabhadra, "Noto Sans Telugu"','400',tt,1064,54,22);
   g.font=tp+'px Ramabhadra, "Noto Sans Telugu", sans-serif';
   g.fillStyle='rgb(255,255,255)';g.fillText(tt,561+TX.dg[0],1350+TX.dg[1]);DB=[561-g.measureText(tt).width/2+TX.dg[0],1323+TX.dg[1],g.measureText(tt).width,tp*1.35]}
   if(SEL.length&&$('fsSt').value==='3'){window.JN_BOX_CORNERS=true;await FourStyle.setLeadersFromCU(SEL);await FourStyle.drawLeaders()}placeHit();window.DRAWN=1;var pl=document.getElementById('pload');if(pl)pl.style.display='none';
