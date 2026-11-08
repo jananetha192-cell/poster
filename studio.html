@@ -202,10 +202,10 @@ window.JN_TEMPLATES.unshift({"id": "dhanteras-lakshmi-20261105", "title": "ధ�
         cut._fsE = { face: mapped, score: face ? face.score : 0.5, poor: poor, top: top, bot: bot, status: face ? "detected" : "guessed" };
       }
       const E = cut._fsE;
-      list.push({ canvas: cut, face: E.face, score: E.score, poor: E.poor, idx: i, top: E.top, bot: E.bot, status: E.status });
+      list.push({ canvas: cut, face: E.face, score: E.score, poor: E.poor, idx: i, top: E.top, bot: E.bot, status: E.status, saved: E.saved||0 });
     }
     if (typeof faceapi !== "undefined" && list.length >= 2 &&
-        !list.some(L => L.status === "detected") && faceapi.tf.getBackend() !== "cpu") {
+        !list.some(L => L.status === "detected" || L.saved) && faceapi.tf.getBackend() !== "cpu") {
       console.warn("[FourStyle] 0 detected -> CPU retry");
       await faceapi.tf.setBackend("cpu"); await faceapi.tf.ready();
       for (const L of list) {
@@ -1171,9 +1171,9 @@ function showTpls(){var d=$('tpls');d.innerHTML='';window.JN_TEMPLATES.forEach(f
 function useTpl(t){if(t.url){location.href=t.url;return}TPL=t;ART=t.art;cv.width=W=TPL.w||1122;cv.height=H=TPL.h||1402;mkSL();th();showTpls();fsSync()}
 /* Keep hit region aligned to the visible crop. */
 (function(){var old=placeHit;placeHit=function(){if(ME&&CROP&&PB){var s=PB[2]/ME.width;placeBox(hitEl,[PB[0]+CROP.x*s,PB[1]+CROP.y*s,CROP.w*s,CROP.h*s]);placeBox(hitN,NB);placeBox(hitD,DB)}else old()}})();
-function enc(c,mx){var s=Math.min(1,mx/Math.max(c.width,c.height)),t=document.createElement('canvas');t.width=Math.max(1,Math.round(c.width*s));t.height=Math.max(1,Math.round(c.height*s));t.getContext('2d').drawImage(c,0,0,t.width,t.height);
- var u=t.toDataURL('image/webp',.82);if(u.indexOf('image/webp')<0)u=t.toDataURL('image/png');return u}
-function encFit(c,mx){var u=enc(c,mx),k=0;while(u.length>700000&&k<4){mx=Math.round(mx*.75);u=enc(c,mx);k++}return u}
+function enc(c,mx,q){var s=Math.min(1,mx/Math.max(c.width,c.height)),t=document.createElement('canvas');t.width=Math.max(1,Math.round(c.width*s));t.height=Math.max(1,Math.round(c.height*s));t.getContext('2d').drawImage(c,0,0,t.width,t.height);
+ var u=t.toDataURL('image/webp',q||.82);if(u.indexOf('image/webp')<0)u=t.toDataURL('image/png');return u}
+function encFit(c,mx,q){var u=enc(c,mx,q),k=0;while(u.length>700000&&k<4){mx=Math.round(mx*.75);u=enc(c,mx,q);k++}return u}
 function fromUrl(u){return new Promise(function(r){var i=new Image();i.onload=function(){r(i)};i.onerror=function(){r(null)};i.src=u})}
 function curState(){return {name:$('nm').value,desg:$('dg').value,ns:NS,crop:(ME_FULL&&CROP)?{x:CROP.x/ME_FULL.width,y:CROP.y/ME_FULL.height,w:CROP.w/ME_FULL.width,h:CROP.h/ME_FULL.height}:null,pos:{ms:+$('ms').value,mx:+$('mx').value,my:+$('my').value,tx:TX}}}
 function schedSave(){if(HYD||!STORE||!UID)return;clearTimeout(saveT);$('sv').textContent='సేవ్ చేస్తున్నాం…';saveT=setTimeout(doSave,1200)}
@@ -1190,7 +1190,7 @@ async function hydrate(){HYD=true;var m=await STORE.getMain(UID);
   if(m&&Number.isInteger(m.ns)&&m.ns>=0&&m.ns<=7){NS=m.ns;$('lc').value=String(NS+2);mkSL()}
   var p=m&&m.pos&&m.pos[TPL.id];if(p){$('ms').value=p.ms;$('mx').value=p.mx;$('my').value=p.my;if(p.tx)TX=p.tx}
   var ph=await STORE.getAsset(UID,'photo');ME=ph?await fromUrl(ph):null;ME_FULL=ME?toC(ME):null;CROP=null;if(ME_FULL&&m&&m.crop){var _cr=m.crop;CROP={x:_cr.x*ME_FULL.width,y:_cr.y*ME_FULL.height,w:_cr.w*ME_FULL.width,h:_cr.h*ME_FULL.height}}SAVED.me=ME_FULL;
-  for(var i=0;i<9;i++){var u=await STORE.getAsset(UID,'l'+i);CU[i]=u?await fromUrl(u):null;SAVED.cu[i]=CU[i]}
+  for(var i=0;i<9;i++){var u=await STORE.getAsset(UID,'l'+i);CU[i]=u?await fromUrl(u):null;SAVED.cu[i]=CU[i];var _lf=m&&m.lface&&m.lface['l'+i];if(CU[i]&&_lf&&_lf.face){var _w2=CU[i].width,_h2=CU[i].height;CU[i]._fsE={face:{x:_lf.face.x*_w2,y:_lf.face.y*_h2,w:_lf.face.w*_w2,h:_lf.face.h*_h2,score:_lf.score||0.5},score:_lf.score||0.5,status:_lf.status||'detected',saved:1,top:(_lf.top||0)*_h2,bot:(_lf.bot||1)*_h2,poor:!!_lf.poor}}}
   th();HYD=false;refreshMeBox();await fsSync();$('sv').textContent=m?'మీ సేవ్ చేసిన వివరాలు లోడ్ అయ్యాయి':'' }
 function fbStore(cfg){var M=null,P=null;
  async function init(){if(M)return;var b='https://www.gstatic.com/firebasejs/10.14.1/';var a=await import(b+'firebase-app.js'),au=await import(b+'firebase-auth.js'),fs=await import(b+'firebase-firestore.js');
