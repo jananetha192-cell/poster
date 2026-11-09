@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>దీపావళి వీడియో పోస్టర్ – మీ పేరుతో</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@500;700;800&family=Ramabhadra&display=swap" rel="stylesheet">
+<script src="mp4-muxer.js"></script>
+<script src="mp4box.all.min.js"></script>
+<style>
+  :root{
+    --bg:#2a0e0d; --panel:#3a1514; --line:#6b3a22; --gold:#e0aa3c; --cream:#fff1d2; --muted:#d9b98a; --ink:#2b0f0e;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--cream);font-family:"Noto Sans Telugu",system-ui,sans-serif}
+  body{padding:16px 14px 40px;display:flex;flex-direction:column;align-items:center;gap:16px}
+  h1{font-size:20px;font-weight:800;margin:4px 0 0;text-align:center;color:var(--gold)}
+  p.lead{margin:0;font-size:14px;line-height:1.6;text-align:center;color:var(--muted);max-width:480px}
+  .stage{width:100%;max-width:480px;border:2px solid var(--gold);border-radius:14px;overflow:hidden;background:#000}
+  canvas{display:block;width:100%;height:auto;touch-action:none;cursor:pointer}
+  .panel{width:100%;max-width:480px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:14px}
+  label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700}
+  input[type=text]{font:inherit;font-weight:500;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:#240b0a;color:var(--cream)}
+  input[type=text]:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .row{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{display:inline-flex;align-items:center;border:1px solid var(--gold);border-radius:999px;overflow:hidden}
+  .chip button{all:unset;cursor:pointer;padding:8px 12px;font-size:13px;font-weight:700;color:var(--cream)}
+  .chip button.x{padding:8px 10px;border-left:1px solid var(--gold);color:#ffb4a0}
+  .chip.filled{background:rgba(224,170,60,.18)}
+  h2{font-size:14px;margin:0;font-weight:800;color:var(--gold)}
+  .btn{font:inherit;font-weight:800;font-size:15px;padding:12px 16px;border-radius:12px;border:0;cursor:pointer}
+  .btn.main{background:var(--gold);color:var(--ink)}
+  .btn.alt{background:transparent;color:var(--cream);border:1px solid var(--gold)}
+  .btn:disabled{opacity:.55;cursor:default}
+  .grow{flex:1 1 140px}
+  .note{font-size:12.5px;line-height:1.6;color:var(--muted);margin:0}
+  .photo-status{width:100%;max-width:480px;font-size:14px;line-height:1.65;padding:10px 14px;border:1px solid var(--gold);border-radius:12px;background:var(--panel);color:var(--cream);margin:0}
+  .photo-status:empty{display:none}
+  .photo-status[data-busy="true"],.photo-status[data-error="true"]{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);width:calc(100% - 28px);z-index:1000;box-shadow:0 4px 18px #0008}
+  progress{width:100%;height:10px;accent-color:var(--gold)}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<h1>దీపావళి వీడియో – మీ నాయకులు, మీ పేరు, మీ ఫోటో</h1>
+<p class="lead">పోస్టర్ మీద ఉన్న సర్కిల్ లేదా ఫోటో బాక్స్‌ను టచ్ చేసి ఫోటో ఎంచుకోండి. ఫోటో పెట్టగానే ముఖం ఆటోమేటిక్‌గా సరిపడుతుంది.</p>
+
+<div class="stage"><canvas id="cv" width="1122" height="1402" aria-label="పోస్టర్ ప్రివ్యూ"></canvas></div>
+<video id="vid" src="11-diwali_poster_video2_sanitized.mp4" playsinline preload="auto" loop style="position:absolute;width:2px;height:2px;opacity:0;pointer-events:none;left:0;top:0"></video>
+
+<div class="panel">
+  <div class="row">
+    <button class="btn main grow" id="playBtn">▶ ప్లే</button>
+    <button class="btn alt grow" id="muteBtn">🔊 శబ్దం ఉంది</button>
+  </div>
+
+  <label class="f">మీ పేరు
+    <input type="text" id="nameIn" maxlength="40" placeholder="ఉదా: మీ పేరు" autocomplete="off">
+  </label>
+  <label class="f">మీ పదవి
+    <input type="text" id="desigIn" maxlength="70" placeholder="ఉదా: మీ పదవి, మీ ప్రాంతం" autocomplete="off">
+  </label>
+
+  <div>
+    <h2>పైన నాయకుల ఫోటోలు</h2>
+    <div class="row" id="leaderChips" style="margin-top:8px"></div>
+  </div>
+  <div>
+    <h2>మీ ఫోటో</h2>
+    <div class="row" id="mainChip" style="margin-top:8px"></div>
+  </div>
+
+  <div class="row">
+    <button class="btn main grow" id="vidBtn">⬇ వీడియో డౌన్‌లోడ్</button>
+    <button class="btn alt grow" id="shareBtn">📤 షేర్ చేయండి</button>
+  </div>
+  <div class="row">
+    <button class="btn alt grow" id="pngBtn">⬇ ఫోటోగా (PNG)</button>
+  </div>
+  <div id="prog" hidden>
+    <progress id="bar" max="100" value="0"></progress>
+    <p class="note" id="progTxt">వీడియో తయారవుతోంది… పూర్తయ్యే వరకు ఈ పేజీని మూయకండి, స్క్రీన్ ఆఫ్ చేయకండి, వేరే యాప్‌కి వెళ్లకండి.</p>
+  </div>
+  <p class="note">వీడియో డౌన్‌లోడ్ కావడానికి వీడియో నిడివి అంత సమయం పడుతుంది. మీరు ఎంచుకున్న ఫోటోలు, పేరు ఈ ఫోన్‌లోనే ఉంటాయి, ఎక్కడికీ అప్‌లోడ్ కావు.</p>
+</div>
+
+<input type="file" id="file" accept="image/*" hidden>
+
+<script>
+/* ------------------------------------------------------------------
+   వాడే విధానం:
+   1) ఈ ఫైల్‌ను, diwali_poster_video2.mp4 ను ఒకే ఫోల్డర్‌లో ఉంచి మీ సైట్‌లో (GitHub Pages వంటిది) పెట్టండి.
+   2) వీడియో ఫైల్ పేరు మార్చితే పైన <video src="..."> లో మార్చండి.
+   3) file:// గా తెరిస్తే ప్రివ్యూ కనిపిస్తుంది కానీ డౌన్‌లోడ్ పని చేయదు; సైట్‌లో హోస్ట్ చేయండి.
+------------------------------------------------------------------- */
+/* SPDX-License-Identifier: AGPL-3.0-only. Existing poster fit reused for video. */
+(function (global) {
+  "use strict";
+
+  // ──────────────────────────────────────────────
+  // Config
+  // ──────────────────────────────────────────────
+  const GOLD = "#D4AF37";
+  const GOLD_BORDER = 2.5;
+  const CIRCLE_BORDER = 3.5;
+  const FADE_FRAC = 0.26;          // bottom fade of the *photo*, not empty canvas
+  const HEAD_UP = 0.78;            // expand face upward for hair/turban
+  const HEAD_SIDE = 0.18;
+  const HEAD_DOWN = 0.55;          // some shoulders
+  const MIN_SCORE = 0.45;
+  const MAX_LEADERS = 9;
+
+  // ──────────────────────────────────────────────
+  // State
+  // ──────────────────────────────────────────────
+  let cv = null;                   // poster canvas #cv
+  let ctx = null;
+  let style = 1;
+  let leaders = [];                // processed {canvas, face, score, poor, idx}
+  let partyLogo = null;            // optional Image / Canvas for style 1
+  let ready = false;
+  let drawChain = Promise.resolve();
+  let faceNetReady = false;
+  let baseRenderer = null;
+  function setBaseRenderer(fn) { baseRenderer = fn; }
+
+  // ──────────────────────────────────────────────
+  // Public API (compatible + new helpers)
+  // ──────────────────────────────────────────────
+  function init(canvasEl) {
+    cv = canvasEl || document.getElementById("cv");
+    if (!cv) throw new Error("FourStyle: canvas #cv not found");
+    ctx = cv.getContext("2d");
+  }
+
+  function setPartyLogo(imgOrCanvas) {
+    partyLogo = imgOrCanvas || null;
+  }
+
+  function setStyle(n) {
+    style = Math.max(1, Math.min(5, n | 0));
+    return queueDraw();
+  }
+
+  function getStyle() { return style; }
+
+  
+  async function setLeadersFromCU(CU, originals) {
+    if (!CU || !CU.length) {
+      leaders = [];
+      ready = true;
+      return queueDraw();
+    }
+    await ensureFaceNet();
+    const list = [];
+    for (let i = 0; i < Math.min(CU.length, MAX_LEADERS); i++) {
+      const cut = CU[i];
+      if (!cut) continue;
+      if (!cut._fsE) {
+        const orig = originals && originals[i] ? originals[i] : cut;
+        const bb = alphaBox(cut), top = bb ? bb.y : 0;
+        
+        const bust = bb && bb.h / bb.w < 1.6;
+        const bot = bb ? (bust ? flatBottom(cut) : bb.y + bb.h) : cut.height;
+        let face = await detectFace(orig, cut);
+        const rawM = face ? mapFaceToCutout(face, orig, cut) : null;
+        let mapped;
+        if (face) {
+          
+          const fullBleed = !bb || (bb.w >= cut.width * 0.98 && bb.h >= cut.height * 0.98);
+          const small = rawM && (rawM.w < cut.width * 0.18 || rawM.h < cut.height * 0.18) && rawM.h < cut.height * 0.30;
+          const base = (window.NO_NORMFACE || (fullBleed && small)) ? rawM : normFace(rawM, top);
+          const g = guessFace(cut);
+          mapped = (g && face.score < 0.55 && g.h > base.h * 1.3) ? g : base;
+        } else {
+          mapped = guessFace(cut);
+        }
+        const poor = isPoorCutout(cut);
+        cut._fsE = { face: mapped, score: face ? face.score : 0.5, poor: poor, top: top, bot: bot, status: face ? "detected" : "guessed" };
+      }
+      const E = cut._fsE;
+      list.push({ canvas: cut, face: E.face, score: E.score, poor: E.poor, idx: i, top: E.top, bot: E.bot, status: E.status });
+    }
+    if (typeof faceapi !== "undefined" && list.length >= 2 &&
+        !list.some(L => L.status === "detected") && faceapi.tf.getBackend() !== "cpu") {
+      console.warn("[FourStyle] 0 detected -> CPU retry");
+      await faceapi.tf.setBackend("cpu"); await faceapi.tf.ready();
+      for (const L of list) {
+        const o = (originals && originals[L.idx]) || L.canvas;
+        const f = await detectFace(o, L.canvas);
+        if (f) {
+          const rm = mapFaceToCutout(f, o, L.canvas);
+          L.face = window.NO_NORMFACE ? rm : normFace(rm, L.top); L.score = f.score; L.status = "detected";
+          L.canvas._fsE.face = L.face; L.canvas._fsE.score = L.score; L.canvas._fsE.status = "detected";
+        }
+      }
+    }
+    leaders = list;
+    ready = true;
+    return queueDraw();
+  }
+
+  
+  function drawLeaders() {
+    return queueDraw();
+  }
+
+  
+  async function exportPNG(filename = "poster.png") {
+    await drawChain;
+    if (!cv) return null;
+    return new Promise(res => {
+      cv.toBlob(b => {
+        if (!b) return res(null);
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(b);
+        a.download = filename;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        res(b);
+      }, "image/png");
+    });
+  }
+
+  // ──────────────────────────────────────────────
+  // Face detection (face-api.js)
+  // ──────────────────────────────────────────────
+  const MODEL = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/model/";
+  let faceApiLoading = null;
+  function loadFaceApi() {
+    if (typeof faceapi !== "undefined") return Promise.resolve(true);
+    if (!faceApiLoading) faceApiLoading = new Promise(res => {
+      const s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/dist/face-api.min.js";
+      s.onload = () => res(true);
+      s.onerror = () => res(false);
+      document.head.appendChild(s);
+    });
+    return faceApiLoading;
+  }
+  async function ensureFaceNet() {
+    if (faceNetReady) return;
+    const ok = await loadFaceApi();
+    if (!ok || typeof faceapi === "undefined") {
+      console.error("[FourStyle] faceapi load failed");
+      return;
+    }
+    try {
+      await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL);
+      faceNetReady = true;
+      console.log("[FourStyle] face model OK");
+    } catch (e) { console.error("[FourStyle] model load fail", e); }
+  }
+
+  function flatten(src) {
+    const w = src.naturalWidth || src.width, h = src.naturalHeight || src.height;
+    const c = document.createElement("canvas");
+    c.width = w; c.height = h;
+    const x = c.getContext("2d");
+    x.fillStyle = "#888"; x.fillRect(0, 0, w, h);
+    x.drawImage(src, 0, 0, w, h);
+    return c;
+  }
+
+  function alphaBox(cut) {
+    const k = 160 / Math.max(cut.width, cut.height);
+    const t = layer(cut.width * k, cut.height * k), g = t.getContext("2d", { willReadFrequently: true });
+    g.drawImage(cut, 0, 0, t.width, t.height);
+    const d = g.getImageData(0, 0, t.width, t.height).data;
+    let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;
+    for (let y = 0; y < t.height; y++) for (let x = 0; x < t.width; x++)
+      if (d[(y * t.width + x) * 4 + 3] > 30) {
+        if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+      }
+    if (x1 < 0) return null;
+    return { x: x0 / k, y: Math.max(0, (y0 - 1) / k), w: (x1 - x0 + 1) / k, h: (y1 - y0 + 1) / k };
+  }
+
+  
+  function flatBottom(cut) {
+    const k = 160 / Math.max(cut.width, cut.height);
+    const t = layer(cut.width * k, cut.height * k), g = t.getContext("2d", { willReadFrequently: true });
+    g.drawImage(cut, 0, 0, t.width, t.height);
+    const d = g.getImageData(0, 0, t.width, t.height).data, ws = [];
+    let mx = 0;
+    for (let y = 0; y < t.height; y++) {
+      let a = -1, b = -1;
+      for (let x = 0; x < t.width; x++) if (d[(y * t.width + x) * 4 + 3] > 30) { if (a < 0) a = x; b = x; }
+      const w = a < 0 ? 0 : b - a + 1; ws.push(w); if (w > mx) mx = w;
+    }
+    for (let y = t.height - 1; y >= 0; y--) if (ws[y] >= mx * 0.85) return (y + 1) / k;
+    return cut.height;
+  }
+
+  async function detectFace(source, cut) {
+    if (typeof faceapi === "undefined" || !faceNetReady) return null;
+    const ow = source.naturalWidth || source.width, oh = source.naturalHeight || source.height;
+    const regions = [], bb = cut && alphaBox(cut);
+    if (bb) {                                    // stage 1: upper part of person only
+      const sx = ow / cut.width, sy = oh / cut.height;
+      const rh = Math.min(bb.h, Math.max(bb.w * 0.9, bb.h * 0.3));
+      const rw = Math.min(bb.w * 1.1, cut.width);
+      const rx = Math.max(0, Math.min(cut.width - rw, bb.x + bb.w / 2 - rw / 2));
+      regions.push({ x: rx * sx, y: bb.y * sy, w: rw * sx, h: Math.min(rh, cut.height - bb.y) * sy });
+    }
+    regions.push({ x: 0, y: 0, w: ow, h: oh });  // stage 2: whole photo
+    for (const r of regions) {
+      const k = 416 / Math.max(r.w, r.h);
+      const c = layer(r.w * k, r.h * k), g = c.getContext("2d");
+      g.fillStyle = "#888"; g.fillRect(0, 0, c.width, c.height);
+      g.drawImage(source, r.x, r.y, r.w, r.h, 0, 0, c.width, c.height);
+      try {
+        let det = await faceapi.detectSingleFace(c,
+          new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.25 }));
+        if (!det) {
+          
+          const id2 = g.getImageData(0, 0, c.width, c.height), d2 = id2.data;
+          let mn2 = 255, mx2 = 0;
+          for (let i = 0; i < d2.length; i += 4) { const l = (d2[i]*.299 + d2[i+1]*.587 + d2[i+2]*.114)|0; if (l<mn2) mn2=l; if (l>mx2) mx2=l; }
+          if (mx2 - mn2 >= 24 && mx2 - mn2 < 250) {
+            const sc2 = 255 / (mx2 - mn2);
+            for (let i = 0; i < d2.length; i += 4) { d2[i]=Math.min(255,(d2[i]-mn2)*sc2); d2[i+1]=Math.min(255,(d2[i+1]-mn2)*sc2); d2[i+2]=Math.min(255,(d2[i+2]-mn2)*sc2); }
+            g.putImageData(id2, 0, 0);
+            det = await faceapi.detectSingleFace(c,
+              new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.25 }));
+          }
+        }
+        if (det) { const b = det.box;
+          return { x: r.x + b.x / k, y: r.y + b.y / k, w: b.width / k, h: b.height / k, score: det.score }; }
+      } catch (e) { console.warn("face fail", e); }
+    }
+    return null;
+  }
+
+  // normalize a detected face to guessFace's definition (hair top to chin)
+  function normFace(f, top) {
+    const H = (f.y + f.h) - top;
+    if (!(H > f.h)) return f;
+    const fh = H * 0.78, fw = fh * 0.8, cx = f.x + f.w / 2;
+    return { x: cx - fw / 2, y: top + H * 0.18, w: fw, h: fh, score: f.score };
+  }
+
+  
+  function mapFaceToCutout(face, orig, cut) {
+    if (!face) return null;
+    const ow = orig.naturalWidth || orig.width || 1;
+    const oh = orig.naturalHeight || orig.height || 1;
+    const cw = cut.width || 1;
+    const ch = cut.height || 1;
+    // Most imgly runs keep identical dimensions → scale = 1
+    const sx = cw / ow;
+    const sy = ch / oh;
+    return {
+      x: face.x * sx,
+      y: face.y * sy,
+      w: face.w * sx,
+      h: face.h * sy,
+      score: face.score
+    };
+  }
+
+
+  function guessFace(cut) {
+    const s = 128, k = s / cut.width;
+    const t = layer(s, cut.height * k);
+    const tc = t.getContext("2d", { willReadFrequently: true });
+    tc.drawImage(cut, 0, 0, t.width, t.height);
+    const d = tc.getImageData(0, 0, t.width, t.height).data;
+    const rows = [];
+    for (let y = 0; y < t.height; y++) {
+      let a = -1, b = -1;
+      for (let x = 0; x < t.width; x++)
+        if (d[(y * t.width + x) * 4 + 3] > 40) { if (a < 0) a = x; b = x; }
+      rows.push(a < 0 ? null : { a, b });
+    }
+    const y0 = rows.findIndex(r => r);
+    if (y0 < 0) return null;
+    const body = rows.slice(y0).map(r => r ? r.b - r.a + 1 : 0);
+    let hm = 0, sh = -1;
+    for (let i = 0; i < body.length; i++) {
+      if (i > 3 && body[i] > hm * 1.45) { sh = i; break; }
+      hm = Math.max(hm, body[i]);
+    }
+    let headH = sh > 0 ? sh : hm * 1.3;
+    headH = Math.max(body.length * 0.1, Math.min(headH, body.length * 0.7));
+    
+    const aspect = body.length / hm;               // height / width
+    if (aspect > 2.6) headH = Math.min(headH, body.length * 0.15);   // full body
+    let cx = 0, cn = 0;
+    for (let i = 0; i < Math.min(headH, body.length); i++) {
+      const r = rows[y0 + i]; if (r) { cx += (r.a + r.b) / 2; cn++; }
+    }
+    cx = cn ? cx / cn : t.width / 2;
+    const fh = headH * 0.78, fw = fh * 0.8;
+    return { x: (cx - fw / 2) / k, y: (y0 + headH * 0.18) / k, w: fw / k, h: fh / k, score: 0.5 };
+  }
+
+  // ──────────────────────────────────────────────
+  // Draw queue – single chain, no double-draw
+  // ──────────────────────────────────────────────
+  function queueDraw() {
+    drawChain = drawChain.then(() => doDraw()).catch(e => {
+      console.warn("[FourStyle] draw error", e);
+    });
+    return drawChain;
+  }
+
+  async function doDraw() {
+    if (!cv || !ctx || !ready) return;
+    if (baseRenderer) await baseRenderer();      // clears + repaints everything except leaders
+    // Leaders are drawn ON TOP of whatever draw0() already painted
+    // (background, art, text, user photo, nameplate).
+    // We never clear the whole canvas here.
+    const W = cv.width;
+    const H = cv.height;
+    const list = leaders;
+    if (!list.length) return;
+
+    switch (style) {
+      case 1: drawStyle1(list, W, H); break;
+      case 2: drawStyle2(list, W, H); break;
+      case 3: drawStyle3(list, W, H); break;
+      case 4: drawStyle4(list, W, H); break;
+      case 5: drawStyle5(list, W, H); break;
+    }
+  }
+
+  // ──────────────────────────────────────────────
+  // Adaptive sizing for 1-9 leaders
+  // ──────────────────────────────────────────────
+  function fitSizes(n, availW, preferred, minGap) {
+    // returns {size, gap} so that n*size + (n-1)*gap <= availW
+    let gap = minGap;
+    let size = preferred;
+    const maxByGap = (availW - (n - 1) * gap) / n;
+    if (size > maxByGap) size = Math.max(32, maxByGap);
+    // re-check gap
+    const used = n * size + (n - 1) * gap;
+    if (used > availW) {
+      gap = Math.max(4, (availW - n * size) / Math.max(1, n - 1));
+    }
+    return { size, gap };
+  }
+
+  // ──────────────────────────────────────────────
+  // Reference styles v3 - user patch 2026-10-31 14:36 (verbatim):
+  // white cards / white ledge / white rings / mixed; replaces gold styles
+  // ──────────────────────────────────────────────
+  // ===== రిఫరెన్స్ స్టైల్స్ =====
+  function layer(w, h) {
+    const c = document.createElement("canvas");
+    c.width = Math.max(1, Math.ceil(w));
+    c.height = Math.max(1, Math.ceil(h));
+    return c;
+  }
+  function blit(c, x, y, shadow) {
+    ctx.save();
+    if (shadow) {
+      ctx.shadowColor = "rgba(0,0,0,.3)";
+      ctx.shadowBlur = cv.width * 0.006;
+      ctx.shadowOffsetY = cv.width * 0.002;
+    }
+    ctx.drawImage(c, x, y);
+    ctx.restore();
+  }
+
+  // ముఖం ఎత్తు = h*faceFrac, ముఖం పైభాగం = h*topFrac, అడ్డంగా మధ్యలో
+  function faceFit(o, L, w, h, faceFrac, topFrac, anchorBottom) {
+    const src = L.canvas;
+    const f0 = L.face || { x: src.width * 0.3, y: src.height * 0.02, w: src.width * 0.4, h: src.height * 0.3 };
+    
+    let fx = Math.min(Math.max(f0.x, 0), src.width - 1);
+    let fy = Math.min(Math.max(f0.y, 0), src.height - 1);
+    let fw = Math.min(f0.w, src.width - fx);
+    let fh = Math.min(f0.h, src.height - fy);
+    if (fw < 8 || fh < 8) { fx = src.width * 0.3; fy = src.height * 0.02; fw = src.width * 0.4; fh = src.height * 0.3; }
+    const s = (h * faceFrac) / fh;
+    const wTop = Math.max(0, fy - fh * 0.30);
+    const wBot = Math.min(src.height, fy + fh * 2.05);
+    const cx0 = fx + fw / 2;
+    const wHalf = Math.max(fw * 1.05, (wBot - wTop) * 0.42);
+    const wx0 = Math.max(0, cx0 - wHalf);
+    const wx1 = Math.min(src.width, cx0 + wHalf);
+    const dx = w / 2 - (cx0 - wx0) * s;
+    const dy = h * topFrac - (fy - wTop) * s;
+    o.drawImage(src, wx0, wTop, wx1 - wx0, wBot - wTop, dx, dy, (wx1 - wx0) * s, (wBot - wTop) * s);
+  }
+
+  function fadeBottom(o, w, h, frac) {
+    const g = o.createLinearGradient(0, h * (1 - frac), 0, h);
+    g.addColorStop(0, "rgba(0,0,0,1)");
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    o.globalCompositeOperation = "destination-in";
+    o.fillStyle = g;
+    o.fillRect(0, 0, w, h);
+    o.globalCompositeOperation = "source-over";
+  }
+
+  function cutout(L, w, h, ff, tf, fade, anchor) {
+    const c = layer(w, h), o = c.getContext("2d");
+    faceFit(o, L, w, h, ff, tf, anchor);   
+    if (L.poor) softMask(o, w, h, 10);
+    if (fade) fadeBottom(o, w, h, fade);
+    return c;
+  }
+
+  function card(L, x, y, w, h) {
+    const c = layer(w, h), o = c.getContext("2d");
+    const r = w * 0.1, p = w * 0.045;
+    roundRect(o, 0, 0, w, h, r); o.fillStyle = "#fff"; o.fill();
+    o.save();
+    roundRect(o, p, p, w - 2 * p, h - 2 * p, r * 0.7); o.clip();
+    o.fillStyle = "#f2f2f2"; o.fillRect(0, 0, w, h);
+    o.translate(p, p);
+    faceFit(o, L, w - 2 * p, h - 2 * p, 0.36, 0.2);
+    o.restore();
+    blit(c, x, y, true);
+  }
+
+
+  function box(L, x, y, D) {
+    const c = layer(D, D), o = c.getContext("2d"), ring = D * 0.05, r = D * 0.14;
+    roundRect(o, 0, 0, D, D, r); o.fillStyle = "#fff"; o.fill();
+    o.save();
+    roundRect(o, ring, ring, D - 2 * ring, D - 2 * ring, r * 0.7); o.clip();
+    o.translate(ring, ring);
+    if (L.status === 'detected') faceFit(o, L, D - 2 * ring, D - 2 * ring, 0.58, 0.13);
+    else { // safe fallback when no face is found: whole person fits, head/chin never cut
+      const iw = D - 2 * ring, ih = D - 2 * ring, src = L.canvas;
+      const sc = Math.min(iw / src.width, ih / src.height) * 0.98;
+      const dw = src.width * sc, dh = src.height * sc;
+      o.drawImage(src, (iw - dw) / 2, Math.max(0, ih - dh), dw, dh);
+    }
+    o.restore();
+    roundRect(o, ring / 2, ring / 2, D - ring, D - ring, r * 0.92);
+    o.strokeStyle = "#fff"; o.lineWidth = ring; o.stroke();
+    blit(c, x, y, true);
+  }
+
+  function circle(L, x, y, D) {
+    const c = layer(D, D), o = c.getContext("2d"), ring = D * 0.05;
+    o.beginPath(); o.arc(D / 2, D / 2, D / 2 - ring / 2, 0, Math.PI * 2);
+    o.fillStyle = "#fff"; o.fill();
+    o.save();
+    o.beginPath(); o.arc(D / 2, D / 2, D / 2 - ring, 0, Math.PI * 2); o.clip();
+    faceFit(o, L, D, D, 0.44, 0.2);
+    o.restore();
+    o.beginPath(); o.arc(D / 2, D / 2, D / 2 - ring / 2, 0, Math.PI * 2);
+    o.strokeStyle = "#fff"; o.lineWidth = ring; o.stroke();
+    blit(c, x, y, true);
+  }
+
+  function square(L, x, y, w, h) {
+    const c = layer(w, h), o = c.getContext("2d");
+    o.fillStyle = "#d4d4d4"; o.fillRect(0, 0, w, h);
+    faceFit(o, L, w, h, 0.38, 0.14);
+    o.strokeStyle = "#ececec"; o.lineWidth = Math.max(2, w * 0.04);
+    o.strokeRect(0, 0, w, h);
+    blit(c, x, y, false);
+  }
+
+  // ---- స్టైల్ 1: పెద్ద కార్డ్ + లోగో + చిన్న కార్డులు ----
+  function drawStyle1(list, W) {
+    const m = W * 0.04, top = W * 0.04, gap = W * 0.007;
+    const bw = W * 0.117, bh = bw * 1.25;
+    card(list[0], m, top + W * 0.014, bw, bh);
+    const rest = list.slice(1), k = rest.length;
+    const sw = k ? Math.min(W * 0.065, (W * 0.52 - gap * (k - 1)) / k) : 0, sh = sw * 1.27;
+    const rowW = k ? k * sw + (k - 1) * gap : 0, rx = W - m - rowW;
+    rest.forEach((L, i) => card(L, rx + i * (sw + gap), top, sw, sh));
+    if (partyLogo) {
+      const space = rx - (m + bw);
+      const ls = Math.min(W * 0.10, space * 0.7);
+      const ly = top + (k ? sh / 2 : bh / 2) - ls / 2;
+      ctx.drawImage(partyLogo, m + bw + (space - ls) / 2, ly, ls, ls);
+    }
+  }
+
+  // ---- స్టైల్ 2: ఎడమ 2 + మధ్యలో చతురస్రాలు + కుడి 1, తెల్ల ledge ----
+  function drawStyle2(list, W) {
+    const n = list.length, top = W * 0.045;
+    const bw = W * 0.12, bh = W * 0.17, ledgeH = W * 0.005;
+    const nl = n >= 6 ? 2 : 1, nr = n >= 4 ? 1 : 0;
+    const left = list.slice(0, nl), right = list.slice(n - nr), mids = list.slice(nl, n - nr);
+
+    left.forEach((L, i) => {
+      const s = i === 0 ? 1 : 0.94, w = bw * s, h = bh * s;
+      blit(cutout(L, w, h, 0.34, 0.08, 0.12), i * bw * 0.78, top + bh - h); 
+    });
+    const groupW = bw * 0.78 * (nl - 1) + bw;
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, top + bh, groupW + W * 0.01, ledgeH);
+
+    right.forEach(L => {
+      blit(cutout(L, bw, bh, 0.34, 0.08, 0, true), W - bw, top); 
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(W - bw - W * 0.01, top + bh, bw + W * 0.01, ledgeH);
+    });
+
+    const k = mids.length;
+    if (!k) return;
+    const gap = W * 0.004;
+    const sw = Math.min(W * 0.05, (W * 0.56 - gap * (k - 1)) / k), sh = sw * 1.4;
+    let x = (W - (k * sw + (k - 1) * gap)) / 2;
+    mids.forEach(L => { square(L, x, top, sw, sh); x += sw + gap; });
+  }
+
+  // ---- స్టైల్ 3: తెల్ల రింగ్ వృత్తాలు, ఒకే వరుస ----
+  function drawStyle3(list, W) {
+    const n = list.length, gap = W * 0.012, top = W * 0.045;
+    const D = Math.min(W * 0.082, (W * 0.9 - gap * (n - 1)) / n);
+    if (window.JN_BOX_CORNERS && n >= 2) {
+      const pl = Math.ceil(n / 2), pr = n - pl, g2 = W * 0.008, m = W * 0.02, side = W * 0.36;
+      const D2 = Math.min(W * 0.105, (side - g2 * (pl - 1)) / pl);
+      const topB = W * 0.079 - D2 / 2;
+      for (let i = 0; i < pl; i++) box(list[i], m + i * (D2 + g2), topB, D2);
+      for (let i = 0; i < pr; i++) box(list[pl + i], W - m - D2 - i * (D2 + g2), topB, D2);
+      return;
+    }
+    let x = (W - (n * D + (n - 1) * gap)) / 2;
+    list.forEach(L => { box(L, x, top, D); x += D + gap; });
+  }
+
+  // ---- స్టైల్ 4: లోగో + ఫేడ్ కటౌట్ + వృత్తాలు + ఫేడ్ కటౌట్లు ----
+  function drawStyle4(list, W) {
+    const n = list.length, top = W * 0.025;
+    if (partyLogo) ctx.drawImage(partyLogo, W * 0.012, top, W * 0.09, W * 0.09);
+    const bR = n <= 2 ? n - 1 : (n >= 6 ? 2 : 1);
+    const cn = n - 1 - bR;
+    let bw = W * 0.10, bh = bw * 1.1, D = W * 0.047, gap = W * 0.008;
+    const rowW = (1 + bR) * bw + cn * D + (n - 1) * gap;
+    const k = Math.min(1, (W * 0.58) / rowW);
+    bw *= k; bh *= k; D *= k; gap *= k;
+    const total = (1 + bR) * bw + cn * D + (n - 1) * gap;
+    let x = (W - total) / 2;
+    list.forEach((L, i) => {
+      if (i === 0 || i >= n - bR) {
+        blit(cutout(L, bw, bh, 0.36, 0.1, 0.35, false), x, top); 
+        x += bw + gap;
+      } else {
+        circle(L, x, top + bh * 0.04, D);
+        x += D + gap;
+      }
+    });
+  }
+
+  // ---- జననేత స్టైల్: ఎడమ పెద్ద కటౌట్ + మధ్య తెల్ల టైళ్ళు + కుడి బంగారు రింగ్ వృత్తం ----
+  function goldCircle(L, x, y, D) {
+    const c = layer(D, D), o = c.getContext("2d"), ringW = D * 0.045;
+    o.beginPath(); o.arc(D/2, D/2, D/2 - ringW*0.6, 0, Math.PI*2); o.fillStyle = "#fff"; o.fill();
+    o.save();
+    o.beginPath(); o.arc(D/2, D/2, D/2 - ringW*1.7, 0, Math.PI*2); o.clip();
+    faceFit(o, L, D, D, 0.44, 0.2);
+    o.restore();
+    [[D/2-ringW*0.55, ringW*1.0, "rgb(154,116,24)"],[D/2-ringW*1.1, ringW*0.75, "rgb(212,175,55)"],[D/2-ringW*1.6, ringW*0.5, "rgb(255,236,170)"]].forEach(v=>{ o.beginPath(); o.arc(D/2,D/2,Math.max(1,v[0]),0,Math.PI*2); o.lineWidth=v[1]; o.strokeStyle=v[2]; o.stroke(); });
+    blit(c, x, y, true);
+  }
+
+  function drawStyle5(list, W, H) {
+    const n = list.length, top = W * 0.045;
+    if (!n) return;
+    if (n === 1) { box(list[0], (W - W*0.1025)/2, top, W*0.1025); return; }
+    const left = list[0], right = list[n-1], mids = list.slice(1, n-1);
+    const tileD0 = W * 0.1025;
+    let D = tileD0, g2 = W * (window.JN5GAP || 0.032);
+    const k = mids.length;
+    if (k) {
+      const availW = W - 2*(W*0.008) - tileD0*0.86 - tileD0 - W*0.03;
+      const fs = fitSizes(k, availW, tileD0, g2);
+      D = fs.size; g2 = fs.gap;
+      const rowW = k * D + (k - 1) * g2;
+      let x = (W - rowW) / 2;
+      mids.forEach(L => { box(L, x, top, D); x += D + g2; });
+    }
+    const lw0 = left.canvas.width * (D / left.canvas.height);
+    const lc = layer(lw0, D), lo = lc.getContext("2d");
+    lo.drawImage(left.canvas, 0, 0, lw0, D);
+    blit(lc, W * 0.008, top);
+    goldCircle(right, W - D - W * 0.008, top, D);
+  }
+
+  // ──────────────────────────────────────────────
+  // Crop helpers
+  // ──────────────────────────────────────────────
+  function expandHead(L, src) {
+    let sx = 0, sy = 0, sw = src.width, sh = src.height, hasFace = false;
+    if (L.face && L.face.w > 8) {
+      hasFace = true;
+      const f = L.face;
+      const up = f.h * HEAD_UP;
+      const side = f.w * HEAD_SIDE;
+      const down = f.h * HEAD_DOWN;
+      sx = Math.max(0, f.x - side);
+      sy = Math.max(0, f.y - up);
+      sw = Math.min(src.width - sx, f.w + side * 2);
+      sh = Math.min(src.height - sy, f.h + up + down);
+    }
+    if (sw < 10 || sh < 10) {
+      return { sx: 0, sy: 0, sw: src.width, sh: src.height, hasFace: false };
+    }
+    return { sx, sy, sw, sh, hasFace };
+  }
+
+  function faceCrop(L, src, targetAspect) {
+    // targetAspect = width/height of frame (3/4 → 0.75)
+    const exp = expandHead(L, src);
+    let { sx, sy, sw, sh } = exp;
+    const srcAspect = sw / sh;
+    if (srcAspect > targetAspect) {
+      // too wide → crop sides
+      const newW = sh * targetAspect;
+      sx += (sw - newW) / 2;
+      sw = newW;
+    } else {
+      // too tall → keep top (face) bias
+      const newH = sw / targetAspect;
+      const extra = sh - newH;
+      sy += extra * 0.15;          // slight top bias
+      sh = newH;
+    }
+    // clamp
+    sx = Math.max(0, sx);
+    sy = Math.max(0, sy);
+    sw = Math.min(sw, src.width - sx);
+    sh = Math.min(sh, src.height - sy);
+    return { sx, sy, sw, sh };
+  }
+
+  // ──────────────────────────────────────────────
+  // Poor-cutout detection + real soft mask (alpha → 0)
+  // ──────────────────────────────────────────────
+  function isPoorCutout(canvas) {
+    try {
+      const c = canvas.getContext("2d");
+      const s = 5;
+      const pts = [
+        [0, 0], [canvas.width - s, 0],
+        [0, canvas.height - s], [canvas.width - s, canvas.height - s],
+        [canvas.width / 2 - s / 2, 0], [canvas.width / 2 - s / 2, canvas.height - s]
+      ];
+      let opaque = 0, total = 0;
+      for (const [px, py] of pts) {
+        const id = c.getImageData(px, py, s, s);
+        for (let i = 3; i < id.data.length; i += 4) {
+          total++;
+          if (id.data[i] > 180) opaque++;
+        }
+      }
+      return (opaque / total) > 0.42;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function softMask(octx, w, h, radius) {
+    // True soft edge that reaches 0 alpha – kills hard rectangles
+    octx.save();
+    octx.globalCompositeOperation = "destination-in";
+    const g = octx.createRadialGradient(
+      w / 2, h / 2, Math.min(w, h) * 0.38,
+      w / 2, h / 2, Math.min(w, h) * 0.55 + radius
+    );
+    g.addColorStop(0, "rgba(0,0,0,1)");
+    g.addColorStop(0.75, "rgba(0,0,0,0.85)");
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    octx.fillStyle = g;
+    octx.fillRect(0, 0, w, h);
+    octx.restore();
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    const rr = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + rr, y);
+    ctx.arcTo(x + w, y, x + w, y + h, rr);
+    ctx.arcTo(x + w, y + h, x, y + h, rr);
+    ctx.arcTo(x, y + h, x, y, rr);
+    ctx.arcTo(x, y, x + w, y, rr);
+    ctx.closePath();
+  }
+
+  // ──────────────────────────────────────────────
+  // Export
+  // ──────────────────────────────────────────────
+  const api = {
+    fitPhoto: async function(c){await setLeadersFromCU([c,c],[c,c]);return leaders[0];},
+    faceFit,
+    init,
+    setBaseRenderer,
+    setPartyLogo,
+    setStyle,
+    getStyle,
+    setLeadersFromCU,
+    drawLeaders,
+    isReady: () => ready,
+    getReport: () => leaders.map(L => ({ idx: L.idx, status: L.status, poor: L.poor })),
+    exportPNG,
+    // legacy aliases so old calls still work
+    setPosterCanvas: init,
+    setLeaders: function () { console.warn("Use setLeadersFromCU(CU, originals)"); },
+    forceRedraw: drawLeaders,
+    switchStyleSafe: async function (n) { setStyle(n); await drawChain; },
+    exportPNGSafe: exportPNG
+  };
+
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = api;
+  } else {
+    global.VideoFit = api;
+  }
+})(typeof window !== "undefined" ? window : globalThis);
+const W = 1122, H = 1402;
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d', { willReadFrequently: true });
+const vid = document.getElementById('vid');
+
+/* పోస్టర్‌లో ఫోటోలు ఉండే చోట్లు (1122×1402 కొలతల్లో) */
+const CY = 72, R = 50;
+const SLOTS = [
+  { kind: 'c', x: 90,  label: 'ఎడమ 1' }, { kind: 'c', x: 207, label: 'ఎడమ 2' }, { kind: 'c', x: 323, label: 'ఎడమ 3' },
+  { kind: 'c', x: 797, label: 'కుడి 1' }, { kind: 'c', x: 913, label: 'కుడి 2' }, { kind: 'c', x: 1029, label: 'కుడి 3' },
+  { kind: 'r', x: 690, y: 800, w: 400, h: 430, rad: 28, label: 'నా ఫోటో' }
+];
+const MAIN = 6;
+const photos = new Array(SLOTS.length).fill(null);   // {img,url,z,ox,oy}
+let nameTxt = '', desigTxt = '';
+let exporting = false;
+let lastVideo = null; /* Invalidated whenever photo or details change. */
+
+/* ---------- భద్రపరచడం (ఈ ఫోన్‌లో మాత్రమే) ---------- */
+const KEY = 'diwali_video_maker_v1';
+function save() {
+  lastVideo=null;
+  try {
+    localStorage.setItem(KEY, JSON.stringify({
+      name: nameTxt, desig: desigTxt,
+      photos: photos.map(p => p ? { url: p.url, z: p.z, ox: p.ox, oy: p.oy, bgVersion:p.bgVersion||0, face:p.face, fitVersion:p.fitVersion||0 } : null)
+    }));
+  } catch (e) { /* స్టోరేజ్ నిండినా పర్వాలేదు */ }
+}
+async function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (!d) return;
+    nameTxt=d.name||''; desigTxt=d.desig||'';
+    document.getElementById('nameIn').value=nameTxt;
+    document.getElementById('desigIn').value=desigTxt;
+    photoBusy=true; syncPhotoLock();
+    const pending=[];
+    for (let i=0;i<Math.min((d.photos||[]).length,photos.length);i++) {
+      const p=d.photos[i]; if(!p)continue;
+      try {
+        const im=await imageFromUrl(p.url);
+        photos[i]={img:im,url:p.url,z:p.z||1,ox:p.ox||0,oy:p.oy||0,bgVersion:p.bgVersion||0, face:p.face, fitVersion:p.fitVersion||0};
+        if(p.bgVersion!==2 && !hasPhotoAlpha(im)) pending.push(i);
+        else photos[i].bgVersion=2;
+      } catch(err) {failedPhotos.add(i);}
+    }
+    renderChips();
+    for (const i of pending) {
+      photoStatus.textContent='సేవ్ చేసిన ఫోటో '+(i+1)+' బ్యాక్‌గ్రౌండ్ తొలగిస్తున్నాం… మొదటిసారి మాత్రమే. పేజీ మూయకండి.';
+      const old=photos[i];
+      try {
+        const response=await fetch(old.url); const blob=await response.blob();
+        const processed=await removePhotoBackground(blob);
+        photos[i]={...processed,z:old.z,ox:old.ox,oy:old.oy};
+        failedPhotos.delete(i); save(); renderChips();
+      } catch(err) {failedPhotos.add(i);}
+    }
+    for(let i=0;i<photos.length;i++)if(photos[i]&&photos[i].fitVersion!==1){
+      photoStatus.textContent='ఫోటో ముఖాన్ని ఆటోమేటిక్‌గా సర్దుతున్నాం…';
+      try{await autoFitPhoto(photos[i]);photos[i].z=1;photos[i].ox=photos[i].oy=0;}catch(e){failedPhotos.add(i);}
+    }
+    save();
+    photoStatus.textContent=failedPhotos.size?'కొన్ని సేవ్ చేసిన ఫోటోల బ్యాక్‌గ్రౌండ్ తొలగింపు పూర్తి కాలేదు. పాత ఫోటోలు అలాగే ఉన్నాయి. పేజీ మళ్లీ లోడ్ చేసి ప్రయత్నించండి; అప్పటివరకు ఎగుమతి ఆపాం.':'సేవ్ చేసిన ఫోటోలు సిద్ధం.';
+    document.body.dataset.migrationDone=failedPhotos.size?'failed':'ready';
+  } catch(err) {photoStatus.textContent='సేవ్ చేసిన ఫోటోలు లోడ్ కాలేదు. మళ్లీ ప్రయత్నించండి.';failedPhotos.add(-1);}
+  finally {photoBusy=false;syncPhotoLock();}
+}
+
+/* ---------- ఫోటో ఎంచుకోవడం ---------- */
+const fileIn = document.getElementById('file');
+let pickIdx = -1;
+function openPicker(i) { if(photoBusy){photoStatus.textContent='ఫోటో సిద్ధమవుతోంది… పూర్తయ్యే వరకు వేచి ఉండండి.';return;} pickIdx = i; fileIn.value = ''; fileIn.click(); }
+let photoBusy = false;
+const failedPhotos = new Set();
+function syncPhotoLock(){const locked=photoBusy||failedPhotos.size>0;document.getElementById('vidBtn').disabled=locked;document.getElementById('pngBtn').disabled=locked;document.getElementById('shareBtn').disabled=locked;if(typeof photoStatus!=='undefined')photoStatus.dataset.busy=String(photoBusy);}
+function imageFromUrl(url){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=url;});}
+function hasPhotoAlpha(im){const c=document.createElement('canvas');c.width=100;c.height=100;const x=c.getContext('2d');x.drawImage(im,0,0,100,100);const d=x.getImageData(0,0,100,100).data;let n=0;for(let k=3;k<d.length;k+=4)if(d[k]<245)n++;return n>300;}
+async function autoFitPhoto(p){
+ const c=document.createElement('canvas');c.width=p.img.width;c.height=p.img.height;c.getContext('2d').drawImage(p.img,0,0);
+ const L=await VideoFit.fitPhoto(c);p.face=L.face;p.fitVersion=1;p.fitStatus=L.status;
+}
+/* Standalone background removal: same engine the poster studio uses
+   (@imgly/background-removal@1.5.5, isnet_quint8), loaded in-page only when the
+   studio iframe parent is absent (test copy opened directly). */
+var localImglyP=null;
+function loadLocalImgly(){if(!localImglyP)localImglyP=import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm').catch(function(e){localImglyP=null;throw e});return localImglyP}
+function bboxLocal(o){var d=o.getContext('2d').getImageData(0,0,o.width,o.height).data,x0=o.width,x1=0,y0=o.height,y1=0;
+ for(var y=0;y<o.height;y++)for(var x=0;x<o.width;x++)if(d[(y*o.width+x)*4+3]>40){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+ if(x1<x0)return o;
+ var w=x1-x0+1,h=y1-y0+1,t=document.createElement('canvas');t.width=w;t.height=h;t.getContext('2d').drawImage(o,x0,y0,w,h,0,0,w,h);return t}
+async function cutLocal(f,onProg){
+ var m=await loadLocalImgly();
+ var u0=URL.createObjectURL(f),im0=await new Promise(function(r,j){var i=new Image();i.onload=function(){r(i)};i.onerror=j;i.src=u0});
+ var inp=f;
+ if(Math.max(im0.width,im0.height)>1500){var rs=1500/Math.max(im0.width,im0.height),rc=document.createElement('canvas');rc.width=Math.round(im0.width*rs);rc.height=Math.round(im0.height*rs);rc.getContext('2d').drawImage(im0,0,0,rc.width,rc.height);inp=await new Promise(function(r){rc.toBlob(r,'image/jpeg',0.92)})}
+ var blob=await Promise.race([m.removeBackground(inp,{model:'isnet_quint8',output:{format:'image/png'},progress:onProg}),new Promise(function(_,j){setTimeout(function(){j(new Error('timeout'))},300000)})]);
+ var u=URL.createObjectURL(blob);
+ var im=await new Promise(function(r,j){var i=new Image();i.onload=function(){r(i)};i.onerror=j;i.src=u});
+ var s=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+ return {c:c,im0:im0}}
+async function removePhotoBackground(f){
+  let result, source;
+  if(window.parent&&typeof window.parent.cut==='function'){
+    result=await window.parent.cut(f);
+    source=typeof window.parent.bbox==='function'?window.parent.bbox(result.c):result.c;
+  }else{
+    result=await cutLocal(f,function(key,cur,total){
+      if(key&&key.indexOf('fetch')===0)photoStatus.textContent=total>0?('బ్యాక్‌గ్రౌండ్ తొలగింపు మోడల్ డౌన్‌లోడ్ అవుతోంది… '+Math.round(cur/total*100)+'% (మొదటిసారి మాత్రమే)'):'బ్యాక్‌గ్రౌండ్ తొలగింపు మోడల్ డౌన్‌లోడ్ అవుతోంది… మొదటిసారి మాత్రమే కొంచెం ఎక్కువ సమయం పడుతుంది';
+      else photoStatus.textContent='ఫోటో బ్యాక్‌గ్రౌండ్ తొలగిస్తున్నాం… దయచేసి వేచి ఉండండి.';
+    });
+    source=bboxLocal(result.c);
+  }
+  const c=document.createElement('canvas'),scale=Math.min(1,1000/Math.max(source.width,source.height));
+  c.width=Math.round(source.width*scale);c.height=Math.round(source.height*scale);c.getContext('2d').drawImage(source,0,0,c.width,c.height);
+  const url=c.toDataURL('image/png');const im=await imageFromUrl(url);
+  const p={img:im,url,z:1,ox:0,oy:0,bgVersion:2};await autoFitPhoto(p);return p;
+}
+const photoStatus = document.createElement('p');
+photoStatus.className = 'photo-status'; photoStatus.setAttribute('aria-live','polite'); photoStatus.setAttribute('role','status');
+cv.parentNode.insertAdjacentElement('afterend',photoStatus);
+fileIn.addEventListener('change', async () => {
+  const f = fileIn.files && fileIn.files[0];
+  if (!f || pickIdx < 0 || photoBusy) return;
+  const idx = pickIdx;
+  photoBusy = true;lastVideo=null;
+  photoStatus.dataset.error='false';delete document.body.dataset.photoError;syncPhotoLock();
+  photoStatus.textContent = 'ఫోటో బ్యాక్‌గ్రౌండ్ తొలగిస్తున్నాం… దయచేసి వేచి ఉండండి.';
+  try {
+    photos[idx] = await removePhotoBackground(f);
+    failedPhotos.delete(idx);
+    renderChips(); save();
+    photoStatus.textContent = 'బ్యాక్‌గ్రౌండ్ తొలగించి, ముఖం ఆటోమేటిక్‌గా సర్దిన ఫోటో సిద్ధం.';
+    document.body.dataset.photoReady = String(idx);
+  } catch (err) {
+    failedPhotos.add(idx);photoStatus.dataset.error='true';
+    photoStatus.textContent = 'బ్యాక్‌గ్రౌండ్ తొలగింపు పూర్తి కాలేదు. పాత ఫోటో అలాగే ఉంది. అదే ఫోటో బాక్స్ నొక్కి మళ్లీ ఎంచుకోండి.';
+    document.body.dataset.photoError = String(err && err.message || err);
+  } finally { photoBusy = false; syncPhotoLock(); }
+});
+
+/* ---------- కింద ఉన్న బటన్లు ---------- */
+function chip(i) {
+  const wrap = document.createElement('div');
+  wrap.className = 'chip' + (photos[i] ? ' filled' : '');
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.textContent = (photos[i] ? '✓ ' : '+ ') + SLOTS[i].label;
+  b.onclick = () => openPicker(i);
+  wrap.appendChild(b);
+  if (photos[i]) {
+    const x = document.createElement('button');
+    x.type = 'button'; x.className = 'x'; x.textContent = '✕'; x.setAttribute('aria-label', SLOTS[i].label + ' ఫోటో తీసివేయి');
+    x.onclick = () => { photos[i] = null; failedPhotos.delete(i); syncPhotoLock(); renderChips(); save(); };
+    wrap.appendChild(x);
+  }
+  return wrap;
+}
+function renderChips() {
+  const lc = document.getElementById('leaderChips'); lc.innerHTML = '';
+  for (let i = 0; i < 6; i++) lc.appendChild(chip(i));
+  const mc = document.getElementById('mainChip'); mc.innerHTML = '';
+  mc.appendChild(chip(MAIN));
+}
+
+document.getElementById('nameIn').addEventListener('input', e => { nameTxt = e.target.value; save(); });
+document.getElementById('desigIn').addEventListener('input', e => { desigTxt = e.target.value; save(); });
+
+/* ---------- ప్లే / శబ్దం ---------- */
+let ac = null, gain = null, dest = null, soundOn = true;
+function setupAudio() {
+  if (ac) return;
+  try {
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+    const src = ac.createMediaElementSource(vid);
+    gain = ac.createGain();
+    dest = ac.createMediaStreamDestination();
+    src.connect(gain); gain.connect(ac.destination);
+    src.connect(dest);
+  } catch (e) { ac = null; }
+}
+const playBtn = document.getElementById('playBtn');
+const muteBtn = document.getElementById('muteBtn');
+playBtn.onclick = async () => {
+  setupAudio(); if (ac && ac.state === 'suspended') await ac.resume();
+  if (vid.paused) { try { await vid.play(); } catch (e) {} } else vid.pause();
+};
+vid.addEventListener('play',  () => playBtn.textContent = '⏸ పాజ్');
+vid.addEventListener('pause', () => { if (!exporting) playBtn.textContent = '▶ ప్లే'; });
+muteBtn.onclick = () => {
+  soundOn = !soundOn;
+  if (gain) gain.gain.value = soundOn ? 1 : 0; else vid.muted = !soundOn;
+  muteBtn.textContent = soundOn ? '🔊 శబ్దం ఉంది' : '🔇 శబ్దం లేదు';
+};
+
+/* ---------- గీత పనులు ---------- */
+function rrPath(c, x, y, w, h, r) {
+  c.beginPath();
+  c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r);
+  c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath();
+}
+function fitText(text, maxW, px, weight) {
+  let s = px;
+  do { ctx.font = weight + ' ' + s + 'px "Noto Sans Telugu", sans-serif'; if (ctx.measureText(text).width <= maxW) break; s -= 2; } while (s > 18);
+  return s;
+}
+function placePhoto(p, cx, cy, fw, fh, isLeader) {
+  if (p.face) {
+    p.z=Math.min(6,Math.max(0.45,p.z));
+    ctx.save();ctx.translate(cx+p.ox,cy+p.oy);ctx.scale(p.z,p.z);ctx.translate(-fw/2,-fh/2);
+    VideoFit.faceFit(ctx,{canvas:p.img,face:p.face},fw,fh,isLeader?0.58:0.54,isLeader?0.14:0.15);
+    ctx.restore();return;
+  }
+  const base = Math.max(fw / p.img.width, fh / p.img.height) * 0.98;
+  p.z = Math.min(Math.max(p.z, 0.45), 6);
+  const dw = p.img.width * base * p.z, dh = p.img.height * base * p.z;
+  const mx = (dw + fw) * 0.4, my = (dh + fh) * 0.4;
+  p.ox = Math.min(Math.max(p.ox, -mx), mx); p.oy = Math.min(Math.max(p.oy, -my), my);
+  ctx.drawImage(p.img, cx - dw / 2 + p.ox, cy - fh / 2 + 8 + p.oy, dw, dh);
+}
+
+/* పై బార్ రంగులను వీడియో నుంచే తీసుకుంటాం, అప్పుడు అతుకులు కనిపించవు */
+const tmp = document.createElement('canvas'); tmp.width = 1; tmp.height = 138;
+const tctx = tmp.getContext('2d');
+function coverBand(x0, x1, sampleX) {
+  let ok = false;
+  try {
+    const d = ctx.getImageData(sampleX, 0, 1, 138);
+    tctx.putImageData(d, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(tmp, 0, 0, 1, 138, x0, 0, x1 - x0, 138);
+    ctx.imageSmoothingEnabled = true;
+    ok = true;
+  } catch (e) {}
+  if (!ok) {
+    const g = ctx.createLinearGradient(0, 0, 0, 138);
+    g.addColorStop(0, '#f7861b'); g.addColorStop(0.44, '#f7861b'); g.addColorStop(0.45, '#17652f');
+    g.addColorStop(0.59, '#17652f'); g.addColorStop(0.6, '#ffffff'); g.addColorStop(0.9, '#fdf1e0'); g.addColorStop(1, '#e8c9a0');
+    ctx.fillStyle = g; ctx.fillRect(x0, 0, x1 - x0, 138);
+  }
+}
+
+function draw() {
+  /* 1) వీడియో ఫ్రేమ్ */
+  if (vid.readyState >= 2) ctx.drawImage(vid, 0, 0, W, H);
+  else { ctx.fillStyle = '#2b0f0e'; ctx.fillRect(0, 0, W, H); }
+
+  /* 2) పై బార్‌లో పాత నాయకుల సర్కిళ్ళు కప్పడం (మోదీ, పార్టీ పేరు మధ్యలో అలాగే ఉంటాయి) */
+  coverBand(0, 400, 394);
+  coverBand(724, W, 731);
+
+  /* 3) నాయకుల సర్కిళ్ళు */
+  for (let i = 0; i < 6; i++) {
+    const s = SLOTS[i], p = photos[i];
+    if (p) {
+      ctx.save(); ctx.beginPath(); ctx.arc(s.x, CY, R, 0, Math.PI * 2); ctx.clip();
+      ctx.fillStyle = "#fff1d2"; ctx.fillRect(s.x-R,CY-R,R*2,R*2);
+      placePhoto(p, s.x, CY, R * 2, R * 2, true); ctx.restore();
+      ctx.beginPath(); ctx.arc(s.x, CY, R, 0, Math.PI * 2);
+      ctx.lineWidth = 5; ctx.strokeStyle = '#d6a836'; ctx.stroke();
+    } else if (!exporting) {
+      ctx.beginPath(); ctx.arc(s.x, CY, R - 4, 0, Math.PI * 2);
+      ctx.setLineDash([8, 7]); ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(70,30,10,.8)'; ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(70,30,10,.85)'; ctx.font = '800 44px "Noto Sans Telugu", sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('+', s.x, CY + 2);
+    }
+  }
+
+  /* 4) కుడి కింద పాత ఫోటో కప్పి మీ ఫోటో */
+  let g = ctx.createLinearGradient(0, 772, 0, 1232);
+  g.addColorStop(0, 'rgba(58,22,19,0)'); g.addColorStop(0.07, 'rgba(58,22,19,1)'); g.addColorStop(1, 'rgb(44,16,15)');
+  ctx.fillStyle = g; ctx.fillRect(650, 772, W - 650, 460);
+
+  const m = SLOTS[MAIN], mp = photos[MAIN];
+  if (mp) {
+    ctx.save(); rrPath(ctx, m.x, m.y, m.w, m.h, m.rad); ctx.clip();
+    placePhoto(mp, m.x + m.w / 2, m.y + m.h / 2, m.w, m.h); ctx.restore();
+  } else if (!exporting) {
+    rrPath(ctx, m.x, m.y, m.w, m.h, m.rad); ctx.fillStyle = 'rgba(224,170,60,.12)'; ctx.fill();
+    ctx.setLineDash([12, 9]); ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(224,170,60,.8)'; ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = '#f2cf86'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = '800 54px "Noto Sans Telugu", sans-serif'; ctx.fillText('+', m.x + m.w / 2, m.y + m.h / 2 - 30);
+    ctx.font = '700 30px "Noto Sans Telugu", sans-serif'; ctx.fillText('మీ ఫోటో', m.x + m.w / 2, m.y + m.h / 2 + 30);
+  }
+
+  /* 5) కింద పేరు, పదవి - జననేత మోడల్: తెల్ల పేరు భాగం పైన, ముదురు ఆరెంజ్ పదవి భాగం కింద, ఒకే కలిపిన ఫ్రేమ్ (పోస్టర్ల మాదిరిగానే) */
+  ctx.fillStyle = 'rgb(43,15,14)'; ctx.fillRect(0, 1232, W, H - 1232);
+
+  const nmT = nameTxt.trim() || (exporting ? '' : 'మీ పేరు');
+  const dgT = desigTxt.trim() || (exporting ? '' : 'మీ పదవి');
+  ctx.save(); ctx.shadowColor = 'rgba(0,0,0,0.35)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 3;
+  rrPath(ctx, 9, 1240, 1104, 148, 16); ctx.fillStyle = 'rgb(255,255,255)'; ctx.fill(); ctx.restore();
+  ctx.save(); rrPath(ctx, 9, 1240, 1104, 148, 16); ctx.clip();
+  const og2 = ctx.createLinearGradient(9, 0, 1113, 0); og2.addColorStop(0, 'rgb(159,56,6)'); og2.addColorStop(0.5, 'rgb(180,66,9)'); og2.addColorStop(1, 'rgb(159,56,6)');
+  ctx.fillStyle = og2; ctx.fillRect(9, 1310, 1104, 78); ctx.restore();
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  if (nmT) {
+    let s = 46; do { ctx.font = '400 ' + s + 'px Ramabhadra, "Noto Sans Telugu", sans-serif'; if (ctx.measureText(nmT).width <= 1064) break; s -= 2; } while (s > 20);
+    ctx.fillStyle = 'rgb(38,40,84)'; ctx.fillText(nmT, W / 2, 1276);
+  }
+  if (dgT) {
+    let s = 46; do { ctx.font = '400 ' + s + 'px Ramabhadra, "Noto Sans Telugu", sans-serif'; if (ctx.measureText(dgT).width <= 1064) break; s -= 2; } while (s > 22);
+    ctx.fillStyle = 'rgb(255,255,255)'; ctx.fillText(dgT, W / 2, 1350);
+  }
+}
+(function loop() { draw(); requestAnimationFrame(loop); })();
+
+/* ---------- వేలితో లాగడం, జూమ్ ---------- */
+function toCanvas(e) {
+  const r = cv.getBoundingClientRect();
+  return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height };
+}
+function hit(x, y) {
+  for (let i = 0; i < 6; i++) { const dx = x - SLOTS[i].x, dy = y - CY; if (dx * dx + dy * dy <= (R + 6) * (R + 6)) return i; }
+  const m = SLOTS[MAIN];
+  if (x >= m.x && x <= m.x + m.w && y >= m.y && y <= m.y + m.h) return MAIN;
+  return -1;
+}
+const ptrs = new Map(); let gest = null;
+cv.addEventListener('pointerdown', e => {
+  const p = toCanvas(e), idx = hit(p.x, p.y);
+  if (idx < 0 && !gest) return;
+  cv.setPointerCapture(e.pointerId);
+  ptrs.set(e.pointerId, p);
+  if (!gest) gest = { idx, moved: 0, last: null };
+  if (ptrs.size === 2) gest.last = dist();
+});
+function dist() { const a = [...ptrs.values()]; return Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y); }
+cv.addEventListener('pointermove', e => {
+  if (!gest || !ptrs.has(e.pointerId)) return;
+  const p = toCanvas(e), prev = ptrs.get(e.pointerId), ph = photos[gest.idx];
+  ptrs.set(e.pointerId, p);
+  if (ptrs.size >= 2) {
+    const d = dist();
+    if (gest.last && ph) ph.z *= d / gest.last;
+    gest.last = d; gest.moved += 10;
+  } else {
+    gest.moved += Math.abs(p.x - prev.x) + Math.abs(p.y - prev.y);
+    if (ph) { ph.ox += p.x - prev.x; ph.oy += p.y - prev.y; }
+  }
+});
+function endPtr(e) {
+  if (!ptrs.has(e.pointerId)) return;
+  ptrs.delete(e.pointerId);
+  if (ptrs.size === 0 && gest) {
+    const tap = gest.moved < 12, idx = gest.idx; gest = null;
+    if (tap) openPicker(idx); else save();
+  } else if (gest) gest.last = null;
+}
+cv.addEventListener('pointerup', endPtr);
+cv.addEventListener('pointercancel', endPtr);
+cv.addEventListener('wheel', e => {
+  const p = toCanvas(e), idx = hit(p.x, p.y);
+  if (idx < 0 || !photos[idx]) return;
+  e.preventDefault();
+  photos[idx].z *= e.deltaY < 0 ? 1.08 : 1 / 1.08; save();
+}, { passive: false });
+
+/* ---------- డౌన్‌లోడ్ ---------- */
+function download(blob, name) {
+  if (window.parent && window.parent !== window) {
+    try {
+      const u = URL.createObjectURL(blob);
+      window.parent.postMessage({ type: 'jn-video-download', url: u, name: name }, 'https://jananetha192-cell.github.io');
+      return;
+    } catch (e) { /* కింద సాధారణ పద్ధతికి వెళ్తాం */ }
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+document.getElementById('pngBtn').onclick = () => {
+  exporting = true;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    try { cv.toBlob(b => { exporting = false; if (b) download(b, 'diwali-poster.png'); }, 'image/png'); }
+    catch (e) { exporting = false; alert('ఈ పేజీని మీ సైట్‌లో హోస్ట్ చేసినప్పుడే డౌన్‌లోడ్ పని చేస్తుంది.'); }
+  }));
+};
+
+function pickMime() {
+  const list = ['video/mp4;codecs=avc1', 'video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+  return window.MediaRecorder ? list.find(t => MediaRecorder.isTypeSupported(t)) : null;
+}
+/* lastVideo is declared with the editable poster state above. */
+let wakeLock = null;
+/* ఎక్స్‌పోర్ట్ ~51 సెకన్లు పడుతుంది - స్క్రీన్ ఆఫ్ అయితే ఫ్రేమ్‌లు ఆగిపోతాయి, కాబట్టి స్క్రీన్ మెరుస్తూనే ఉంచుతాం */
+async function keepScreenOn() {
+  if (!('wakeLock' in navigator)) return;
+  try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
+}
+async function releaseScreenLock() {
+  try { if (wakeLock) await wakeLock.release(); } catch (e) {}
+  wakeLock = null;
+}
+document.addEventListener('visibilitychange', () => { if (exporting && !document.hidden) keepScreenOn(); });
+async function produceVideo(bar) {
+  await keepScreenOn();
+  try {
+    let blob = null, ext = 'mp4', compatible = true;
+    if (window.VideoEncoder && window.Mp4Muxer && window.MP4Box) {
+      try { blob = await exportPhoneMp4(bar); } catch (e) { compatible = false; }
+    } else compatible = false;
+    if (!blob) { const r = await exportRecorder(bar); blob = r.blob; ext = r.ext; compatible = false; }
+    lastVideo = { blob: blob, ext: ext };
+    return { blob: blob, ext: ext, compatible: compatible };
+  } finally { releaseScreenLock(); }
+}
+const vidBtn = document.getElementById('vidBtn');
+vidBtn.onclick = async () => {
+  const prog = document.getElementById('prog'), bar = document.getElementById('bar');
+  prog.hidden = false; bar.value = 0;
+  vidBtn.disabled = true; exporting = true;
+  try {
+    const r = await produceVideo(bar);
+    download(r.blob, 'diwali-video.' + r.ext);
+    if (!r.compatible) alert('ఈ ఫోన్‌లో వీడియో పాత పద్ధతిలో తయారైంది; కొన్ని ఫోన్‌ల్లో ప్లే కాకపోవచ్చు.');
+    bar.value = 100;
+  } catch (e) {
+    alert('వీడియో తయారు కాలేదు. పేజీని మీ సైట్‌లో హోస్ట్ చేసి మళ్ళీ ప్రయత్నించండి.');
+  }
+  vid.loop = true; vid.currentTime = 0; exporting = false; vidBtn.disabled = false;
+  setTimeout(() => { prog.hidden = true; }, 1500);
+};
+const shareBtn = document.getElementById('shareBtn');
+shareBtn.onclick = async () => {
+  if(photoBusy||failedPhotos.size){syncPhotoLock();return;}
+  const prog = document.getElementById('prog'), bar = document.getElementById('bar');
+  shareBtn.disabled = true;
+  try {
+    if (!lastVideo) {
+      prog.hidden = false; bar.value = 0; exporting = true;
+      try {
+        const r = await produceVideo(bar);
+        bar.value = 100;
+        if (!r.compatible) alert('ఈ ఫోన్‌లో వీడియో పాత పద్ధతిలో తయారైంది; కొన్ని ఫోన్‌ల్లో ప్లే కాకపోవచ్చు.');
+      } catch (e) {
+        alert('వీడియో తయారు కాలేదు. పేజీని మీ సైట్‌లో హోస్ట్ చేసి మళ్ళీ ప్రయత్నించండి.');
+        return;
+      } finally {
+        vid.loop = true; vid.currentTime = 0; exporting = false;
+        setTimeout(() => { prog.hidden = true; }, 1500);
+      }
+    }
+    const f = new File([lastVideo.blob], 'diwali-video.' + lastVideo.ext, { type: lastVideo.blob.type || ('video/' + lastVideo.ext) });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) {
+      try {
+        await navigator.share({ files: [f], title: 'దీపావళి వీడియో పోస్టర్' });
+        return;
+      } catch (e) {
+        if (e && e.name === 'AbortError') return; /* వాడుకరి రద్దు చేశారు */
+        if (e && (e.name === 'NotAllowedError' || e.name === 'InvalidStateError')) {
+          alert('వీడియో సిద్ధం. ఇప్పుడు మళ్ళీ "షేర్" నొక్కండి - వెంటనే షేర్ అవుతుంది.');
+          return;
+        }
+        /* ఇతర లోపాల్లో కింద డౌన్‌లోడ్ మార్గానికి */
+      }
+    }
+    download(lastVideo.blob, 'diwali-video.' + lastVideo.ext);
+    alert('ఈ ఫోన్‌లో నేరుగా షేర్ అవకాశం లేదు. వీడియో డౌన్‌లోడ్ అయింది - గ్యాలరీ/ఫైల్స్ నుంచి షేర్ చేయండి.');
+  } finally {
+    syncPhotoLock();
+  }
+};
+
+/* ఫోన్‌లో నడిచే H264+AAC MP4 - వీడియో ఈ ఫోన్‌లోనే తయారవుతుంది */
+async function exportPhoneMp4(bar) {
+  const cfg = { codec: 'avc1.640028', width: W, height: H, bitrate: 2200000, framerate: 30, avc: { format: 'avc' } };
+  const sup = await VideoEncoder.isConfigSupported(cfg);
+  if (!sup.supported) throw new Error('no avc encoder');
+
+  /* టెంప్లేట్ వీడియోలోని ఆడియోను అలాగే వాడతాం (మళ్ళీ ఎన్‌కోడ్ చేయము) */
+  const resp = await fetch(vid.currentSrc || vid.src);
+  const tbuf = await resp.arrayBuffer();
+  const afile = MP4Box.createFile();
+  let ainfo = null, samples = [];
+  await new Promise((res, rej) => {
+    afile.onError = rej;
+    afile.onReady = (info) => {
+      if (!info.audioTracks.length) { res(); return; }
+      ainfo = info.audioTracks[0];
+      afile.setExtractionOptions(ainfo.id, null, { nbSamples: 1000000 });
+      afile.start();
+    };
+    afile.onSamples = (id, u, s) => { samples = samples.concat(s); res(); };
+    tbuf.fileStart = 0; afile.appendBuffer(tbuf); afile.flush();
+  });
+
+  const muxer = new Mp4Muxer.Muxer({
+    target: new Mp4Muxer.ArrayBufferTarget(),
+    video: { codec: 'avc', width: W, height: H },
+    audio: samples.length ? { codec: 'aac', sampleRate: ainfo.audio.sample_rate, numberOfChannels: ainfo.audio.channel_count } : undefined,
+    fastStart: 'in-memory',
+    firstTimestampBehavior: 'offset'
+  });
+  let encErr = null;
+  const encoder = new VideoEncoder({
+    output: (c, m) => muxer.addVideoChunk(c, m),
+    error: (e) => { encErr = e; }
+  });
+  encoder.configure(cfg);
+
+  vid.loop = false; vid.pause();
+  if (vid.currentTime > 0.05) await new Promise(r => { vid.addEventListener('seeked', r, { once: true }); vid.currentTime = 0; });
+  const wasMuted = vid.muted; vid.muted = true;
+  let ended = false; vid.addEventListener('ended', () => { ended = true; }, { once: true });
+  await vid.play();
+  let frames = 0, lastTs = -1;
+  while (!ended) {
+    if (encErr) throw encErr;
+    await new Promise(r => requestAnimationFrame(r));
+    if (vid.readyState >= 2 && encoder.encodeQueueSize < 6) {
+      const ts = Math.round(vid.currentTime * 1000000);
+      if (ts > lastTs) {
+        const vf = new VideoFrame(cv, { timestamp: ts, duration: 33333 });
+        encoder.encode(vf, { keyFrame: frames % 90 === 0 });
+        vf.close(); frames++; lastTs = ts;
+      }
+    }
+    bar.value = Math.min(99, (vid.currentTime / (vid.duration || 1)) * 100);
+  }
+  await encoder.flush(); encoder.close();
+  if (samples.length) {
+    const tsc = ainfo.timescale;
+    for (const s of samples) muxer.addAudioChunkRaw(s.data, 'key', Math.round(s.cts * 1000000 / tsc), Math.round(s.duration * 1000000 / tsc));
+  }
+  muxer.finalize();
+  vid.muted = wasMuted;
+  return new Blob([muxer.target.buffer], { type: 'video/mp4' });
+}
+
+/* పాత పద్ధతి (వెబ్‌కోడెక్స్ లేని ఫోన్‌ల్లో) - ఫలితం అన్ని ఫోన్‌ల్లో నడవకపోవచ్చు */
+async function exportRecorder(bar) {
+  const mime = pickMime();
+  if (!mime) throw new Error('no recorder');
+  setupAudio();
+  if (ac && ac.state === 'suspended') await ac.resume();
+  vid.loop = false; vid.pause();
+  if (vid.currentTime > 0.05) await new Promise(r => { vid.addEventListener('seeked', r, { once: true }); vid.currentTime = 0; });
+  const stream = cv.captureStream(30);
+  if (dest) dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+  if (gain) gain.gain.value = 0;
+  const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 5000000 });
+  const chunks = [];
+  rec.ondataavailable = ev => { if (ev.data && ev.data.size) chunks.push(ev.data); };
+  const done = new Promise(res => { rec.onstop = res; });
+  const tick = () => { bar.value = Math.min(99, (vid.currentTime / (vid.duration || 1)) * 100); };
+  vid.addEventListener('timeupdate', tick);
+  vid.addEventListener('ended', () => rec.stop(), { once: true });
+  await vid.play(); rec.start(500);
+  await done;
+  vid.removeEventListener('timeupdate', tick);
+  if (gain) gain.gain.value = soundOn ? 1 : 0;
+  const ext = mime.startsWith('video/mp4') ? 'mp4' : 'webm';
+  return { blob: new Blob(chunks, { type: mime.split(';')[0] }), ext };
+}
+
+/* ---------- మొదలు ---------- */
+renderChips(); load();
+if (document.fonts && document.fonts.load) document.fonts.load('800 40px "Noto Sans Telugu"');
+vid.addEventListener('loadeddata', () => { if (vid.paused) vid.currentTime = 0.05; });
+</script>
+</body>
+</html>
