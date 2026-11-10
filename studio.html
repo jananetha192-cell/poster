@@ -937,8 +937,9 @@ async function drawCommonFrame(){
   var ex=pX+(+$('mx').value)+cax*s9,ey=H1-mh+(+$('my').value)+cay*s9;
   var visH=Math.min(cah*s9,1240-ey),visW=Math.min(caw*s9,W1-ex);
   if(visH<40||visW<40){
-    $('ms').value='100';$('mx').value='0';$('my').value='0';
+    $('ms').value='133';$('mx').value='-63';$('my').value='-47';
     mh=309;mw=Math.round(meIm.width*mh/meIm.height);if(mw>325){mw=325;mh=Math.round(meIm.height*mw/meIm.height)}
+    mw=Math.round(mw*1.33);mh=Math.round(mh*1.33);
     s9=mw/meIm.width;pX=W1-10-mw;
     var ey2=H1-mh+cay*s9;if(ey2>1180){$('my').value=String(Math.round(1180-(H1-mh)-cay*s9))}
   }
