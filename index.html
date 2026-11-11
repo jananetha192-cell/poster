@@ -7,6 +7,10 @@
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>జననేత – రోజువారీ పోస్టర్లు</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0b1224">
+<link rel="icon" type="image/png" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;600;700;800&display=swap" rel="stylesheet"></noscript>
@@ -198,6 +202,7 @@ window.addEventListener('pageshow',function(e){if(e.persisted)siteVerCheck()});
 })();
 </script>
 <script src="jn-stats.js" defer></script><script src="jn-shared.js"></script><script src="jn-admin-sync.js"></script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(function(){})}</script>
 <script>
 /* తెరిచి ఉన్న పేజీ అర్ధరాత్రి (IST) దాటితే తనంతట అదే తాజా పరచుకుంటుంది: నిన్న / ఈ రోజు / రాబోయే / ఫోల్డర్ సరిగ్గా మారడానికి */
 (function(){function chk(){if(istDate(0)!==todayKey)location.reload()}
