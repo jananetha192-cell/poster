@@ -25,7 +25,7 @@ main{max-width:520px;margin:0 auto;padding:14px 0 24px}
 .slide{min-width:100%;align-self:flex-start;scroll-snap-align:center;padding:0 14px}
 .slide .pcard+.pcard{margin-top:14px}
 .pcard{background:#3d2110;border:1px solid #5a3a1e;border-radius:18px;padding:12px;position:relative}
-.daybadge{position:absolute;top:22px;left:22px;z-index:2;background:#f6871f;color:#fff;font-size:13px;font-weight:700;padding:6px 14px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.daybadge{display:inline-block;background:#f6871f;color:#fff;font-size:13px;font-weight:700;padding:6px 14px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.4);margin:0 0 8px}
 .pcard img{width:100%;height:auto;border-radius:12px;display:block}
 .ptitle{font-size:16px;font-weight:700;color:#ffc63f;margin:10px 2px 2px}
 .psub{font-size:12.5px;color:#d8b596;margin:0 2px 10px}
@@ -52,7 +52,7 @@ dialog{margin:auto;max-width:min(440px,calc(100% - 28px));max-height:90vh;overfl
 #tsTrack::-webkit-scrollbar{display:none}
 .tsSlide{min-width:calc(100% - 28px);margin:0 14px;scroll-snap-align:center;position:relative;display:block;border-radius:18px;overflow:hidden;background:#3d2110;border:1px solid #5a3a1e;text-decoration:none;align-self:flex-start}
 .tsSlide img{width:100%;height:auto;display:block}
-.tsbadge{position:absolute;top:10px;left:10px;z-index:2;background:#f6871f;color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.tsbadge{display:inline-block;background:#f6871f;color:#fff;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.4);margin:8px 0 0 10px}
 .tstitle{display:block;font-size:14px;font-weight:700;color:#ffc63f;padding:9px 12px}
 #tsDots{display:flex;gap:7px;justify-content:center;margin-top:9px}
 #tsDots i{width:8px;height:8px;border-radius:50%;background:#5a3a1e;transition:.2s}
@@ -93,7 +93,7 @@ POSTERS.unshift({date:'2026-11-05',title:'సునామీపై అవగా�
 POSTERS.unshift({date:'2026-11-05',title:'రమా ఏకాదశి శుభాకాంక్షలు',sub:'మీ పేరు, మీ ఫోటోతో పోస్టర్',href:'studio.html?template=rama-ekadashi-20261105',img:'26-rama-ekadashi-20261105-b.jpg',home:true});
 POSTERS.unshift({date:'2026-11-06',title:'ధనత్రయోదశి శుభాకాంక్షలు',sub:'మీ పేరు, మీ ఫోటోతో పోస్టర్',href:'studio.html?template=dhanteras-20261105',img:'27-dhanteras-20261105-b.jpg',home:true});
 POSTERS.unshift({date:'2026-11-06',title:'ధనత్రయోదశి శుభాకాంక్షలు · బంగారు కుండ',sub:'మీ పేరు, మీ ఫోటోతో పోస్టర్',href:'studio.html?template=dhanteras-pot-20261105',img:'2-37-dhanteras-pot-leaders6-20261105.jpg',home:true});
-POSTERS.unshift({date:'2026-11-06',title:'ధనత్రయోదశి శుభాకాంక్షలు · ధన్వంతరి',sub:'మీ పేరు, మీ ఫోటోతో పోస్టర్',href:'studio.html?template=dhanteras-lakshmi-20261105',img:'1-36-dhanteras-lakshmi-leaders6-20261105.jpg',home:true});
+POSTERS.unshift({date:'2026-11-06',title:'ధనత్రయోదశి శుభాకాంక్షలు · ధన్వంతరి',sub:'మీ పేరు, మీ ఫోటోతో పోస్టర్',href:'studio.html?template=dhanteras-lakshmi-20261105',img:'dhanteras-lakshmi-clean.jpg',home:true});
 POSTERS.unshift({date:'2026-11-04',title:'మోదీ ప్రభుత్వం - అభివృద్ధి దిశగా అడుగులు',sub:'మీ పేరు, మీ ఫోటోతో పోస్టర్',href:'studio.html?template=tricolour-modi-20261105',img:'28-tricolour-modi-20261105-b.jpg',home:true});
 POSTERS.unshift({date:'2026-11-08',title:'దీపావళి శుభాకాంక్షలు · శ్రీరామ దీపం',sub:'మీ పేరు, మీ ఫోటోతో పోస్టర్',href:'studio.html?template=ram-diwali-20261107',img:'31-ram-diwali-20261107.jpg',home:true});
 POSTERS.unshift({date:'2026-11-07',title:'సి.వి. రామన్ జయంతి',sub:'జయంతి శుభాకాంక్షలు పోస్టర్',href:'studio.html?template=cv-raman-common-20261107',img:'raman-middle-20-60-20.jpg',home:true});
@@ -101,9 +101,15 @@ POSTERS.unshift({date:'2026-11-08',title:'శ్రీ లాల్ కృష్
 
 POSTERS.unshift({date:'2026-11-08',kind:'video',title:'దీపావళి శుభాకాంక్షలు · వీడియో పోస్టర్',sub:'మీ ఫోటో, పేరు, నాయకులతో 51 సెకన్ల వీడియో',href:'studio.html?video=diwali-20261107',img:'diwali-video-preview-20261107.jpg',home:true});
 POSTERS.unshift({date:'2026-11-10',title:'\u0c15\u0c3e\u0c30\u0c4d\u0c24\u0c40\u0c15 \u0c2e\u0c3e\u0c38 \u0c36\u0c41\u0c2d\u0c3e\u0c15\u0c3e\u0c02\u0c15\u0c4d\u0c37\u0c32\u0c41 1',sub:'\u0c2e\u0c40 \u0c2a\u0c47\u0c30\u0c41, \u0c2e\u0c40 \u0c2b\u0c4b\u0c1f\u0c4b\u0c24\u0c4b \u0c2a\u0c4b\u0c38\u0c4d\u0c1f\u0c30\u0c4d',href:'studio.html?template=karthika-masam-20261110',img:'4-karthika-masam-20261110.jpg',home:true});
- POSTERS.unshift({date:'2026-11-10',title:'\u0c15\u0c3e\u0c30\u0c4d\u0c24\u0c40\u0c15 \u0c2e\u0c3e\u0c38 \u0c36\u0c41\u0c2d\u0c3e\u0c15\u0c3e\u0c02\u0c15\u0c4d\u0c37\u0c32\u0c41 2',sub:'\u0c2e\u0c40 \u0c2a\u0c47\u0c30\u0c41, \u0c2e\u0c40 \u0c2b\u0c4b\u0c1f\u0c4b\u0c24\u0c4b \u0c2a\u0c4b\u0c38\u0c4d\u0c1f\u0c30\u0c4d',href:'studio.html?template=karthika-masam-2-20261110',img:'5-karthika-masam-2-20261110.jpg',home:true});POSTERS.unshift({date:'2026-11-08',title:'దీపావళి శుభాకాంక్షలు · దీపాల వలయం',sub:'మీ పేరు, మీ ఫోటోతో పోస్టర్',href:'studio.html?template=diwali-lamps-20261107',img:'diwali-lamps-20261107.jpg',home:true});
+ POSTERS.unshift({date:'2026-11-10',title:'\u0c15\u0c3e\u0c30\u0c4d\u0c24\u0c40\u0c15 \u0c2e\u0c3e\u0c38 \u0c36\u0c41\u0c2d\u0c3e\u0c15\u0c3e\u0c02\u0c15\u0c4d\u0c37\u0c32\u0c41 2',sub:'\u0c2e\u0c40 \u0c2a\u0c47\u0c30\u0c41, \u0c2e\u0c40 \u0c2b\u0c4b\u0c1f\u0c4b\u0c24\u0c4b \u0c2a\u0c4b\u0c38\u0c4d\u0c1f\u0c30\u0c4d',href:'studio.html?template=karthika-masam-2-20261110',img:'5-karthika-masam-2-20261110.jpg',home:true});
+POSTERS.unshift({date:'2026-11-11',title:'బీఆర్ఎస్ పార్టీ ఫ్రేమ్',sub:'మీ ఫోటో, పేరు, పదవితో పోస్టర్',href:'studio.html?template=brs-frame-20261111',img:'preview-brs-v13.jpg',home:true,party:'brs'});
+POSTERS.unshift({date:'2026-11-11',title:'కాంగ్రెస్ పార్టీ ఫ్రేమ్',sub:'మీ ఫోటో, పేరు, పదవితో పోస్టర్',href:'studio.html?template=congress-frame-20261111',img:'preview-congress-v14.jpg',home:true,party:'congress'});
+POSTERS.unshift({date:'2026-11-11',title:'రైతు గర్జన',sub:'మీరు పంపిన చిత్రం అలాగే',href:'studio.html?template=brs-raithu-garjana-20261111',img:'brs-raithu-garjana-20261111.jpg',home:true,party:'brs'});
+POSTERS.unshift({date:'2026-11-11',title:'తెలంగాణ ప్రగతి - ప్రజాపాలన లక్ష్యం',sub:'మీరు పంపిన చిత్రం అలాగే',href:'studio.html?template=congress-telangana-pragati-20261111',img:'congress-telangana-pragati-20261111.jpg',home:true,party:'congress'});POSTERS.unshift({date:'2026-11-08',title:'దీపావళి శుభాకాంక్షలు · దీపాల వలయం',sub:'మీ పేరు, మీ ఫోటోతో పోస్టర్',href:'studio.html?template=diwali-lamps-20261107',img:'diwali-lamps-20261107.jpg',home:true});
 
 </script>
+<script src="jn-party.js"></script>
+<script>POSTERS=JNParty.localize(POSTERS)</script>
 <script>
 /* మూడు స్లయిడ్‌లు: నిన్న / ఈ రోజు / రేపు – తేదీ ఆధారంగా ఆర్కైవ్ (posters.js) నుండి ఆటోమేటిక్ ఎంపిక */
 function istDate(off){var d=new Date(Date.now()+off*86400000);var p=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit',numberingSystem:'latn'}).formatToParts(d),v={};p.forEach(function(x){v[x.type]=x.value});return v.year+'-'+v.month+'-'+v.day}

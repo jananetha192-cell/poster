@@ -75,6 +75,8 @@ function openRequestedStudio(){
 
 JNFS.registry(false).then(function(items){
   if(!items||!items.length)return;
+  if(window.JNParty)items=items.filter(function(t){return JNParty.matchTemplate(t)});
+  if(!items.length)return;
   if(isStudio){
     injectStudio(items);
     afterLoad(function(){wrapStudio();openRequestedStudio()});

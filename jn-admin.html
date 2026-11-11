@@ -14,7 +14,7 @@ h1{font-size:21px;color:#ffc63f;text-align:center;margin:10px 0 2px}
 .card{background:#3d2110;border:1px solid #5a3a1e;border-radius:18px;padding:16px;margin-bottom:16px}
 .card h2{font-size:16px;color:#ffc63f;margin-bottom:12px}
 label{display:block;font-size:14px;font-weight:700;margin:12px 0 6px;color:#f0d7bd}
-input[type=text],input[type=password],input[type=email],input[type=date]{width:100%;padding:12px;border-radius:10px;border:1px solid #6b4a2a;background:#240b06;color:#f5e6d3;font:inherit;font-size:15px}
+input[type=text],input[type=password],input[type=email],input[type=date],select{width:100%;padding:12px;border-radius:10px;border:1px solid #6b4a2a;background:#240b06;color:#f5e6d3;font:inherit;font-size:15px}
 input[type=file]{width:100%;padding:12px;border-radius:10px;border:1px dashed #8a5a2e;background:#240b06;color:#d8b596;font:inherit;font-size:14px}
 button{display:block;width:100%;padding:14px;border:0;border-radius:12px;background:#f6871f;color:#fff;font:inherit;font-size:17px;font-weight:700;margin-top:14px;cursor:pointer}
 button.sec{background:#5a3a1e;font-size:14px;padding:10px}
@@ -80,6 +80,13 @@ button:disabled{opacity:.5}
   <div class="note" id="dateEcho" style="margin-top:4px"></div>
   <label>ఉపశీర్షిక</label>
   <input type="text" id="subline" value="మీ పేరు, మీ ఫోటోతో పోస్టర్">
+  <label>ఏ పార్టీవారికి కనిపించాలి</label>
+  <select id="party">
+    <option value="common" selected>అందరికీ (పండుగ/జయంతి/సాధారణ)</option>
+    <option value="bjp">బీజేపీ వారికి మాత్రమే</option>
+    <option value="brs">బీఆర్ఎస్ వారికి మాత్రమే</option>
+    <option value="congress">కాంగ్రెస్ వారికి మాత్రమే</option>
+  </select>
   <div id="previewWrap" class="hidden">
     <label>హోమ్ పేజీలో ఇలా కనిపిస్తుంది:</label>
     <div class="pcard" id="cardPreview"></div>
@@ -178,7 +185,7 @@ document.getElementById('pubBtn').onclick=function(){
   var id='jn-'+date.replace(/-/g,'')+'-'+Date.now().toString(36);
   this.disabled=true;setSt(st,'ప్రచురిస్తున్నాం… (కొంచెం సమయం పడుతుంది)');
   JNFS.writeDoc('jn_art',id,{art:artFull,updated:Date.now()})
-    .then(function(){return JNFS.writeDoc('jn_templates',id,{title:title,date:date,sub:document.getElementById('subline').value.trim()||'మీ పేరు, మీ ఫోటోతో పోస్టర్',thumb:artThumb,created:Date.now(),live:true})})
+    .then(function(){return JNFS.writeDoc('jn_templates',id,{title:title,date:date,sub:document.getElementById('subline').value.trim()||'మీ పేరు, మీ ఫోటోతో పోస్టర్',party:document.getElementById('party').value,thumb:artThumb,created:Date.now(),live:true})})
     .then(function(){return JNFS.bumpManifest()})
     .then(function(){
       setSt(st,'ప్రచురించాం ✓ పరీక్ష హోమ్ పేజీ, స్టూడియోలో కనిపిస్తుంది: jananetha192-cell.github.io/poster/index-test.html');
