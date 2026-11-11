@@ -63,8 +63,8 @@ dialog{margin:auto;max-width:min(440px,calc(100% - 28px));max-height:90vh;overfl
 <body>
 <header><h1>జననేత</h1><p>రోజువారీ పోస్టర్లు – మీ పేరు, మీ ఫోటోతో</p></header>
 <main>
-<section id="topslider" aria-label="ఈ రోజు మరియు రాబోయే పోస్టర్లు"><div id="tsTrack"></div><div id="tsDots"></div><div class="tsNote">⇦ పోస్టర్లు ఒకటొకటిగా స్వయంచాలకంగా మారుతాయి · తాకి చూడండి, పోస్టర్ మీద నొక్కితే అదే టెంప్లేట్ తెరుస్తుంది ⇨</div></section>
-<div id="daytabs" aria-label="పోస్టర్ రోజు"><button type="button" data-day="0">నిన్నటివి</button><button type="button" data-day="1" class="selected" aria-pressed="true">ఈ రోజు పోస్టర్లు</button><button type="button" data-day="2">రాబోయే పోస్టర్లు</button></div><div id="track"></div>
+<section id="topslider" aria-label="ఈ రోజు మరియు రేపటి పోస్టర్లు"><div id="tsTrack"></div><div id="tsDots"></div><div class="tsNote">⇦ పోస్టర్లు ఒకటొకటిగా స్వయంచాలకంగా మారుతాయి · తాకి చూడండి, పోస్టర్ మీద నొక్కితే అదే టెంప్లేట్ తెరుస్తుంది ⇨</div></section>
+<div id="daytabs" aria-label="పోస్టర్ రోజు"><button type="button" data-day="0">నిన్నటివి</button><button type="button" data-day="1" class="selected" aria-pressed="true">ఈ రోజు పోస్టర్లు</button><button type="button" data-day="2">రేపటి పోస్టర్లు</button></div><div id="track"></div>
 <div id="dots"></div>
 <div id="count"></div>
 <div id="newPosters" style="margin:16px 14px 0"></div>
@@ -126,21 +126,21 @@ function amitActions(p){return /3-studio-amit\.html|template=amit-padayatra/.tes
 var AMIT_INVITE="ఈ అమిత్ షా పోస్టర్‌ను మీ ఫోటో, పేరు, పదవి పెట్టుకుని మీరే తయారు చేసుకోండి.\n\nకింది లింక్ తెరిచి ‘ఈ రోజు’లో ‘పోస్టర్ చేసుకోండి’ నొక్కండి. మీ వివరాలు పెట్టి పోస్టర్ డౌన్‌లోడ్ చేసుకోండి.\n👇👇👇\nhttps://jananetha192-cell.github.io/poster/";
 function saveAmitBlob(b){var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='jananetha-amit-poster.png';a.click();setTimeout(function(){URL.revokeObjectURL(u)},60000)}
 document.addEventListener('click',async function(e){var btn=e.target.closest('[data-amit-action]');if(!btn)return;var card=btn.closest('.pcard'),status=card.querySelector('.poster-action-status');btn.disabled=true;try{var res=await fetch(card.querySelector('img').src);if(!res.ok)throw Error('image');var b=await res.blob();if(btn.dataset.amitAction==='share'){var f=new File([b],'jananetha-amit-poster.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:AMIT_INVITE,title:'అమిత్ షా · మహా పాదయాత్ర'});status.textContent=''}else{saveAmitBlob(b);try{await navigator.clipboard.writeText(AMIT_INVITE);status.textContent='PNG డౌన్‌లోడ్ అయింది. మెసేజ్, లింక్ కాపీ అయ్యాయి.'}catch(err){status.textContent=AMIT_INVITE}}}else{saveAmitBlob(b);status.textContent='PNG సిద్ధం.'}}catch(err){if(err.name!=='AbortError')status.textContent='మళ్లీ ప్రయత్నించండి.'}finally{btn.disabled=false}});
-var DAYS=[{label:'నిన్నటివి',off:-1},{label:'ఈ రోజు పోస్టర్లు',off:0},{label:'రాబోయే పోస్టర్లు',off:1}];
+var DAYS=[{label:'నిన్నటివి',off:-1},{label:'ఈ రోజు పోస్టర్లు',off:0},{label:'రేపటి పోస్టర్లు',off:1}];
 var tr=document.getElementById('track'),dots=document.getElementById('dots'),cnt=document.getElementById('count');
 var todayKey=istDate(0),yesterdayKey=istDate(-1);
 /* విభాగం అధిభర్తీ: entry యొక్క cat ('past'|'today'|'upcoming') ఉంటే తేదీ లెక్కను అధిగమిస్తుంది; లేకపోతే తేదీ ఆధారంగానే */
 function pcat(p){return p.cat||(p.date===todayKey?'today':(p.date<todayKey?'past':'upcoming'))}
 function posterCard(p,label){return '<div class="pcard"><div class="daybadge">'+(p.kind==='video'?'▶ వీడియో · ':'')+label+'</div><img src="'+p.img+'" alt="'+p.title+'" loading="lazy"><div class="ptitle">'+p.title+'</div><div class="psub">'+p.sub+'</div><a class="go" href="'+p.href+'">'+(p.kind==='video'?'వీడియో చేసుకోండి':'పోస్టర్ చేసుకోండి')+'</a>'+amitActions(p)+'<div class="pdate">'+teDate(p.date)+'</div></div>'}
 DAYS.forEach(function(day,i){
- var items=i===1?POSTERS.filter(function(p){return pcat(p)==='today'}):POSTERS.filter(function(p){return /^\d{4}-\d{2}-\d{2}$/.test(p.date)&&pcat(p)===(i===0?'past':'upcoming')&&(i!==0||p.date===yesterdayKey)}).sort(function(a,b){return i===0?b.date.localeCompare(a.date):a.date.localeCompare(b.date)});
+ var items=POSTERS.filter(function(p){return p.date===istDate(day.off)});
  var d=document.createElement('div');d.className='slide';d.dataset.items=items.length;
  if(items.length){d.innerHTML=items.map(function(p){return posterCard(p,day.label)}).join('')}
  else{var msg=i===0?'నిన్నటి పోస్టర్లు లేవు':(i===2?'కొత్త పోస్టర్లు త్వరలో…':'ఈ రోజు పోస్టర్ త్వరలో…');d.innerHTML='<div class="pcard"><div class="daybadge">'+day.label+'</div><div class="empty"><div class="big">🖼️</div><div class="msg">'+msg+'</div><div class="sub">'+(i===1?teDate(todayKey)+'<br>':'')+'పాత పోస్టర్ల కొరకు కింది ఆర్కైవ్ చూడండి</div></div></div>'}
  tr.appendChild(d);var dot=document.createElement('i');if(i==1)dot.className='on';dots.appendChild(dot);dot.onclick=function(){tr.scrollTo({left:i*tr.clientWidth,behavior:'smooth'})};
 });
 /* పాత పోస్టర్ల ఫోల్డర్: నిన్నటికంటే పాతవి (తొలగించకుండా) - తేదీ ప్రకారం తనంతట అదే మారుతుంది */
-(function(){var old=POSTERS.filter(function(p){return /^\d{4}-\d{2}-\d{2}$/.test(p.date)&&pcat(p)==='past'&&p.date!==yesterdayKey}).sort(function(a,b){return b.date.localeCompare(a.date)});
+(function(){var old=POSTERS.filter(function(p){return /^\d{4}-\d{2}-\d{2}$/.test(p.date)&&p.date!==todayKey&&p.date!==yesterdayKey&&p.date!==istDate(1)}).sort(function(a,b){return b.date.localeCompare(a.date)});
  var f=document.getElementById('oldFolder');if(!f||!old.length)return;
  document.getElementById('oldCount').textContent='('+old.length+')';
  var l=document.getElementById('oldList');l.innerHTML=old.map(function(p){return '<div style="margin-top:12px">'+posterCard(p,'పాత పోస్టర్లు')+'</div>'}).join('');
@@ -175,11 +175,11 @@ window.addEventListener('pageshow',function(e){if(e.persisted)siteVerCheck()});
 </script>
 
 <script>
-/* పైన స్లయిడర్: ఈ రోజు + రాబోయే పోస్టర్లు ఒకటొకటిగా స్వయంచాలక స్క్రోల్ (ఒక్కొక్కటి 1.5 సెకన్లు); నొక్కితే ఆ టెంప్లేట్ */
+/* పైన స్లయిడర్: ఈ రోజు + రేపటి పోస్టర్లు ఒకటొకటిగా స్వయంచాలక స్క్రోల్ (ఒక్కొక్కటి 1.5 సెకన్లు); నొక్కితే ఆ టెంప్లేట్ */
 (function(){
  var FULLART={'tgfunds-poster.html':'tgfunds-nomid.webp','voter-poster.html':'voter-nomid.webp','bandi-poster.html':'bandi-nomid.webp'};
  var track=document.getElementById('tsTrack'),dots=document.getElementById('tsDots');
- var items=POSTERS.filter(function(p){return /^\d{4}-\d{2}-\d{2}$/.test(p.date)&&(pcat(p)==='today'||pcat(p)==='upcoming')})
+ var items=POSTERS.filter(function(p){return /^\d{4}-\d{2}-\d{2}$/.test(p.date)&&(p.date===todayKey||p.date===istDate(1))})
   .sort(function(a,b){return (pcat(a)===pcat(b))?a.date.localeCompare(b.date):(pcat(a)==='today'?-1:1)});
  if(!items.length){document.getElementById('topslider').style.display='none';return}
  items.forEach(function(p,i){
@@ -207,7 +207,7 @@ window.addEventListener('pageshow',function(e){if(e.persisted)siteVerCheck()});
  start();
 })();
 </script>
-<script src="jn-stats.js" defer></script><script src="jn-shared.js"></script><script src="jn-admin-sync.js"></script>
+<script src="jn-stats.js" defer></script><script src="jn-shared.js"></script><script src="jn-admin-sync.js?v=20261111-dates"></script>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(function(){})}</script>
 <script>
 /* తెరిచి ఉన్న పేజీ అర్ధరాత్రి (IST) దాటితే తనంతట అదే తాజా పరచుకుంటుంది: నిన్న / ఈ రోజు / రాబోయే / ఫోల్డర్ సరిగ్గా మారడానికి */

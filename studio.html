@@ -49,6 +49,8 @@ canvas{width:100%;max-width:440px;height:auto;border-radius:10px;box-shadow:0 8p
 .gbtn{background:#fff;color:#222;font-weight:700;border:none;border-radius:10px;padding:13px 18px;font-size:16px;font-family:inherit;cursor:pointer;width:100%;margin-top:14px}
 #tpls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;max-width:1100px;margin-left:auto;margin-right:auto}
 .tp{width:92px;cursor:pointer;text-align:center;font-size:12px;color:#FFE9B0}.tp img{width:92px;height:115px;object-fit:cover;object-position:top;border-radius:8px;border:3px solid transparent;display:block}.tp.on img{border-color:#FFD874}
+
+#tpls{display:block;padding:0 14px;box-sizing:border-box}.jn-date-group{margin:0 0 18px}.jn-date-group h2{font-size:17px;margin:8px 0 12px}.jn-date-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:14px 10px}.jn-date-grid .tp{border:0;padding:0;background:transparent;color:#FFE9B0;font:inherit;font-size:12px;width:100%;text-align:center;align-self:start}.jn-date-grid .tp img{width:100%;height:auto;aspect-ratio:4/5;box-sizing:border-box;margin:0 0 6px}.jn-date-folder{border:1px solid #6b5b3c;border-radius:12px;padding:12px;margin-bottom:20px}.jn-date-folder summary{cursor:pointer;min-height:28px;font-size:16px;font-weight:700}.jn-date-folder .jn-date-grid{margin-top:14px}
 </style>
 </head>
 <body>
@@ -96,6 +98,7 @@ canvas{width:100%;max-width:440px;height:auto;border-radius:10px;box-shadow:0 8p
  </div>
 </div>
 <script src="studio-config-20261104.js?v=202611071855"></script>
+<script src="jn-template-dates.js"></script>
 <script src="studio-templates.js?v=20261104"></script><script src="studio-templates-more.js?v=20261104"></script><script>window.JN_TEMPLATES.unshift({"id": "diwali-saffron-20261107", "title": "దీపావళి శుభాకాంక్షలు", "frame": "sq", "w": 1122, "h": 1402, "art": "30-diwali-saffron-20261107.jpg", "sq": {"commonFrame": true, "headFit": true}});
 JN_TEMPLATES.unshift({"id": "cv-raman-common-20261107", "title": "\u0c38\u0c3f.\u0c35\u0c3f. \u0c30\u0c3e\u0c2e\u0c28\u0c4d \u0c1c\u0c2f\u0c02\u0c24\u0c3f", "frame": "sq", "w": 1122, "h": 1402, "art": "raman-middle-20-60-20.jpg", "sq": {"commonFrame": true, "headFit": true}});
 window.JN_TEMPLATES.unshift({"id": "ram-diwali-20261107", "title": "దీపావళి శుభాకాంక్షలు · శ్రీరామ దీపం", "frame": "sq", "w": 1122, "h": 1402, "art": "31-ram-diwali-20261107.jpg", "sq": {"commonFrame": true, "headFit": true}});window.JN_TEMPLATES.unshift({"id": "ap-avatarana-fields-20261101", "title": "ఆంధ్రప్రదేశ్ అవతరణ దినోత్సవం 2", "art": "6-ap-avatarana-fields-20261101.jpg"});
@@ -1198,7 +1201,16 @@ function placeHit(){placeBox(hitEl,ME?PB:null);placeBox(hitN,NB);placeBox(hitD,D
 
 var requestedTemplate=new URLSearchParams(location.search).get('template');var selectedTemplate=window.JN_TEMPLATES.find(function(t){return t.id===requestedTemplate&&!t.url})||window.JN_TEMPLATES[0];ART=selectedTemplate.art;
 var TPL=selectedTemplate,STORE=null,UID=null,HYD=true,saveT=null,SAVED={me:null,cu:[]},LAST='';if(TPL.w){cv.width=TPL.w;cv.height=TPL.h;W=TPL.w;H=TPL.h}
-function showTpls(){var d=$('tpls');d.innerHTML='';window.JN_TEMPLATES.forEach(function(t){var e=document.createElement('div');e.className='tp'+(t.id==TPL.id?' on':'');e.innerHTML='<img src="'+t.art+'"><div>'+t.title+'</div>';e.onclick=function(){useTpl(t)};d.appendChild(e)})}
+function showTpls(){
+ var d=$('tpls'),wasOpen=!!document.querySelector('#jnOldTemplates[open]');d.innerHTML='';
+ function day(off){var v={};new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(Date.now()+off*86400000)).forEach(function(p){v[p.type]=p.value});return v.year+'-'+v.month+'-'+v.day}
+ var days=[{date:day(0),label:'ఈ రోజు'},{date:day(-1),label:'నిన్న'},{date:day(1),label:'రేపు'}];
+ function date(t){return t.date||(window.JN_TEMPLATE_DATES||{})[t.id]||(window.JN_TEMPLATE_DATES||{})[t.url]||''}
+ function grid(items,parent){var g=document.createElement('div');g.className='jn-date-grid';items.forEach(function(t){var e=document.createElement('button');e.type='button';e.className='tp'+(t.id==TPL.id?' on':'');var img=document.createElement('img');img.src=t.art;img.alt='';img.loading='lazy';e.appendChild(img);var title=document.createElement('div');title.textContent=t.title;e.appendChild(title);e.onclick=function(){useTpl(t)};g.appendChild(e)});parent.appendChild(g)}
+ days.forEach(function(day){var items=window.JN_TEMPLATES.filter(function(t){return date(t)===day.date});var sec=document.createElement('section');sec.className='jn-date-group';var h=document.createElement('h2');h.textContent=day.label+' · '+day.date.split('-').reverse().join('-')+' ('+items.length+')';sec.appendChild(h);if(items.length)grid(items,sec);else{var p=document.createElement('p');p.className='note';p.textContent=day.label+' పోస్టర్లు ఇంకా లేవు';sec.appendChild(p)}d.appendChild(sec)});
+ var other=window.JN_TEMPLATES.filter(function(t){return !days.some(function(x){return date(t)===x.date})});
+ var folder=document.createElement('details');folder.id='jnOldTemplates';folder.open=wasOpen;folder.className='jn-date-folder';var summary=document.createElement('summary');summary.textContent='పాత పోస్టర్లు ('+other.length+')';folder.appendChild(summary);var note=document.createElement('p');note.className='note';note.textContent='మిగతా పోస్టర్లు ఇక్కడ ఉన్నాయి. ఏ పోస్టర్‌నూ తొలగించలేదు.';folder.appendChild(note);grid(other,folder);d.appendChild(folder);
+}
 function useTpl(t){if(t.url){location.href=t.url;return}TPL=t;ART=t.art;cv.width=W=TPL.w||1122;cv.height=H=TPL.h||1402;mkSL();th();showTpls();fsSync()}
 /* Keep hit region aligned to the visible crop. */
 (function(){var old=placeHit;placeHit=function(){if(ME&&CROP&&PB){var s=PB[2]/ME.width;placeBox(hitEl,[PB[0]+CROP.x*s,PB[1]+CROP.y*s,CROP.w*s,CROP.h*s]);placeBox(hitN,NB);placeBox(hitD,DB)}else old()}})();
@@ -1338,7 +1350,7 @@ g.save();g.font='700 '+c[2]+'px "Noto Sans Telugu",sans-serif';g.textAlign='cent
   else document.addEventListener('DOMContentLoaded', showVideo);
 })();
 </script>
-<script src="jn-shared.js"></script><script src="jn-admin-sync.js"></script>
+<script src="jn-shared.js"></script><script src="jn-admin-sync.js?v=20261111-dates"></script>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(function(){})}</script>
 </body>
      </html>
