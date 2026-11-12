@@ -1,7 +1,7 @@
 (function(){
 var style=document.createElement('style');style.textContent='.jn-progress{display:flex;align-items:center;gap:12px;margin:12px 0;padding:12px;border:1px solid #b78a41;border-radius:12px;background:#211c19;color:#ffe3a6;font:14px "Noto Sans Telugu",sans-serif}.jn-progress[hidden]{display:none}.jn-progress img{width:52px;height:60px;object-fit:contain;background:#ffffff18;border-radius:8px}.jn-spin{width:23px;height:23px;border:3px solid #ffffff40;border-top-color:#ffc74b;border-radius:50%;animation:jnSpin .8s linear infinite;flex-shrink:0}@keyframes jnSpin{to{transform:rotate(360deg)}}';document.head.appendChild(style);
 window.addEventListener('DOMContentLoaded',function(){
-var panel=document.createElement('div');panel.className='jn-progress';panel.hidden=true;panel.setAttribute('role','status');panel.setAttribute('aria-live','polite');panel.innerHTML='<img alt="అప్‌లోడ్ చేసిన ఫోటో"><span class="jn-spin" aria-hidden="true"></span><span>బ్యాక్‌గ్రౌండ్ తీస్తున్నాం…</span>';document.getElementById('st').before(panel);
+var panel=document.createElement('div');panel.className='jn-progress';panel.hidden=true;panel.setAttribute('role','status');panel.setAttribute('aria-live','polite');panel.innerHTML='<img alt="అప్‌లోడ్ చేసిన ఫోటో"><span class="jn-spin" aria-hidden="true"></span><span>బ్యాక్‌గ్రౌండ్ తీస్తున్నాం…</span>';document.getElementById('meBox').after(panel);
 var url=null;['meF','ldF'].forEach(function(id){document.getElementById(id).addEventListener('change',function(e){var f=e.target.files[0];if(!f||window.__jnBusy)return;if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(f);panel.querySelector('img').src=url;panel.hidden=false},true)});
 setInterval(function(){if(!window.__jnBusy)panel.hidden=true},100);
 });})();
