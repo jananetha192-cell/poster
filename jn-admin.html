@@ -170,6 +170,7 @@ document.getElementById('art').onchange=function(e){
     setSt(st,'సిద్ధం ✓ పైన ప్రివ్యూ చూడండి');
   }).catch(function(err){setSt(st,err.message,true)});
 };
+document.getElementById('middleOnly').onchange=function(){var input=document.getElementById('art');if(input.files.length)input.onchange({target:input})};
 document.getElementById('title').oninput=function(){
   if(!artThumb)return;
   document.querySelector('#cardPreview .ptitle').textContent=document.getElementById('title').value||'(పేరు)';
