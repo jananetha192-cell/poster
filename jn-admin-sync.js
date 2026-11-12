@@ -78,8 +78,9 @@ JNFS.registry(false).then(function(items){
   if(window.JNParty)items=items.filter(function(t){return JNParty.matchTemplate(t)});
   if(!items.length)return;
   if(isStudio){
-    injectStudio(items);
-    afterLoad(function(){wrapStudio();openRequestedStudio()});
+    var ready=Promise.resolve();
+    if(items.some(function(t){return !!t.middleOnly})&&!window.JNSchemeFrame){ready=new Promise(function(resolve,reject){var sc=document.createElement('script');sc.src='jn-scheme-middle-20261112.js';sc.onload=resolve;sc.onerror=reject;document.head.appendChild(sc)})}
+    ready.then(function(){injectStudio(items);afterLoad(function(){wrapStudio();openRequestedStudio()})});
   }else{
     afterLoad(function(){injectHome(items)});
   }
