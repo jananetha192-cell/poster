@@ -5,7 +5,7 @@
    మిగilin అన్ని టెంప్లేట్లు/రెండరర్లు (సాధారణ, పింక్, స్కీం-మధ్య) అలాగే ఉంటాయి.
    మధ్య చిత్రం ఎత్తును ఆ రికార్డులో సేవ్ చేసిన చిత్రం కొలతల (artW/artH) నుండి మాత్రమే తీసుకుంటుంది -
    కొలతలు లేని పాత రికార్డులు అలాగే; తక్కువ ఎత్తు చిత్రాలకు దిగువ భాగం పైకి జరుగుతుంది,
-   వ్యక్తిగత ఫోటో అప్రమేయంగా ఎడమవైపు అంచున ఉంటుంది. */
+   వ్యక్తిగత ఫోటో కట్అవుట్ అమోదిత దిగువ-ఎడమ పాకెట్‌లో సరిపోతుంది (నమూనా మాటలను కప్పదు). */
 async function drawCongressMidFrame(){NB=null;DB=null;PB=null;if(!window.__jnBusy&&/100%/.test($("st").textContent))$("st").textContent="";
  var W1=1122;
  var ord=[0];for(var oi=2;oi<NS+2;oi++)ord.push(oi);ord.push(1);var SEL=ord.map(function(i){return CU[i]}).filter(Boolean);
@@ -25,7 +25,13 @@ async function drawCongressMidFrame(){NB=null;DB=null;PB=null;if(!window.__jnBus
   fit=false;
   if(mw>325){mw=325;mh=Math.round(meIm.height*mw/meIm.width)}
   var scale=(+$('ms').value)/100;mw=Math.round(mw*scale);mh=Math.round(mh*scale);
-  pX=fit?(W1-16-mw):(SH>0?10:(W1-10-mw));
+  if(SH>0){
+   /* ఆమోదిత దిగువ-ఎడమ పాకెట్ (x 10..165, y 735..ఫలకం పై అంచు): ఫోటో కట్అవుట్ (ఆల్ఫా) భాగం అందులోనే - నమూనా మాటలను కప్పదు */
+   var abF=meIm.__jnAB||(meIm.__jnAB=jnAlphaBox(meIm));
+   var sCap=Math.min(155/abF.w,148/abF.h);
+   if(mw>meIm.width*sCap){mw=Math.round(meIm.width*sCap);mh=Math.round(meIm.height*sCap)}
+   pX=10-Math.round(abF.x*(mw/meIm.width));
+  }else pX=fit?(W1-16-mw):(W1-10-mw);
  }
  if(meIm){
   g.save();g.beginPath();g.rect(0,0,W1,1257-SH);g.clip();
@@ -34,15 +40,28 @@ async function drawCongressMidFrame(){NB=null;DB=null;PB=null;if(!window.__jnBus
   var cax=Math.max(cr9.x,ab.x),cay=Math.max(cr9.y,ab.y),caw=Math.min(cr9.x+cr9.w,ab.x+ab.w)-cax,cah=Math.min(cr9.y+cr9.h,ab.y+ab.h)-cay;
   if(caw<=0||cah<=0){cax=cr9.x;cay=cr9.y;caw=cr9.w;cah=cr9.h}
   var ex=pX+(+$('mx').value)+cax*s9,ey=H1-mh+(+$('my').value)+cay*s9;
+  if(SH>0){
+   ey=(1257-SH)-cah*s9+(+$('my').value);
+   if(ex<10)ex=10;if(ex+caw*s9>165)ex=Math.round(165-caw*s9);
+   if(ey<735)ey=735;if(ey+cah*s9>1257-SH)ey=Math.round(1257-SH-cah*s9);
+  }
   var visH=Math.min(cah*s9,(1257-SH)-ey),visW=Math.min(caw*s9,W1-ex);
   if(visH<40||visW<40){
-    $('ms').value='133';$('mx').value='-63';$('my').value='-47';
-    mh=309;mw=Math.round(meIm.width*mh/meIm.height);if(mw>325){mw=325;mh=Math.round(meIm.height*mw/meIm.height)}
-    mw=Math.round(mw*1.33);mh=Math.round(mh*1.33);
-    s9=mw/meIm.width;pX=SH>0?10:(W1-10-mw);
-    var ey2=H1-mh+cay*s9;if(ey2>1197-SH){$('my').value=String(Math.round((1197-SH)-(H1-mh)-cay*s9))}
+    if(SH>0){
+      $('ms').value='100';$('mx').value='0';$('my').value='0';
+      mh=309;mw=Math.round(meIm.width*mh/meIm.height);if(mw>325){mw=325;mh=Math.round(meIm.height*mw/meIm.width)}
+      var sC2=Math.min(155/caw,148/cah);if(mw>meIm.width*sC2){mw=Math.round(meIm.width*sC2);mh=Math.round(meIm.height*sC2)}
+      s9=mw/meIm.width;pX=10-Math.round(ab.x*s9);ex=pX+cax*s9;ey=Math.round(1257-SH-cah*s9);
+    }else{
+      $('ms').value='133';$('mx').value='-63';$('my').value='-47';
+      mh=309;mw=Math.round(meIm.width*mh/meIm.height);if(mw>325){mw=325;mh=Math.round(meIm.height*mw/meIm.height)}
+      mw=Math.round(mw*1.33);mh=Math.round(mh*1.33);
+      s9=mw/meIm.width;pX=W1-10-mw;
+      var ey2=H1-mh+cay*s9;if(ey2>1197-SH){$('my').value=String(Math.round((1197-SH)-(H1-mh)-cay*s9))}
+    }
   }
   if(fit){g.drawImage(meIm,cr9.x,cr9.y,cr9.w,cr9.h,pX+cr9.x*s9,H1-16-mh+cr9.y*s9,cr9.w*s9,cr9.h*s9)}
+  else if(SH>0){g.drawImage(meIm,cr9.x,cr9.y,cr9.w,cr9.h,Math.round(ex+(cr9.x-cax)*s9),Math.round(ey+(cr9.y-cay)*s9),Math.round(cr9.w*s9),Math.round(cr9.h*s9))}
   else{g.drawImage(meIm,cr9.x,cr9.y,cr9.w,cr9.h,pX+(+$('mx').value)+cr9.x*s9,H1-mh+(+$('my').value)+cr9.y*s9,cr9.w*s9,cr9.h*s9)}
   g.restore();
  }
@@ -54,7 +73,7 @@ async function drawCongressMidFrame(){NB=null;DB=null;PB=null;if(!window.__jnBus
  g.save();rr(g,9,1257-SH,1104,148,16);g.clip();
  var og=g.createLinearGradient(9,0,1113,0);og.addColorStop(0,'rgb(17,109,60)');og.addColorStop(0.5,'rgb(30,149,83)');og.addColorStop(1,'rgb(17,109,60)');
  g.fillStyle=og;g.fillRect(9,1327-SH,1104,78);g.restore();
- PB=meIm?[pX+(+$('mx').value),H1-mh+(+$('my').value),mw,mh]:null;
+ PB=meIm?(SH>0?[Math.round(ex-cax*s9),Math.round(ey-cay*s9),mw,mh]:[pX+(+$('mx').value),H1-mh+(+$('my').value),mw,mh]):null;
  g.textAlign='center';g.textBaseline='middle';
  if(nm){var np=fitFont('Ramabhadra, "Noto Sans Telugu"','400',nm,1064,50,20);
   g.font=np+'px Ramabhadra, "Noto Sans Telugu", sans-serif';
