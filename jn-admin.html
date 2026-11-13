@@ -72,7 +72,7 @@ button:disabled{opacity:.5}
 <div class="card hidden" id="addCard">
   <h2>2. కొత్త టెంప్లేట్</h2>
   <label>పోస్టర్ బొమ్మ (మీరు తయారుచేసిన పూర్తి టెంప్లేట్ ఫోటో)</label>
-  <input type="file" id="art" accept="image/*"><label><input type="checkbox" id="middleOnly"> చదరపు మధ్య చిత్రం - కట్ చేయకుండా</label>
+  <input type="file" id="art" accept="image/*"><label><input type="checkbox" id="middleOnly"> మధ్య చిత్రం - కట్ చేయకుండా</label>
   <label>టెంప్లేట్ పేరు</label>
   <input type="text" id="title" placeholder="ఉదా: దీపావళి శుభాకాంక్షలు">
   <label>తేదీ (ఏ రోజు కార్డులో చూపించాలి)</label>
@@ -105,7 +105,7 @@ button:disabled{opacity:.5}
 <script src="jn-shared.js"></script>
 <script>
 var W=1122,H=1402;
-var artFull=null,artThumb=null,artMiddle=false;
+var artFull=null,artThumb=null,artMiddle=false,artDims=null;
 function istNow(){var p=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit',numberingSystem:'latn'}).formatToParts(new Date()),v={};p.forEach(function(x){v[x.type]=x.value});return v.year+'-'+v.month+'-'+v.day}
 function teDate(ds){var p=ds.split('-');var d=new Date(+p[0],+p[1]-1,+p[2],12);return d.toLocaleDateString('te-IN',{day:'numeric',month:'long',year:'numeric',weekday:'long'})}
 function setSt(el,msg,err){el.textContent=msg;el.className='st'+(err?' err':'')}
@@ -139,7 +139,7 @@ document.getElementById('pwBtn').onclick=function(){
   }).catch(function(e){st.textContent='మార్పు కాలేదు: '+(e.message||'')});
 };
 
-function makeVersions(file){if(document.getElementById('middleOnly').checked)return new Promise(function(res,rej){var fr=new FileReader();fr.onload=function(){var im=new Image();im.onload=function(){if(im.width!==im.height)return rej(new Error('ఈ ఎంపికకు చదరపు చిత్రం కావాలి'));if(fr.result.length>950000)return rej(new Error('చిత్రం చాలా పెద్దది - కట్ లేదా కుదింపు చేయలేదు'));var c=document.createElement('canvas');c.width=c.height=360;c.getContext('2d').drawImage(im,0,0,360,360);res({full:fr.result,thumb:c.toDataURL('image/jpeg',.85),middleOnly:true})};im.onerror=rej;im.src=fr.result};fr.onerror=rej;fr.readAsDataURL(file)});return new Promise(function(res,rej){
+function makeVersions(file){if(document.getElementById('middleOnly').checked)return new Promise(function(res,rej){var fr=new FileReader();fr.onload=function(){var im=new Image();im.onload=function(){if(fr.result.length>950000)return rej(new Error('చిత్రం చాలా పెద్దది - కట్ లేదా కుదింపు చేయలేదు'));var c=document.createElement('canvas');c.width=360;c.height=Math.max(1,Math.round(360*im.height/im.width));c.getContext('2d').drawImage(im,0,0,c.width,c.height);res({full:fr.result,thumb:c.toDataURL('image/jpeg',.85),middleOnly:true,artW:im.width,artH:im.height})};im.onerror=rej;im.src=fr.result};fr.onerror=rej;fr.readAsDataURL(file)});return new Promise(function(res,rej){
   var u=URL.createObjectURL(file),im=new Image();
   im.onload=function(){
     /* కవర్-క్రాప్ 1122x1402 */
@@ -161,7 +161,7 @@ document.getElementById('art').onchange=function(e){
   var f=e.target.files[0];if(!f)return;artFull=null;artThumb=null;document.getElementById('pubBtn').disabled=true;document.getElementById('previewWrap').classList.add('hidden');
   var st=document.getElementById('pubSt');setSt(st,'బొమ్మ సిద్ధం చేస్తున్నాం…');
   makeVersions(f).then(function(v){
-    artFull=v.full;artThumb=v.thumb;artMiddle=!!v.middleOnly;
+    artFull=v.full;artThumb=v.thumb;artMiddle=!!v.middleOnly;artDims=v.artW?{w:v.artW,h:v.artH}:null;
     var d=document.getElementById('cardPreview');
     var t=document.getElementById('title').value||'(పేరు)';
     d.innerHTML='<div class="daybadge">కొత్తది</div><img src="'+artThumb+'" alt=""><div class="ptitle">'+(t.replace(/</g,'&lt;'))+'</div><div class="psub">'+document.getElementById('subline').value.replace(/</g,'&lt;')+'</div><span class="go">పోస్టర్ చేసుకోండి</span><div class="pdate">'+teDate(document.getElementById('date').value)+'</div>';
@@ -185,12 +185,14 @@ document.getElementById('pubBtn').onclick=function(){
   if(!artFull){setSt(st,'బొమ్మ ఎంచుకోండి',true);return}
   var id='jn-'+date.replace(/-/g,'')+'-'+Date.now().toString(36);
   this.disabled=true;setSt(st,'ప్రచురిస్తున్నాం… (కొంచెం సమయం పడుతుంది)');
+  var rec={title:title,date:date,sub:document.getElementById('subline').value.trim()||'మీ పేరు, మీ ఫోటోతో పోస్టర్',middleOnly:artMiddle,party:document.getElementById('party').value,thumb:artThumb,created:Date.now(),live:true};
+  if(artDims){rec.artW=artDims.w;rec.artH=artDims.h}
   JNFS.writeDoc('jn_art',id,{art:artFull,updated:Date.now()})
-    .then(function(){return JNFS.writeDoc('jn_templates',id,{title:title,date:date,sub:document.getElementById('subline').value.trim()||'మీ పేరు, మీ ఫోటోతో పోస్టర్',middleOnly:artMiddle,party:document.getElementById('party').value,thumb:artThumb,created:Date.now(),live:true})})
+    .then(function(){return JNFS.writeDoc('jn_templates',id,rec)})
     .then(function(){return JNFS.bumpManifest()})
     .then(function(){
       setSt(st,'ప్రచురించాం ✓ పరీక్ష హోమ్ పేజీ, స్టూడియోలో కనిపిస్తుంది: jananetha192-cell.github.io/poster/index-test.html');
-      artFull=null;artThumb=null;
+      artFull=null;artThumb=null;artDims=null;
       document.getElementById('art').value='';document.getElementById('title').value='';
       document.getElementById('previewWrap').classList.add('hidden');
       loadList();
