@@ -34,6 +34,7 @@ function injectHome(items){
     div.className='pcard';
     div.innerHTML='<div class="daybadge">'+labels[cat]+'</div><img src="'+t.thumb+'" alt="'+t.title+'" loading="lazy"><div class="ptitle">'+t.title+'</div><div class="psub">'+(t.sub||'మీ పేరు, మీ ఫోటోతో పోస్టర్')+'</div><a class="go" href="'+href+'">పోస్టర్ చేసుకోండి</a><div class="pdate">'+teDate(t.date)+'</div>';
     slide.insertBefore(div,slide.firstChild);
+    if(cat>0&&typeof window.__jnTsAdd==='function')window.__jnTsAdd({date:t.date,title:t.title,href:href,img:t.thumb,kind:t.kind});
   });
   try{if(typeof window.upd==='function')window.upd()}catch(e){}
 }
