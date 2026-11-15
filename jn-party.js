@@ -13,6 +13,7 @@ var MAP={
  '3-studio-amit.html':'bjp','3-studio-patel.html':'common',
  'mkb':'bjp','padayatra':'bjp',
  'lakshmi':'common','form18':'common','maps':'common',
+ 'private-pink-kcr':'brs',
  /* పండుగ టెంప్లేట్లు ఇప్పుడు పార్టీ-ప్రత్యేక కళాఖండాలతో (PARTY_ART) అందరికీ common */
  'patel-unity':'common','ap-avatarana-fields-20261101':'common','ap-avatarana-temple-20261101':'common',
  'tsunami-awareness-20261104':'common','rama-ekadashi-20261105':'common',
@@ -45,7 +46,7 @@ function localize(arr){var p=get();return filterPosters(arr.map(function(o){
   var m=(o.href||'').match(/template=([A-Za-z0-9-]+)/);
   if(m&&PARTY_ART[m[1]])o.img=artFor(m[1],o.img);
   return o}))}
-function get(){try{var v=localStorage.getItem(KEY);return PARTIES[v]?v:null}catch(e){return null}}
+function get(){return 'bjp'}
 function set(v){try{localStorage.setItem(KEY,v)}catch(e){}}
 function partyOf(p){
   if(!p)return 'common';
@@ -92,7 +93,7 @@ function ensureChip(){
   chip.onclick=openDlg;
   document.body.appendChild(chip);
 }
-function boot(){injectCss();ensureChip();if(!get())openDlg()}
+function boot(){}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 return {get:get,set:set,partyOf:partyOf,visible:visible,filterPosters:filterPosters,localize:localize,artFor:artFor,matchField:matchField,matchTemplate:matchTemplate,label:label,PARTIES:PARTIES,open:openDlg};
 })();
