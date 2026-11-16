@@ -14,7 +14,7 @@ h1{font-size:21px;color:#ffc63f;text-align:center;margin:10px 0 2px}
 .card{background:#3d2110;border:1px solid #5a3a1e;border-radius:18px;padding:16px;margin-bottom:16px}
 .card h2{font-size:16px;color:#ffc63f;margin-bottom:12px}
 label{display:block;font-size:14px;font-weight:700;margin:12px 0 6px;color:#f0d7bd}
-input[type=text],input[type=password],input[type=email],input[type=date],select{width:100%;padding:12px;border-radius:10px;border:1px solid #6b4a2a;background:#240b06;color:#f5e6d3;font:inherit;font-size:15px}
+input[type=text],input[type=password],input[type=email],input[type=date]{width:100%;padding:12px;border-radius:10px;border:1px solid #6b4a2a;background:#240b06;color:#f5e6d3;font:inherit;font-size:15px}
 input[type=file]{width:100%;padding:12px;border-radius:10px;border:1px dashed #8a5a2e;background:#240b06;color:#d8b596;font:inherit;font-size:14px}
 button{display:block;width:100%;padding:14px;border:0;border-radius:12px;background:#f6871f;color:#fff;font:inherit;font-size:17px;font-weight:700;margin-top:14px;cursor:pointer}
 button.sec{background:#5a3a1e;font-size:14px;padding:10px}
@@ -72,7 +72,7 @@ button:disabled{opacity:.5}
 <div class="card hidden" id="addCard">
   <h2>2. కొత్త టెంప్లేట్</h2>
   <label>పోస్టర్ బొమ్మ (మీరు తయారుచేసిన పూర్తి టెంప్లేట్ ఫోటో)</label>
-  <input type="file" id="art" accept="image/*"><label><input type="checkbox" id="middleOnly"> మధ్య చిత్రం - కట్ చేయకుండా</label>
+  <input type="file" id="art" accept="image/*">
   <label>టెంప్లేట్ పేరు</label>
   <input type="text" id="title" placeholder="ఉదా: దీపావళి శుభాకాంక్షలు">
   <label>తేదీ (ఏ రోజు కార్డులో చూపించాలి)</label>
@@ -80,13 +80,6 @@ button:disabled{opacity:.5}
   <div class="note" id="dateEcho" style="margin-top:4px"></div>
   <label>ఉపశీర్షిక</label>
   <input type="text" id="subline" value="మీ పేరు, మీ ఫోటోతో పోస్టర్">
-  <label>ఏ పార్టీవారికి కనిపించాలి</label>
-  <select id="party">
-    <option value="common" selected>అందరికీ (పండుగ/జయంతి/సాధారణ)</option>
-    <option value="bjp">బీజేపీ వారికి మాత్రమే</option>
-    <option value="brs">బీఆర్ఎస్ వారికి మాత్రమే</option>
-    <option value="congress">కాంగ్రెస్ వారికి మాత్రమే</option>
-  </select>
   <div id="previewWrap" class="hidden">
     <label>హోమ్ పేజీలో ఇలా కనిపిస్తుంది:</label>
     <div class="pcard" id="cardPreview"></div>
@@ -105,7 +98,7 @@ button:disabled{opacity:.5}
 <script src="jn-shared.js"></script>
 <script>
 var W=1122,H=1402;
-var artFull=null,artThumb=null,artMiddle=false,artDims=null;
+var artFull=null,artThumb=null;
 function istNow(){var p=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit',numberingSystem:'latn'}).formatToParts(new Date()),v={};p.forEach(function(x){v[x.type]=x.value});return v.year+'-'+v.month+'-'+v.day}
 function teDate(ds){var p=ds.split('-');var d=new Date(+p[0],+p[1]-1,+p[2],12);return d.toLocaleDateString('te-IN',{day:'numeric',month:'long',year:'numeric',weekday:'long'})}
 function setSt(el,msg,err){el.textContent=msg;el.className='st'+(err?' err':'')}
@@ -139,7 +132,7 @@ document.getElementById('pwBtn').onclick=function(){
   }).catch(function(e){st.textContent='మార్పు కాలేదు: '+(e.message||'')});
 };
 
-function makeVersions(file){if(document.getElementById('middleOnly').checked)return new Promise(function(res,rej){var fr=new FileReader();fr.onload=function(){var im=new Image();im.onload=function(){if(fr.result.length>950000)return rej(new Error('చిత్రం చాలా పెద్దది - కట్ లేదా కుదింపు చేయలేదు'));var c=document.createElement('canvas');c.width=360;c.height=Math.max(1,Math.round(360*im.height/im.width));c.getContext('2d').drawImage(im,0,0,c.width,c.height);res({full:fr.result,thumb:c.toDataURL('image/jpeg',.85),middleOnly:true,artW:im.width,artH:im.height})};im.onerror=rej;im.src=fr.result};fr.onerror=rej;fr.readAsDataURL(file)});return new Promise(function(res,rej){
+function makeVersions(file){return new Promise(function(res,rej){
   var u=URL.createObjectURL(file),im=new Image();
   im.onload=function(){
     /* కవర్-క్రాప్ 1122x1402 */
@@ -158,10 +151,10 @@ function makeVersions(file){if(document.getElementById('middleOnly').checked)ret
 })}
 
 document.getElementById('art').onchange=function(e){
-  var f=e.target.files[0];if(!f)return;artFull=null;artThumb=null;document.getElementById('pubBtn').disabled=true;document.getElementById('previewWrap').classList.add('hidden');
+  var f=e.target.files[0];if(!f)return;
   var st=document.getElementById('pubSt');setSt(st,'బొమ్మ సిద్ధం చేస్తున్నాం…');
   makeVersions(f).then(function(v){
-    artFull=v.full;artThumb=v.thumb;artMiddle=!!v.middleOnly;artDims=v.artW?{w:v.artW,h:v.artH}:null;
+    artFull=v.full;artThumb=v.thumb;
     var d=document.getElementById('cardPreview');
     var t=document.getElementById('title').value||'(పేరు)';
     d.innerHTML='<div class="daybadge">కొత్తది</div><img src="'+artThumb+'" alt=""><div class="ptitle">'+(t.replace(/</g,'&lt;'))+'</div><div class="psub">'+document.getElementById('subline').value.replace(/</g,'&lt;')+'</div><span class="go">పోస్టర్ చేసుకోండి</span><div class="pdate">'+teDate(document.getElementById('date').value)+'</div>';
@@ -170,7 +163,6 @@ document.getElementById('art').onchange=function(e){
     setSt(st,'సిద్ధం ✓ పైన ప్రివ్యూ చూడండి');
   }).catch(function(err){setSt(st,err.message,true)});
 };
-document.getElementById('middleOnly').onchange=function(){var input=document.getElementById('art');if(input.files.length)input.onchange({target:input})};
 document.getElementById('title').oninput=function(){
   if(!artThumb)return;
   document.querySelector('#cardPreview .ptitle').textContent=document.getElementById('title').value||'(పేరు)';
@@ -185,14 +177,12 @@ document.getElementById('pubBtn').onclick=function(){
   if(!artFull){setSt(st,'బొమ్మ ఎంచుకోండి',true);return}
   var id='jn-'+date.replace(/-/g,'')+'-'+Date.now().toString(36);
   this.disabled=true;setSt(st,'ప్రచురిస్తున్నాం… (కొంచెం సమయం పడుతుంది)');
-  var rec={title:title,date:date,sub:document.getElementById('subline').value.trim()||'మీ పేరు, మీ ఫోటోతో పోస్టర్',middleOnly:artMiddle,party:document.getElementById('party').value,thumb:artThumb,created:Date.now(),live:true};
-  if(artDims){rec.artW=artDims.w;rec.artH=artDims.h}
   JNFS.writeDoc('jn_art',id,{art:artFull,updated:Date.now()})
-    .then(function(){return JNFS.writeDoc('jn_templates',id,rec)})
+    .then(function(){return JNFS.writeDoc('jn_templates',id,{title:title,date:date,sub:document.getElementById('subline').value.trim()||'మీ పేరు, మీ ఫోటోతో పోస్టర్',thumb:artThumb,created:Date.now(),live:true})})
     .then(function(){return JNFS.bumpManifest()})
     .then(function(){
       setSt(st,'ప్రచురించాం ✓ పరీక్ష హోమ్ పేజీ, స్టూడియోలో కనిపిస్తుంది: jananetha192-cell.github.io/poster/index-test.html');
-      artFull=null;artThumb=null;artDims=null;
+      artFull=null;artThumb=null;
       document.getElementById('art').value='';document.getElementById('title').value='';
       document.getElementById('previewWrap').classList.add('hidden');
       loadList();

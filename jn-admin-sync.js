@@ -27,14 +27,13 @@ function injectHome(items){
     var href=studioPage+'?template='+t.__id;
     if(document.querySelector('a.go[href="'+href+'"]'))return;
     var cat=t.date===today?1:(t.date<today?0:2);
-    if(t.date!==today&&t.date!==window.yesterdayKey&&t.date!==(window.istDate?window.istDate(1):'')){var ol=document.getElementById('oldList'),of=document.getElementById('oldFolder');if(ol&&of){var od=document.createElement('div');od.style.marginTop='12px';od.innerHTML='<div class="pcard"><div class="daybadge">పాత పోస్టర్లు</div><img src="'+t.thumb+'" alt="'+t.title+'" loading="lazy"><div class="ptitle">'+t.title+'</div><div class="psub">'+(t.sub||'మీ పేరు, మీ ఫోటోతో పోస్టర్')+'</div><a class="go" href="'+href+'">పోస్టర్ చేసుకోండి</a><div class="pdate">'+teDate(t.date)+'</div></div>';ol.insertBefore(od,ol.firstChild);of.style.display='block';var oc=document.getElementById('oldCount');if(oc)oc.textContent='('+ol.children.length+')';return}}
+    if(cat===0&&window.yesterdayKey&&t.date!==window.yesterdayKey){var ol=document.getElementById('oldList'),of=document.getElementById('oldFolder');if(ol&&of){var od=document.createElement('div');od.style.marginTop='12px';od.innerHTML='<div class="pcard"><div class="daybadge">పాత పోస్టర్లు</div><img src="'+t.thumb+'" alt="'+t.title+'" loading="lazy"><div class="ptitle">'+t.title+'</div><div class="psub">'+(t.sub||'మీ పేరు, మీ ఫోటోతో పోస్టర్')+'</div><a class="go" href="'+href+'">పోస్టర్ చేసుకోండి</a><div class="pdate">'+teDate(t.date)+'</div></div>';ol.insertBefore(od,ol.firstChild);of.style.display='block';var oc=document.getElementById('oldCount');if(oc)oc.textContent='('+ol.children.length+')';return}}
     var slide=tr.children[cat];if(!slide)return;
     var empty=slide.querySelector('.empty');if(empty)empty.closest('.pcard').remove();
     var div=document.createElement('div');
     div.className='pcard';
     div.innerHTML='<div class="daybadge">'+labels[cat]+'</div><img src="'+t.thumb+'" alt="'+t.title+'" loading="lazy"><div class="ptitle">'+t.title+'</div><div class="psub">'+(t.sub||'మీ పేరు, మీ ఫోటోతో పోస్టర్')+'</div><a class="go" href="'+href+'">పోస్టర్ చేసుకోండి</a><div class="pdate">'+teDate(t.date)+'</div>';
     slide.insertBefore(div,slide.firstChild);
-    if(cat>0&&typeof window.__jnTsAdd==='function')window.__jnTsAdd({date:t.date,title:t.title,href:href,img:t.thumb,kind:t.kind});
   });
   try{if(typeof window.upd==='function')window.upd()}catch(e){}
 }
@@ -44,7 +43,7 @@ function injectStudio(items){
   if(!window.JN_TEMPLATES)return;
   items.forEach(function(t){
     if(!window.JN_TEMPLATES.some(function(x){return x.id===t.__id})){
-      window.JN_TEMPLATES.unshift({id:t.__id,title:t.title,date:t.date,frame:'sq',w:1122,h:t.middleOnly?1642:1402,art:t.thumb,schemeMiddle:!!t.middleOnly,jnArt:true,artFull:false,artW:t.artW,artH:t.artH,sq:t.middleOnly?{}:{commonFrame:true,headFit:true}});
+      window.JN_TEMPLATES.unshift({id:t.__id,title:t.title,frame:'sq',w:1122,h:1402,art:t.thumb,jnArt:true,artFull:false,sq:{commonFrame:true,headFit:true}});
     }
   });
   if(typeof window.showTpls==='function'){try{window.showTpls()}catch(e){}}
@@ -76,12 +75,9 @@ function openRequestedStudio(){
 
 JNFS.registry(false).then(function(items){
   if(!items||!items.length)return;
-  if(window.JNParty)items=items.filter(function(t){return JNParty.matchTemplate(t)});
-  if(!items.length)return;
   if(isStudio){
-    var ready=Promise.resolve();
-    if(items.some(function(t){return !!t.middleOnly})&&!window.JNSchemeFrame){ready=new Promise(function(resolve,reject){var sc=document.createElement('script');sc.src='jn-scheme-middle-20261112.js';sc.onload=resolve;sc.onerror=reject;document.head.appendChild(sc)})}
-    ready.then(function(){injectStudio(items);afterLoad(function(){wrapStudio();openRequestedStudio()})});
+    injectStudio(items);
+    afterLoad(function(){wrapStudio();openRequestedStudio()});
   }else{
     afterLoad(function(){injectHome(items)});
   }
