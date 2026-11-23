@@ -43,7 +43,7 @@ function injectStudio(items){
   if(!window.JN_TEMPLATES)return;
   items.forEach(function(t){
     if(!window.JN_TEMPLATES.some(function(x){return x.id===t.__id})){
-      window.JN_TEMPLATES.unshift({id:t.__id,title:t.title,frame:'sq',w:1122,h:1402,art:t.thumb,jnArt:true,artFull:false,middleOnly:!!t.middleOnly,sq:{commonFrame:true,headFit:true}});
+      window.JN_TEMPLATES.unshift({id:t.__id,title:t.title,frame:'sq',w:1122,h:1402,art:t.thumb,jnArt:true,artFull:false,middleOnly:!!t.middleOnly,date:t.date||null,sq:{commonFrame:true,headFit:true}});
     }
   });
   if(typeof window.showTpls==='function'){try{window.showTpls()}catch(e){}}
