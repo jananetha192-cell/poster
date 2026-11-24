@@ -36,6 +36,38 @@ function injectHome(items){
     slide.insertBefore(div,slide.firstChild);
   });
   try{if(typeof window.upd==='function')window.upd()}catch(e){}
+  buildTopSlider(items,today);
+}
+
+/* ---- హోమ్ పేజీ: పైన స్లయిడ్‌షో - రాబోయే పోస్టర్లు స్వయంచాలకంగా ---- */
+function buildTopSlider(items,today){
+  var sec=document.getElementById('topslider'),track=document.getElementById('tsTrack'),dots=document.getElementById('tsDots');
+  if(!sec||!track||!dots||track.children.length)return;
+  var up=items.filter(function(t){return t.date&&t.date>today&&t.thumb}).sort(function(a,b){return a.date.localeCompare(b.date)});
+  if(!up.length)return;
+  up.forEach(function(t,i){
+    var a=document.createElement('a');a.className='tsSlide';a.href=studioPage+'?template='+t.__id;
+    a.innerHTML='<span class="tsbadge">రాబోయే</span><img src="'+t.thumb+'" alt="'+t.title+'" loading="'+(i<2?'eager':'lazy')+'"><span class="tstitle">'+t.title+'</span>';
+    track.appendChild(a);
+    var d=document.createElement('i');if(i===0)d.className='on';dots.appendChild(d);
+    d.onclick=function(){track.scrollTo({left:i*track.clientWidth,behavior:'auto'})};
+  });
+  track.style.touchAction='pan-y';
+  sec.style.display='block';
+  var cur=0,timer=null,touching=false;
+  function sync(){cur=Math.round(track.scrollLeft/track.clientWidth);cur=Math.max(0,Math.min(up.length-1,cur));
+    [].forEach.call(dots.children,function(d,j){d.className=j===cur?'on':''})}
+  track.addEventListener('scroll',function(){requestAnimationFrame(sync)});
+  function step(){if(document.hidden||touching)return;
+    var n=cur+1>=up.length?0:cur+1;
+    track.scrollTo({left:n*track.clientWidth,behavior:'smooth'})}
+  function start(){if(timer||up.length<2)return;timer=setInterval(step,1500)}
+  function stop(){if(timer){clearInterval(timer);timer=null}}
+  track.addEventListener('pointerdown',function(){touching=true;stop()});
+  track.addEventListener('pointerup',function(){touching=false;setTimeout(start,3000)});
+  track.addEventListener('pointercancel',function(){touching=false;setTimeout(start,3000)});
+  document.addEventListener('visibilitychange',function(){document.hidden?stop():start()});
+  start();
 }
 
 /* ---- స్టూడియో: టెంప్లేట్ పికర్‌లో చేర్చు + పూర్తి బొమ్మ మార్పు ---- */
