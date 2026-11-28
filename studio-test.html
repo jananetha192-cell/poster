@@ -909,7 +909,7 @@ async function drawCommonFrame(){
     center; with no selection the original template and its baked row paint unchanged */
  if(SEL.length)await FourStyle.setLeadersFromCU(SEL);var ref=await img(ART);var commonTop=await img(F18ER);
  var meIm=ME?ME:null;
- g.drawImage(ref,0,0,W1,H1);g.drawImage(commonTop,0,0,1122,135,0,0,1122,135);
+ if(TPL.middleOnly){g.fillStyle='#ffffff';g.fillRect(0,0,W1,H1);var scM=Math.min(W1/ref.width,1240/ref.height),dwM=Math.round(ref.width*scM),dhM=Math.round(ref.height*scM);g.drawImage(ref,Math.round((W1-dwM)/2),1240-dhM,dwM,dhM)}else{g.drawImage(ref,0,0,W1,H1)}g.drawImage(commonTop,0,0,1122,135,0,0,1122,135);
  if(SEL.length&&$('fsSt').value==='5'){var LDP=leadLayout(SELC.length);
   for(var li=0;li<SELC.length;li++){var lIm=SELC[li];if(lIm)ldCircle(lIm,LDP[li].cx,LDP[li].cy,LDP[li].d)}}
  /* visitor photo: flush bottom-right, rising above the navy bar (same geometry as the approved template).
@@ -1307,6 +1307,6 @@ g.save();g.font='700 '+c[2]+'px "Noto Sans Telugu",sans-serif';g.textAlign='cent
   else document.addEventListener('DOMContentLoaded', showVideo);
 })();
 </script>
-<script src="jn-shared.js"></script><script src="jn-admin-sync.js"></script>
+<script src="jn-shared.js"></script><script src="jn-admin-sync.js"></script><script src="jn-daily.js"></script>
 </body>
      </html>
